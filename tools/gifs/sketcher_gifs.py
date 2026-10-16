@@ -12,7 +12,7 @@ import math
 import os
 import sys
 
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from draw import F_CAP, F_LABEL, W, H, save_gif, ease  # noqa: E402
@@ -75,6 +75,53 @@ def draw_button(base_rgba, icon, pressed):
         base_rgba.alpha_composite(icon, (int(x + (s - icon.width) / 2), int(y + (s - icon.height) / 2)))
 
 
+F_MONO = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 25)
+F_PTXT = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 26)
+F_PTIT = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 26)
+
+
+PANEL_LH = 36
+
+
+def panel_box(d, panel, size):
+    """Where the card goes: right (G-code, reports) or left under the button (model tree)."""
+    Wb, Hb = size
+    font = F_MONO if panel.get("mono", True) else F_PTXT
+    lines = panel["lines"]
+    w = max([d.textlength(panel["title"], font=F_PTIT)] + [d.textlength(x, font=font) for x in lines]) + 48
+    w = min(w, Wb * 0.56)
+    h = 70 + PANEL_LH * len(lines) + 18
+    x0, y0 = (26, 140) if panel.get("pos") == "left" else (Wb - w - 26, 30)
+    return x0, y0, w, h, font
+
+
+def panel_row(d, panel, size, i):
+    x0, y0, w, h, font = panel_box(d, panel, size)
+    return x0 + 22 + min(d.textlength(panel["lines"][i], font=font), 160) * 0.5, y0 + 74 + i * PANEL_LH + PANEL_LH / 2 - 4
+
+
+def draw_panel(d, panel, size):
+    """A card: real G-code lines, a report, a list, or the model tree (pos=left, sel=row)."""
+    if not panel or not panel.get("title"):
+        return
+    lines = panel["lines"]
+    lh = PANEL_LH
+    x0, y0, w, h, font = panel_box(d, panel, size)
+    d.rounded_rectangle([x0 + 4, y0 + 6, x0 + w + 4, y0 + h + 6], 18, fill=(0, 0, 0, 45))
+    d.rounded_rectangle([x0, y0, x0 + w, y0 + h], 18, fill=(255, 255, 255, 250), outline=(203, 213, 225), width=2)
+    d.rounded_rectangle([x0, y0, x0 + w, y0 + 56], 18, fill=(15, 23, 42, 250))
+    d.rectangle([x0, y0 + 36, x0 + w, y0 + 56], fill=(15, 23, 42, 250))
+    d.text((x0 + 22, y0 + 28), panel["title"], font=F_PTIT, fill=(255, 255, 255), anchor="lm")
+    for i, ln in enumerate(lines):
+        if panel.get("sel") == i:
+            d.rounded_rectangle([x0 + 10, y0 + 70 + i * lh - 2, x0 + w - 10, y0 + 70 + (i + 1) * lh - 4], 8,
+                                fill=(209, 250, 229, 255), outline=(16, 185, 129), width=2)
+        col = (225, 29, 72) if ln.startswith("⚠") or "←" in ln else (30, 41, 59)
+        if font is F_MONO and ln[:2] in ("G0", "G1", "G2", "G3", "G8", "G9"):
+            col = (79, 70, 229) if ln[:3] != "G0 " else (16, 120, 90)
+        d.text((x0 + 22, y0 + 74 + i * lh + lh / 2 - 4), ln, font=font, fill=col, anchor="lm")
+
+
 def load(path):
     """Key frame with thicker lines: FreeCAD draws 1 px lines and the GIF is half size."""
     return Image.open(path).convert("RGB").filter(ImageFilter.MinFilter(3))
@@ -92,6 +139,7 @@ def render(rec_dir, out_path):
     if meta.get("icon"):
         icon = Image.open(os.path.join(rec_dir, meta["icon"])).convert("RGBA").resize((64, 64), Image.LANCZOS)
     pressed = [False]
+    panel = [None]
 
     def emit(ms, ring=None, img=None):
         im = (img or base).convert("RGBA")
@@ -101,6 +149,7 @@ def render(rec_dir, out_path):
         d = ImageDraw.Draw(ov)
         if ring is not None:
             draw_ring(d, cur[0], cur[1], ring)
+        draw_panel(d, panel[0], size)
         draw_cursor(d, cur[0], cur[1])
         draw_caption(d, cap[0], cap[1], size)
         im = Image.alpha_composite(im, ov).convert("RGB")
@@ -141,6 +190,21 @@ def render(rec_dir, out_path):
             for k in range(5):
                 emit(60, ring=k / 4)
             emit(350)
+        elif t == "panel":
+            panel[0] = ev if ev.get("title") else None
+            emit(300)
+        elif t == "pick" and panel[0]:
+            # click a row of the card (e.g. the Job in the tree), then show it selected
+            probe = ImageDraw.Draw(Image.new("RGBA", (8, 8)))
+            x1, y1 = panel_row(probe, panel[0], size, ev["row"])
+            x0, y0 = cur
+            for k in range(1, 11):
+                e = ease(k / 10)
+                cur = [x0 + (x1 - x0) * e, y0 + (y1 - y0) * e]
+                emit(FRAME_MS)
+            panel[0] = dict(panel[0], sel=ev["row"])
+            for k in range(5):
+                emit(60, ring=k / 4)
         elif t == "hold":
             emit(ev["ms"])
     emit(1200)
