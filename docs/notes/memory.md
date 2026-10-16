@@ -38,6 +38,10 @@ Short, durable facts for the next Claude session. Details live in the other note
   two stages (short line first, GIF after ~1.5 s).
 - Style he liked: light background, wood-colour stock, blue-grey tool, red = the setting being
   explained, dark caption bar with a Greek sentence (tools/gifs/draw.py holds the palette).
+  v2 palette (he asked "a bit more modern"): wood grain, metallic tools, soft shadows.
+- The Claude app shows only the FIRST FRAME of a GIF: to show him animations, publish an HTML
+  artifact with the GIFs embedded (gallery: https://claude.ai/artifact/UGYx8Sx1bjfUHiosRUoYjw).
+- Accuracy: every help text needs a source in docs/notes/verification.md ("no errors" — Marios).
 - Open question to ask him: which cutters (flat/ball/V-bit) and materials (wood/alu/plastic) he uses,
   so the examples match his work.
 

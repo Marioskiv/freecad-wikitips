@@ -30,20 +30,26 @@ F_CAP = _font("DejaVuSans-Bold.ttf", 12)
 F_BIG = _font("DejaVuSans-Bold.ttf", 14)
 
 # palette (kept in one place so every animation looks the same)
-BG = (250, 250, 247)
-STOCK = (214, 184, 140)
-STOCK_EDGE = (150, 120, 80)
-PART = (176, 190, 205)
-PART_EDGE = (90, 105, 125)
-TOOL = (90, 110, 140)
-SHANK = (70, 80, 95)
-ACTIVE = (215, 55, 40)
-DIM = (125, 125, 125)
-RAPID = (40, 150, 70)
-FEED = (230, 140, 20)
-PATH = (40, 110, 200)
-LEFT = (120, 180, 230)   # material left on purpose (stock to leave)
-CAP_BG = (40, 50, 70)
+# v2 (2026-10-16): same roles Marios liked, slightly more modern (cooler white, richer wood,
+# metallic tools, slate caption bar).
+BG = (247, 248, 250)
+STOCK = (221, 182, 132)
+STOCK_EDGE = (166, 124, 74)
+GRAIN = (205, 162, 110)
+PART = (203, 213, 225)
+PART_EDGE = (100, 116, 139)
+TOOL = (96, 120, 156)
+TOOL_HI = (168, 186, 212)
+SHANK = (61, 72, 92)
+ACTIVE = (228, 52, 70)
+DIM = (140, 152, 170)
+RAPID = (16, 170, 120)
+FEED = (240, 150, 20)
+PATH = (37, 99, 235)
+LEFT = (125, 190, 245)   # material left on purpose (stock to leave)
+CAP_BG = (30, 41, 59)
+WARN_BG = (176, 36, 52)
+SHADOW = (222, 226, 232)
 WHITE = (255, 255, 255)
 
 
@@ -59,8 +65,26 @@ class Frame:
         return [(x * SS, y * SS) for x, y in pts]
 
     def rect(self, x0, y0, x1, y1, fill=None, outline=None, width=1):
+        if fill == STOCK:        # wood gets a soft shadow and grain
+            self.wood(x0, y0, x1, y1, outline)
+            return
         self.d.rectangle([min(x0, x1) * SS, min(y0, y1) * SS, max(x0, x1) * SS, max(y0, y1) * SS],
                          fill=fill, outline=outline, width=width * SS)
+
+    def wood(self, x0, y0, x1, y1, outline=None):
+        x0, x1 = min(x0, x1), max(x0, x1)
+        y0, y1 = min(y0, y1), max(y0, y1)
+        self.d.rounded_rectangle([(x0 + 3) * SS, (y0 + 4) * SS, (x1 + 3) * SS, (y1 + 4) * SS], 3 * SS, fill=SHADOW)
+        self.d.rectangle([x0 * SS, y0 * SS, x1 * SS, y1 * SS], fill=STOCK)
+        k = 0
+        y = y0 + 7
+        while y < y1 - 3:      # gentle wavy grain lines
+            pts = [(x, y + 1.6 * math.sin((x + k * 37) / 23.0)) for x in range(int(x0) + 4, int(x1) - 3, 6)]
+            if len(pts) > 1:
+                self.line(pts, GRAIN, 1)
+            y += 9 + (k % 3) * 3
+            k += 1
+        self.d.rectangle([x0 * SS, y0 * SS, x1 * SS, y1 * SS], outline=outline or STOCK_EDGE, width=SS)
 
     def rrect(self, x0, y0, x1, y1, r, fill=None, outline=None, width=1):
         self.d.rounded_rectangle([x0 * SS, y0 * SS, x1 * SS, y1 * SS], r * SS,
@@ -110,8 +134,9 @@ class Frame:
         self.d.text((x * SS, y * SS), s, fill=fill, font=font, anchor=anchor)
 
     def caption(self, s, warn=False):
-        self.rect(0, H - CAP_H, W, H, fill=(150, 40, 30) if warn else CAP_BG)
-        self.text(10, H - CAP_H / 2, s, fill=WHITE, font=F_CAP, anchor="lm")
+        self.rect(0, H - CAP_H, W, H, fill=WARN_BG if warn else CAP_BG)
+        self.rect(0, H - CAP_H, 4, H, fill=ACTIVE if not warn else (255, 210, 120))
+        self.text(12, H - CAP_H / 2, s, fill=WHITE, font=F_CAP, anchor="lm")
 
     def title(self, s, color=CAP_BG):
         self.text(8, 6, s, fill=color, font=F_BIG)
@@ -120,25 +145,38 @@ class Frame:
     def endmill_side(self, x, ytip, d=18, flute_len=34, color=TOOL):
         """Flat end mill seen from the side, tip centre at (x, ytip)."""
         r = d / 2
-        self.rect(x - r, ytip - flute_len, x + r, ytip, fill=color)
+        self.metal(x - r, ytip - flute_len, x + r, ytip, color)
         for k in range(int(flute_len / 9)):
             yy = ytip - 4 - k * 9
-            self.line([(x - r, yy), (x + r, yy - 5)], (165, 180, 205), 1.5)
-        self.rect(x - r * 0.7, ytip - flute_len - 16, x + r * 0.7, ytip - flute_len, fill=SHANK)
+            self.line([(x - r, yy), (x + r, yy - 5)], TOOL_HI, 1.5)
+        self.metal(x - r * 0.7, ytip - flute_len - 16, x + r * 0.7, ytip - flute_len, SHANK)
+
+    def metal(self, x0, y0, x1, y1, color):
+        """Rectangle shaded like a round bar lit from the left."""
+        w = x1 - x0
+        n = max(2, int(w * SS))
+        for i in range(n):
+            t = i / (n - 1)
+            k = 1.0 - abs(t - 0.32) * 1.3          # highlight left of centre
+            c = tuple(int(min(255, ch + 70 * max(0.0, k) - 25)) for ch in color)
+            xx = x0 * SS + i
+            self.d.line([(xx, y0 * SS), (xx, y1 * SS)], fill=c)
 
     def drill_side(self, x, ytip, d=14, length=36):
         r = d / 2
         tip = r * 0.6
         self.poly([(x - r, ytip - tip), (x + r, ytip - tip), (x, ytip)], fill=TOOL)
-        self.rect(x - r, ytip - length, x + r, ytip - tip, fill=TOOL)
+        self.metal(x - r, ytip - length, x + r, ytip - tip, TOOL)
         for k in range(int((length - tip) / 9)):
             yy = ytip - tip - 4 - k * 9
-            self.line([(x - r, yy), (x + r, yy - 6)], (165, 180, 205), 1.5)
-        self.rect(x - r * 0.7, ytip - length - 14, x + r * 0.7, ytip - length, fill=SHANK)
+            self.line([(x - r, yy), (x + r, yy - 6)], TOOL_HI, 1.5)
+        self.metal(x - r * 0.7, ytip - length - 14, x + r * 0.7, ytip - length, SHANK)
 
     def tool_top(self, cx, cy, r, angle=0.0, color=TOOL, alpha_ring=True):
         """End mill seen from above, with 2 flutes rotated by `angle` (radians)."""
+        self.circle(cx + 2, cy + 3, r, fill=SHADOW)
         self.circle(cx, cy, r, fill=color, outline=SHANK, width=1)
+        self.circle(cx - r * 0.3, cy - r * 0.3, r * 0.45, fill=TOOL_HI)
         for k in range(2):
             a = angle + k * math.pi
             self.line([(cx, cy), (cx + r * 0.95 * math.cos(a), cy + r * 0.95 * math.sin(a))],

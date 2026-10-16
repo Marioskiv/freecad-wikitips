@@ -190,7 +190,7 @@ def step_down():
         "down_rapid": "Ολικό βάθος 12 mm, Step Down 4 mm → 3 περάσματα",
         "layer": "Πέρασμα {n} από {N}: κατεβαίνει {dz} mm (Step Down)",
         "bottom": "Μικρότερο Step Down = πιο αργά αλλά πιο ήπια για τη φρέζα",
-        "end": "Ξύλο/MDF με φρέζα 6 mm: συνήθως 2–6 mm ανά πέρασμα"},
+        "end": "Για αρχή: μισή διάμετρο (φρέζα 6 mm → 3 mm ανά πέρασμα)"},
         layers=(-4.0, -8.0, -12.0), extra=step_bracket)
 
 
@@ -439,26 +439,42 @@ def facing_patterns():
 def pattern_angle():
     fr = []
     cx, cy = (TX0 + TX1) / 2, (TY0 + TY1) / 2
-    for ang in (0, 45, 90):
+
+    def scene(ang, tool_t=None, cap=""):
         a = math.radians(ang)
         f = Frame()
-        face_base(f, "Angle %d°" % ang)
-        L = 200
-        k = -8
-        while k <= 8:
+        face_base(f)
+        L, k = 220, -9
+        while k <= 9:
             ox, oy = -math.sin(a) * k * 13, math.cos(a) * k * 13
-            p0 = (cx + ox - math.cos(a) * L, cy + oy - math.sin(a) * L)
-            p1 = (cx + ox + math.cos(a) * L, cy + oy + math.sin(a) * L)
-            f.line([p0, p1], PATH, 1.5)
+            f.line([(cx + ox - math.cos(a) * L, cy + oy - math.sin(a) * L),
+                    (cx + ox + math.cos(a) * L, cy + oy + math.sin(a) * L)], PATH, 1.5)
             k += 1
-        f.rect(0, 0, TX0, H, fill=BG)
-        f.rect(TX1, 0, W, H, fill=BG)
-        f.rect(0, 0, W, TY0, fill=BG)
-        f.rect(0, TY1, W, H, fill=BG)
+        # mask everything outside the face, then frame it again
+        f.d.rectangle([0, 0, TX0 * 2 - 1, H * 2], fill=BG)
+        f.d.rectangle([TX1 * 2 + 1, 0, W * 2, H * 2], fill=BG)
+        f.d.rectangle([0, 0, W * 2, TY0 * 2 - 1], fill=BG)
+        f.d.rectangle([0, TY1 * 2 + 1, W * 2, H * 2], fill=BG)
         f.rect(TX0, TY0, TX1, TY1, outline=STOCK_EDGE)
-        f.tag(TX1 + 8, TY0, "Angle %d°" % ang)
-        f.caption("Angle: γυρίζει τις γραμμές του μοτίβου κατά %d°" % ang)
-        fr.append((f, 1300))
+        # angle gauge
+        gx, gy = TX1 + 52, TY0 + 52
+        f.line([(gx - 34, gy), (gx + 34, gy)], DIM, 1)
+        f.arc(gx, gy, 26, -ang, 0, ACTIVE, 3) if ang > 0 else None
+        f.line([(gx, gy), (gx + 34 * math.cos(-a), gy + 34 * math.sin(-a))], ACTIVE, 3)
+        f.text(gx, gy + 22, "%d°" % round(ang), fill=ACTIVE, font=F_LABEL, anchor="mm")
+        if tool_t is not None:   # tool running along the middle line
+            d = (tool_t - 0.5) * 2 * 110
+            f.tool_top(cx + math.cos(a) * d, cy + math.sin(a) * d, R_TOP, angle=tool_t * 20)
+        f.caption(cap)
+        return f
+
+    for stop, nxt in ((0, 45), (45, 90), (90, 0)):
+        for i in range(11):
+            fr.append((scene(stop, i / 10, "Angle %d°: οι γραμμές του μοτίβου πάνε έτσι" % stop), 70))
+        steps = 12
+        for i in range(1, steps + 1):
+            ang = lerp(stop, nxt, ease(i / steps)) if nxt else lerp(stop, 0, ease(i / steps))
+            fr.append((scene(ang, None, "Αλλάζοντας το Angle γυρίζουν όλες οι γραμμές"), 60))
     return fr
 
 
@@ -715,8 +731,14 @@ def peck():
         f.dashed(HOLE_X - 40, zy(R), HOLE_X + 40, zy(R), PATH, 1.5)
         f.text(HOLE_X + 44, zy(R), "R", fill=PATH, font=F_LABEL, anchor="lm")
     fr.append((drill_scene(("final",), LEVELS["safe"], 0, "Peck: τρυπάει λίγο-λίγο και βγαίνει να καθαρίσει", extra=rline), 1600))
+    first = True
     while depth > LEVELS["final"]:
         nd = max(LEVELS["final"], depth - q)
+        if not first:   # G83: rapid back down to just above the last depth, then feed again
+            for i in range(4):
+                fr.append((drill_scene(("final",), lerp(R, depth + 0.3, ease(i / 3)), depth,
+                                       "Γρήγορα κάτω ως λίγο πάνω από το προηγούμενο βάθος", extra=rline), 60))
+        first = False
         for i in range(6):
             fr.append((drill_scene(("final",), lerp(depth, nd, i / 5), min(depth, lerp(depth, nd, i / 5)),
                                    "Κατεβαίνει %g mm (Peck depth)" % q, extra=rline), 70))
@@ -746,16 +768,49 @@ def dwell():
     return fr
 
 
+def drilled(f, bottom, d=14):
+    """Hole made by a drill whose tip reached `bottom` (cone at the bottom)."""
+    r = d / 2
+    tip = r * 0.6
+    yb = zy(bottom)
+    f.poly([(HOLE_X - r, zy(0)), (HOLE_X + r, zy(0)), (HOLE_X + r, yb - tip), (HOLE_X, yb),
+            (HOLE_X - r, yb - tip)], fill=BG)
+
+
 @gif("drill_extra_offset")
 def drill_extra_offset():
     fr = []
+    fin, extra = LEVELS["final"], -1.6
+    cap1 = "Το τρυπάνι έχει μύτη (κώνο) στην άκρη"
 
-    def tipline(f):
-        f.dashed(HOLE_X - 30, zy(LEVELS["final"] - 1.2), HOLE_X + 30, zy(LEVELS["final"] - 1.2), PATH, 1.5)
-    fr.append((drill_scene(("final",), LEVELS["final"], LEVELS["final"],
-                           "Το τρυπάνι έχει μύτη: στο Final Depth η τρύπα στενεύει"), 2200))
-    fr.append((drill_scene(("final",), LEVELS["final"] - 1.2, LEVELS["final"] - 1.2,
-                           "Extra Offset: πάει λίγο πιο βαθιά → πλήρης διάμετρος", extra=tipline), 2400))
+    def at(z, cap, marks=None, warn=False):
+        def ex(f):
+            drilled(f, min(0, z))
+            if marks:
+                marks(f)
+        return drill_scene(("final",), z, 0, cap, warn, extra=ex)
+
+    def narrow(f):   # red marks where the hole is narrower than the drill at Final Depth
+        y = zy(fin)
+        f.line([(HOLE_X - 7, y - 4), (HOLE_X - 2, y + 1)], ACTIVE, 2.5)
+        f.line([(HOLE_X + 7, y - 4), (HOLE_X + 2, y + 1)], ACTIVE, 2.5)
+        f.tag(HOLE_X + 26, y - 26, "εδώ στενεύει", fill=ACTIVE)
+
+    def full(f):
+        y = zy(fin)
+        f.line([(HOLE_X - 7, y), (HOLE_X + 7, y)], RAPID, 3)
+        f.tag(HOLE_X + 26, y - 26, "πλήρης διάμετρος ✓", fill=RAPID)
+        f.dashed(HOLE_X - 34, zy(fin + extra), HOLE_X + 34, zy(fin + extra), PATH, 1.5)
+        f.text(HOLE_X + 38, zy(fin + extra), "+Extra Offset", fill=PATH, font=F_SMALL, anchor="lm")
+
+    for i in range(10):
+        fr.append((at(lerp(LEVELS["safe"], fin, i / 9), cap1), 70))
+    fr.append((at(fin, "Στο Final Depth η τρύπα στενεύει προς τα κάτω", narrow, True), 2000))
+    for i in range(8):
+        fr.append((at(lerp(LEVELS["safe"], 0, i / 7), "Extra Offset: ίδια τρύπα, λίγο πιο βαθιά"), 50))
+    for i in range(10):
+        fr.append((at(lerp(0, fin + extra, i / 9), "Extra Offset: ίδια τρύπα, λίγο πιο βαθιά"), 70))
+    fr.append((at(fin + extra, "Η μύτη περνά πιο κάτω → σωστή διάμετρος στο βάθος", full), 2400))
     return fr
 
 
@@ -763,16 +818,31 @@ def drill_extra_offset():
 def peck_retract():
     fr = []
     R = 2.0
+    show = ("clear", "safe", "start", "final")
 
     def rline(f):
         f.dashed(HOLE_X - 50, zy(R), HOLE_X + 50, zy(R), ACTIVE, 2)
         f.text(HOLE_X + 54, zy(R), "Peck Retract (R)", fill=ACTIVE, font=F_LABEL, anchor="lm")
+
+    def fr_(z, depth, cap):
+        return drill_scene((), z, depth, cap, extra=rline, show=show)
+
     for i in range(6):
-        fr.append((drill_scene((), lerp(-6, R, i / 5), -6, "Peck Retract: πόσο ανεβαίνει ανάμεσα στα «τσιμπήματα»",
-                               extra=rline, show=("clear", "safe", "final")), 80))
-    fr.append((fr[-1][0], 2000))
-    fr.append((drill_scene((), R, -6, "Λίγο πάνω από το υλικό αρκεί (π.χ. 1–2 mm)", extra=rline,
-                           show=("clear", "safe", "final")), 2000))
+        fr.append((fr_(lerp(LEVELS["clear"], R, ease(i / 5)), 0, "Πρώτα γρήγορα κάτω ως το R"), 70))
+    fr.append((fr_(R, 0, "R = λίγο πάνω από το υλικό (συνήθως 1–2 mm)"), 1200))
+    depth = 0.0
+    for nd in (-4.0, -8.0, -12.0):
+        if depth < 0:
+            for i in range(4):
+                fr.append((fr_(lerp(R, depth + 0.3, ease(i / 3)), depth, "Ξανά κάτω, γρήγορα ως το προηγούμενο βάθος"), 60))
+        for i in range(6):
+            z = lerp(depth, nd, i / 5)
+            fr.append((fr_(z, min(0, z), "Τρυπάει αργά 4 mm"), 70))
+        depth = nd
+        for i in range(5):
+            fr.append((fr_(lerp(depth, R, ease(i / 4)), depth, "Βγαίνει ως το R (όχι πιο ψηλά) → κερδίζει χρόνο"), 60))
+        fr.append((fr[-1][0], 300))
+    fr.append((fr_(R, depth, "Δεν είναι το Safe Height της εργασίας"), 2200))
     return fr
 
 

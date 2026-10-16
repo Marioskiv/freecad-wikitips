@@ -24,6 +24,14 @@
   ask about his cutters and materials; Fusion names in fields_el.json are from Claude's knowledge
   (Fusion help pages checked only for the heights) — verify the rest if possible.
 - Next (PR 3): GIFs for unusual Part/PartDesign buttons (Binders, Boolean, Clone, Datums...).
+- Later the same day: Marios saw only still images in the Claude app (it shows the first frame);
+  published a private gallery artifact so he can see them move. He asked for: more motion in
+  pattern_angle / drill_extra_offset / peck_retract (done), slightly more modern colours (done:
+  palette v2 in draw.py — wood grain, metallic tools, shadows, slate caption bar), deeper study
+  of other CAD/CAM docs and no errors (docs/notes/verification.md). Corrections from the study:
+  Step Down guidance (½·D to 1·D), plunge < ½ feed, removed unverified feed numbers, Step Over
+  warning (>70–80 %), Min Travel wording, peck animation now shows the rapid back down (G83).
+  Asked about Sketcher: not done yet → next PR.
 
 ## 2026-10-11 → 2026-10-16 (Cowork, one long conversation)
 
