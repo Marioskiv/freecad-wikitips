@@ -42,6 +42,9 @@
 - YouTube is blocked in the container (no youtube.com/youtu.be); videos must be uploaded as files.
 - Marios gave standing permission to merge PRs into main; PR 3 and PR 4 merged by Claude.
   Pending: more colour contrast in the CAM animations (later).
+- PR 6: Part / Part Design unusual buttons (11 commands) with 3D recordings from real FreeCAD,
+  short Greek texts checked against the wiki (Part Cut order, Linear Pattern Length = first→last).
+  Tests ALL PASS; merged by Claude.
 - Feedback round: "fewer words, the mouse should show the right way; CAM colours not nice (the
   brown wood)". Done on PR 4: palette v4 (slate block), all CAM captions shortened to 2–5 words,
   Sketcher GIFs now begin with the press of the real toolbar icon, popups cut to one sentence +

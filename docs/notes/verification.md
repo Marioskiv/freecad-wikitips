@@ -69,3 +69,17 @@ describes tool-first, the way the animations show it.
 Layout idea (numbered steps under the animation, "how to select" / "where useful" / tip boxes,
 shortcut badge) came from a screenshot of another program's help (MDJ Works) shown by Marios;
 drawn in our own colours, nothing copied.
+
+# Part / Part Design help, checked 2026-10-16 (FreeCAD 26.3 wiki pages)
+
+| Command | Checked statement | Verdict |
+|---|---|---|
+| Part_Cut | "the last one being subtracted from the first one" → order matters | ✔ wiki |
+| Part_Fuse / Part_Common | two (or more for Fuse) shapes; Common = intersection | ✔ wiki |
+| Part_Section | intersection wires/points; "selection order has no impact on the result" | ✔ wiki |
+| PartDesign_Mirrored / Linear / Polar | select feature(s), parameters (plane, axis, Length, Occurrences) in the task panel; Linear Length = first to last occurrence, Occurrences include the original | ✔ wiki |
+| PartDesign_Boolean | activate the receiving body, do not select it; Add Body, pick the other; Fuse/Cut/Common | ✔ wiki |
+| PartDesign_Plane | only inside a Body; Z offset is normal to the plane | ✔ wiki |
+| PartDesign_SubShapeBinder | references geometry of other bodies; using external geometry directly in a Body gives out-of-scope errors | ✔ wiki (ShapeBinder/SubShapeBinder pages) |
+| PartDesign_Clone | linked copy following edits except placement, created inside a separate Body | ✔ wiki |
+| Clone animation | the copy is drawn with a plain Part copy placed beside (same look as a moved clone) | visual only |
