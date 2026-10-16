@@ -7,8 +7,14 @@ Short, durable facts for the next Claude session. Details live in the other note
 - Answer in **Greek script**, simple words. He is not a programmer and does not know CAD/CAM well:
   explain *why*, not just *what*. He wants professional, carefully researched work.
 - **Ask before** changing, copying or deleting any file, and before commit/push.
-- **Workflow = Pull Requests** (decided 2026-10-16): every change goes on its own branch
-  → PR → he reads it on GitHub and presses *Merge*. Never push to `main` directly.
+- **Workflow = Pull Requests** (decided 2026-10-16): every change goes on its own branch → PR.
+  **Since 2026-10-16 Marios lets Claude merge the PRs into `main` himself** ("I don't know which
+  to merge; you have my permission to put it on main"): merge only after the real-FreeCAD tests
+  say ALL PASS, base every PR on `main`, merge in order. Still never push to `main` directly.
+
+## Pending (do later, he asked to wait)
+- CAM animations: **more colour contrast** (he likes the v4 look, but the stock/tool/paths need
+  stronger contrast). Ideas: darker stock edge + darker tool, stronger path colour, darker labels.
 - Repo: `Marioskiv/freecad-wikitips` (private). Created by Marios by hand on github.com because
   Claude's GitHub app cannot create repositories (403). Attach it with `add_repo` (push access).
 - Scope: ONLY the WikiTips FreeCAD addon. His other projects (e.g. polar-cnc-converter) are separate.
