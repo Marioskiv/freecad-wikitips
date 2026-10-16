@@ -1,5 +1,20 @@
 # Session log
 
+## 2026-10-16 (Claude Code cloud session, second)
+- Repo published: Marios created `Marioskiv/freecad-wikitips` (private) by hand; Claude pushed the
+  v0.2.0 commit to `main`. Workflow agreed: PRs only.
+- Installed FreeCAD 26.3.0 (conda-forge, Linux) in the cloud container and ran WikiTips in it for
+  the first time in a real FreeCAD. Found: Python dropdown groups (Part offset/compound/join/split,
+  CAM drilling/post/sim/engrave/dressup) and Undo/Redo showed no popup; long texts made popups up to
+  690 px tall. Fixed on branch `fix/real-freecad-groups` (PR 1); added `tests/freecad_gui_test.py`
+  (PASS) and `docs/notes/memory.md`.
+- Researched GIF sources (see addon-research.md); made two prototypes Marios liked: PartDesign Pad
+  (scripted FreeCAD frames) and CAM heights/depths (drawn diagram with Greek captions).
+- Marios asked for: GIFs (preferred), help for unusual buttons, help on every dialog field (CAM
+  depths/heights/stepover..., 3D ops), careful study, re-use of licensed material.
+- Open: Marios has not installed it on Windows yet (needs the Mod path from the Python console);
+  ask about his cutters and materials.
+
 ## 2026-10-11 → 2026-10-16 (Cowork, one long conversation)
 
 Solved FreeCAD problems (details in `freecad-findings.md`):
