@@ -51,6 +51,12 @@ Global toolbar "WikiTips" with an on/off command `WikiTips_Toggle`
   pressed first (icon saved by sketcher_rec.py from Gui.Command.get(name).getAction()).
 - Popups are short by design: commands = d + selw (⚠) + uses; fields = d + w + Fusion name.
 
+## Part / Part Design help (PR 6)
+- 11 more commands in content/commands_el.json: Part_Cut/Fuse/Common/Section, PartDesign_Mirrored,
+  PolarPattern, LinearPattern, Boolean, Plane, SubShapeBinder, Clone. Animations recorded in real
+  FreeCAD 3D view by `tools/gifs/part_rec.py` (same events.json → sketcher_gifs.py), in
+  content/img/part (~0.6 MB). Part booleans show "click, Ctrl+click, press button".
+
 ## Data pipeline (tools/)
 - Primary source: https://github.com/Reqrefusion/FreeCAD-Documentation-html (offline copy of the
   live wiki, all languages, updated daily, ~1.8 GB). Pages = `wiki/<Command>.html`, images
