@@ -42,6 +42,13 @@ Short, durable facts for the next Claude session. Details live in the other note
 - The Claude app shows only the FIRST FRAME of a GIF: to show him animations, publish an HTML
   artifact with the GIFs embedded (gallery: https://claude.ai/artifact/UGYx8Sx1bjfUHiosRUoYjw).
 - Accuracy: every help text needs a source in docs/notes/verification.md ("no errors" — Marios).
+- Popup layout he liked (from MDJ Works screenshots): animation from the real app with cursor +
+  click ring + numbered Greek step badge; then "what it does", "ΠΩΣ ΕΠΙΛΕΓΕΙΣ", "ΠΟΥ ΧΡΗΣΙΜΕΥΕΙ",
+  💡 tip, shortcut badge. Implemented for commands in content/commands_el.json.
+- PRs: base each PR on `main` (PR 2 once got merged into the PR 1 branch by mistake).
+- He wants modern colours: palette v3 (draw.py) for drawn GIFs, light theme for FreeCAD recordings
+  (sketcher_rec.py THEME).
+- Videos: YouTube is blocked here; ask him to upload the file (frames can then be extracted).
 - Open question to ask him: which cutters (flat/ball/V-bit) and materials (wood/alu/plastic) he uses,
   so the examples match his work.
 

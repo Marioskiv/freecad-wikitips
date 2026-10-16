@@ -38,3 +38,34 @@ then vendor documentation; forum posts only as supporting evidence. Update this 
 - Not reachable from the cloud container: linuxcnc.org, camotics.org, docs.grid.space,
   docs.carbide3d.com, estlcam.de, vectric.com (DNS/proxy). Their GitHub sources were used instead
   where they exist. CAMotics/jscut/bCNC repos reachable but not yet read.
+
+# Sketcher help (content/commands_el.json), checked 2026-10-16
+
+Source for every row: the FreeCAD wiki page of the command (26.3 text, from the Reqrefusion mirror),
+"Usage" section. FreeCAD has two ways to start a constraint: tool first ("continue mode", the
+order often matters) or selection first ("run-once mode", usually any order). Our "Πώς επιλέγεις"
+describes tool-first, the way the animations show it.
+
+| Command | Checked statement | Verdict |
+|---|---|---|
+| ConstrainSymmetric | tool first: two points, then the symmetry point/line, in that order; select first: two points + line in any order | ✔ wiki |
+| ConstrainHorVer | line or two points; horizontal or vertical, whichever is closest | ✔ wiki |
+| ConstrainParallel | two lines; select-first allows more lines | ✔ wiki |
+| ConstrainPerpendicular | two edges (one a line); also point+2 edges | ✔ wiki |
+| ConstrainTangent | two edges; two lines → collinear; endpoints → joined + tangent | ✔ wiki |
+| ConstrainEqual | same type of edges; several with select-first | ✔ wiki |
+| ConstrainCoincidentUnified | two points join; point+edge → on the edge; two circles → concentric | ✔ wiki |
+| ConstrainLock | one point → H+V dimensions from the origin; several points → from the LAST point | ✔ wiki (our first text said "first point": corrected) |
+| Dimension | context-sensitive; M cycles types; the 2nd click position chooses horizontal/vertical/distance | ✔ wiki |
+| ConstrainAngle | two lines, or one line vs. X axis (select first), or arc aperture; negative value reverses | ✔ wiki |
+| CreateRectangle | M modes, U rounded corners, J frame | ✔ wiki; shortcut G,R from the 26.3 tooltip |
+| CreateCircle / CreateArc | M → 3 rim points | ✔ wiki |
+| CreatePolyline | M = next segment arc, F = fillet option, close by snapping to the start, right click/Esc = open | ✔ wiki |
+| Trimming | no pre-selection; hold-and-drag; constraints transferred | ✔ wiki |
+| CreateFillet | no pre-selection; M = chamfer; radius from the shortest edge (corner pick) or from the first click (two edges) | ✔ wiki (first text said "depends where you click": made exact) |
+| ToggleConstruction | selection → toggles geometry; no selection → toggles creation mode | ✔ wiki |
+| Symmetric of the two ends of an already horizontal line about the V axis is redundant | seen in our own scripted test (orange = redundant); NOT checked in the GUI tool → not written in the help | — |
+
+Layout idea (numbered steps under the animation, "how to select" / "where useful" / tip boxes,
+shortcut badge) came from a screenshot of another program's help (MDJ Works) shown by Marios;
+drawn in our own colours, nothing copied.

@@ -32,6 +32,14 @@
   Step Down guidance (½·D to 1·D), plunge < ½ feed, removed unverified feed numbers, Step Over
   warning (>70–80 %), Min Travel wording, peck animation now shows the rapid back down (G83).
   Asked about Sketcher: not done yet → next PR.
+- PR 2 was merged into the PR 1 branch (base not retargeted after PR 1 merged) → opened PR 3
+  (same branch → main). LESSON: base every PR on main, or retarget before asking for Merge.
+- Marios showed screenshots of MDJ Works help (Swedish): animation from the real app with cursor,
+  numbered steps, "how to select" / "how to use" boxes, tip, shortcut badge. Built PR 4
+  (feature/sketcher-help): that layout in our style + 17 Sketcher animations recorded in real
+  FreeCAD + Greek texts checked against the wiki (Lock text corrected), CAM GIFs restyled
+  (palette v3). Tests ALL PASS (1920x1200 and 1366x768 screens).
+- YouTube is blocked in the container (no youtube.com/youtu.be); videos must be uploaded as files.
 
 ## 2026-10-11 → 2026-10-16 (Cowork, one long conversation)
 

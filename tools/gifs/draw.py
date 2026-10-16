@@ -32,7 +32,7 @@ F_BIG = _font("DejaVuSans-Bold.ttf", 14)
 # palette (kept in one place so every animation looks the same)
 # v2 (2026-10-16): same roles Marios liked, slightly more modern (cooler white, richer wood,
 # metallic tools, slate caption bar).
-BG = (247, 248, 250)
+BG = (244, 246, 250)          # same as the Sketcher recordings
 STOCK = (221, 182, 132)
 STOCK_EDGE = (166, 124, 74)
 GRAIN = (205, 162, 110)
@@ -41,14 +41,15 @@ PART_EDGE = (100, 116, 139)
 TOOL = (96, 120, 156)
 TOOL_HI = (168, 186, 212)
 SHANK = (61, 72, 92)
-ACTIVE = (228, 52, 70)
-DIM = (140, 152, 170)
+ACTIVE = (225, 29, 72)        # rose: the setting being explained
+DIM = (148, 163, 184)
 RAPID = (16, 170, 120)
 FEED = (240, 150, 20)
 PATH = (37, 99, 235)
 LEFT = (125, 190, 245)   # material left on purpose (stock to leave)
-CAP_BG = (30, 41, 59)
-WARN_BG = (176, 36, 52)
+CAP_BG = (15, 23, 42)         # caption pill (slate 900)
+WARN_BG = (190, 18, 60)
+AMBER = (245, 158, 11)
 SHADOW = (222, 226, 232)
 WHITE = (255, 255, 255)
 
@@ -134,9 +135,17 @@ class Frame:
         self.d.text((x * SS, y * SS), s, fill=fill, font=font, anchor=anchor)
 
     def caption(self, s, warn=False):
-        self.rect(0, H - CAP_H, W, H, fill=WARN_BG if warn else CAP_BG)
-        self.rect(0, H - CAP_H, 4, H, fill=ACTIVE if not warn else (255, 210, 120))
-        self.text(12, H - CAP_H / 2, s, fill=WHITE, font=F_CAP, anchor="lm")
+        """Floating rounded caption, like the Sketcher animations."""
+        font = F_CAP
+        tw = self.d.textlength(s, font=font) / SS
+        if tw > W - 44:
+            font = F_LABEL
+            tw = self.d.textlength(s, font=font) / SS
+        w = min(W - 12, tw + 34)
+        x0, y0, h = (W - w) / 2, H - CAP_H + 4, CAP_H - 8
+        self.rrect(x0, y0, x0 + w, y0 + h, h / 2, fill=WARN_BG if warn else CAP_BG)
+        self.circle(x0 + 12, y0 + h / 2, 4, fill=(255, 210, 120) if warn else AMBER)
+        self.text(x0 + 22, y0 + h / 2, s, fill=WHITE, font=font, anchor="lm")
 
     def title(self, s, color=CAP_BG):
         self.text(8, 6, s, fill=color, font=F_BIG)

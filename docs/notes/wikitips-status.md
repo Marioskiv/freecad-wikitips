@@ -38,6 +38,17 @@ Global toolbar "WikiTips" with an on/off command `WikiTips_Toggle`
 - Covered: CAM Profile, Pocket Shape, MillFacing, Adaptive, Drilling (+ Helix/Engrave fields).
   3D Surface/Waterline commands do not exist in this build (need experimental/OCL) — not done.
 
+## Greek help for commands (branch feature/sketcher-help, PR 4)
+- `content/commands_el.json`: hand-written Greek help for 17 Sketcher commands, overriding the
+  English wiki text (menu path kept). Sections: d (what), sel/selw (how to select), uses (where
+  useful), tip; rendered by `sections_html()`; shortcut shown as a badge in the header. On small
+  screens the popup drops "uses" and "tip" if it would not fit (`compact`).
+- `content/img/sketcher/*.gif`: 17 animations recorded in REAL FreeCAD 26.3
+  (`tools/gifs/sketcher_rec.py`, light theme via View preferences) and composed with cursor,
+  click rings and numbered step badges (`tools/gifs/sketcher_gifs.py`). ~0.9 MB.
+- All GIFs (CAM + Sketcher) share one look: background #F4F6FA, floating slate caption pill,
+  amber accents (palette v3, draw.py).
+
 ## Data pipeline (tools/)
 - Primary source: https://github.com/Reqrefusion/FreeCAD-Documentation-html (offline copy of the
   live wiki, all languages, updated daily, ~1.8 GB). Pages = `wiki/<Command>.html`, images

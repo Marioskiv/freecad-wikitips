@@ -28,7 +28,9 @@ os.makedirs(OUT, exist_ok=True)
 WORKBENCHES = ["SketcherWorkbench", "PartDesignWorkbench", "PartWorkbench", "CAMWorkbench"]
 POPUPS = {  # button (defaultAction objectName) -> expected command
     "Sketcher_CompCreateArc": None, "Sketcher_CompCreateRectangles": None,
-    "Sketcher_CompDimensionTools": None, "Sketcher_CompExternal": "Sketcher_Projection",
+    "Sketcher_CompDimensionTools": "Sketcher_Dimension", "Sketcher_CompExternal": "Sketcher_Projection",
+    "Sketcher_ConstrainSymmetric": "Sketcher_ConstrainSymmetric", "Sketcher_CompHorVer": "Sketcher_ConstrainHorVer",
+    "Sketcher_CompCurveEdition": "Sketcher_Trimming", "Sketcher_ConstrainTangent": "Sketcher_ConstrainTangent",
     "PartDesign_Pad": "PartDesign_Pad", "PartDesign_Pocket": "PartDesign_Pocket",
     "PartDesign_CompPrimitiveAdditive": None, "PartDesign_SubShapeBinder": "PartDesign_SubShapeBinder",
     "Part_Boolean": "Part_Boolean", "Part_CompOffset": "Part_Offset",
