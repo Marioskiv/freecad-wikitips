@@ -25,6 +25,19 @@ Global toolbar "WikiTips" with an on/off command `WikiTips_Toggle`
   scaled. Hidden on Leave/press/wheel/hide of the owner and by a 250 ms cursor-position check.
 - `eventFilter` wraps everything in try/except → never disturbs FreeCAD.
 
+## Field help in dialogs (branch feature/cam-field-help, PR 2)
+- `content/fields_el.json` (hand-written, Greek): 72 fields keyed by Qt objectName; `Op:name`
+  overrides per operation (Op = module of the edited object's Proxy, e.g. `MillFacing:clearingPattern`).
+  Keys: t title, d text, w warning, f Fusion 360 name, i animation (content/img/...).
+- `content/img/cam/*.gif`: 25 animations (2.3 MB) drawn by `tools/gifs/cam_gifs.py` + `draw.py`.
+  Example situation: 6 mm flat end mill, wood/MDF, 12 mm pocket.
+- `FieldWatcher` (150 ms timer, only while `Gui.Control.activeDialog()`): widget under cursor →
+  objectName (or parents up to 3, for spin-box line edits; or the field next to a QLabel) → after
+  450 ms rest shows the popup; the field's English tooltip is moved into the popup (small, gray).
+  The popup stores only a screen rect. No event filters on dialog widgets (crash lesson, memory.md).
+- Covered: CAM Profile, Pocket Shape, MillFacing, Adaptive, Drilling (+ Helix/Engrave fields).
+  3D Surface/Waterline commands do not exist in this build (need experimental/OCL) — not done.
+
 ## Data pipeline (tools/)
 - Primary source: https://github.com/Reqrefusion/FreeCAD-Documentation-html (offline copy of the
   live wiki, all languages, updated daily, ~1.8 GB). Pages = `wiki/<Command>.html`, images
@@ -52,6 +65,9 @@ Text is English (wiki has no Greek translation).
   Sketcher 54, PartDesign 68, Part 57, CAM 44 visible buttons: all have an entry except
   CAM_MillFacing and CAM_OperationCopy (new in 26.3, no wiki page yet).
   Not yet seen on Windows — Marios still has to install and confirm.
+- PR 2, real FreeCAD 26.3: `tests/run_freecad_tests.sh` ALL PASS — popups on 20/26 Profile,
+  24/27 Pocket Shape, 21/22 MillFacing, 30/32 Adaptive, 24/26 Drilling visible fields (the rest
+  are hidden/zero-size in the test layout), toolbars of 4 workbenches PASS.
 - Offline test with PySide6 6.12 and a mock FreeCAD main window that mimics FreeCAD's real
   structures (objectName per command, dropdown group + button menu): popups for normal commands,
   CAM_/Path_ alias, dropdown group, unknown command falls back, toggle off/on, light and dark palette.
