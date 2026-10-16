@@ -27,6 +27,7 @@
 | `data/` | `commands.json` + σμικρυμένες εικόνες (παράγονται, μην τα αλλάζεις με το χέρι) |
 | `tools/build_data.sh` | ξαναφτιάχνει το `data/` από το wiki (κατεβάζει ~2 GB) |
 | `tests/run_popup_test.py` | δοκιμή χωρίς FreeCAD, με ψεύτικο παράθυρο (PySide6, offscreen) |
+| `tests/freecad_gui_test.py` | δοκιμή μέσα σε πραγματικό FreeCAD (`xvfb-run -a freecad tests/freecad_gui_test.py`) |
 | `docs/notes/` | σημειώσεις εργασίας και έρευνας (για τον Claude και για σένα) |
 
 Δοκιμή:

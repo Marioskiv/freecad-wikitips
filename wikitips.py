@@ -8,6 +8,7 @@ repository, CC-BY 3.0), so no internet connection is needed.
 
 import json
 import os
+import re
 
 import FreeCAD as App
 import FreeCADGui as Gui
@@ -97,38 +98,120 @@ def lookup(name):
     return None, None
 
 
+_ITALIC = re.compile(r"<i>\s*([A-Za-z][A-Za-z0-9_]*)")
+_TIP_MAP = None
+
+
+def _tip_map():
+    """Plain tooltip/status text -> command name, for actions without a name.
+
+    Python dropdown groups (Part_CompOffset, CAM_DrillingTools, ...) create
+    their sub-actions without objectName; only their text identifies them.
+    """
+    global _TIP_MAP
+    if _TIP_MAP is None:
+        _TIP_MAP = {}
+        try:
+            for n in Gui.Command.listAll():
+                c = Gui.Command.get(n)
+                info = c.getInfo() if c is not None else {}
+                for k in ("toolTip", "statusTip"):
+                    t = (info.get(k) or "").strip()
+                    if t:
+                        _TIP_MAP.setdefault(t, n)
+        except Exception:
+            pass
+    return _TIP_MAP
+
+
+def action_name(action):
+    """Command name of one QAction, or "" if it cannot be found.
+
+    Verified in FreeCAD 26.3: C++ commands set objectName and data(); the rich
+    tooltip ends with <i>CommandName</i> (or <i>Sub (Group:0)</i> for groups);
+    Python group sub-actions only carry the plain tooltip/status text.
+    """
+    if action is None:
+        return ""
+    n = action.objectName()
+    if n:
+        return n
+    d = action.data()
+    if isinstance(d, str) and d:
+        return d
+    m = _ITALIC.findall(action.toolTip() or "")
+    if m:
+        return m[-1]
+    for t in (action.toolTip(), action.statusTip()):
+        t = (t or "").strip()
+        if t and t in _tip_map():
+            return _tip_map()[t]
+    return ""
+
+
 def command_name(action, button=None):
     """Find the FreeCAD command name behind a toolbar button.
 
     FreeCAD names every command QAction after the command (Gui::Action sets
     objectName). For dropdown groups (e.g. the Sketcher circle/arc group) the
     button shows the group action and keeps the sub-commands in the button's
-    own menu; the group copies the tooltip of the sub-command currently shown.
+    own menu; the group copies the tooltip and icon of the sub-command shown.
     """
     if action is None:
         return None
     key, entry = lookup(action.objectName() or "")
     if entry:
         return key
+    # the tooltip names the command really shown, e.g. Std_Undo or
+    # "Sketcher_Projection (Sketcher_CompExternal:0)"
+    for n in reversed(_ITALIC.findall(action.toolTip() or "")):
+        key, entry = lookup(n)
+        if entry:
+            return key
     menus = []
     if button is not None and button.menu() is not None:
         menus.append(button.menu())
     if action.menu() is not None:
         menus.append(action.menu())
     tip = action.toolTip()
+    icon_key = action.icon().cacheKey()
     for menu in menus:
-        subs = [a for a in menu.actions() if a.objectName() and not a.isSeparator()]
-        # 1) sub-command with the same tooltip as the button (= the one shown)
-        # 2) the checked one   3) the same icon
+        subs = [(a, action_name(a)) for a in menu.actions() if not a.isSeparator()]
+        subs = [(a, n) for a, n in subs if n]
+        # 1) same tooltip as the button (= the one shown)  2) the checked one
+        # 3) the same icon  4) the first one (FreeCAD's default)
         for test in (lambda a: a.toolTip() == tip,
                      lambda a: a.isCheckable() and a.isChecked(),
-                     lambda a: a.icon().cacheKey() == action.icon().cacheKey()):
-            for sub in subs:
+                     lambda a: a.icon().cacheKey() == icon_key,
+                     lambda a: True):
+            for sub, n in subs:
                 if test(sub):
-                    key, entry = lookup(sub.objectName())
+                    key, entry = lookup(n)
                     if entry:
                         return key
     return None
+
+
+MAX_PARAGRAPHS = 2
+MAX_TEXT = 420  # characters of visible text; longer wiki intros are cut
+MAX_STEPS = 4
+_PARA = re.compile(r"<p>.*?</p>", re.S)
+_TAGS = re.compile(r"<[^>]+>")
+
+
+def short_html(html):
+    """Keep the first paragraphs of a wiki description so the popup fits a laptop screen."""
+    paras = _PARA.findall(html) or ([html] if html else [])
+    out, size = [], 0
+    for p in paras[:MAX_PARAGRAPHS]:
+        n = len(_TAGS.sub("", p))
+        if out and size + n > MAX_TEXT:
+            break
+        out.append(p)
+        size += n
+    if len(out) < len(paras):
+        out.append("<p style='color:gray'>…</p>")
+    return "".join(out)
 
 
 def clean_label(text):
@@ -246,8 +329,8 @@ class TipPopup(QtWidgets.QFrame):
             self.image.clear()
             self.image.hide()
 
-        html = entry.get("d", "")
-        steps = entry.get("u") or []
+        html = short_html(entry.get("d", ""))
+        steps = (entry.get("u") or [])[:MAX_STEPS]
         if steps:
             html += "<p><b>Πώς χρησιμοποιείται:</b></p><ol style='margin-left:-20px'>%s</ol>" % "".join(
                 "<li>%s</li>" % s for s in steps)
