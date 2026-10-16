@@ -63,7 +63,9 @@ Global toolbar "WikiTips" with an on/off command `WikiTips_Toggle`
   (`HOME=<tmp> FREECAD=<fc> OUT=<dir> sh tools/gifs/cam_rec.sh [scene...]`, then
   `python3 tools/gifs/sketcher_gifs.py <dir> content/img/camcmd`), 4 drawn by cam_cmd_gifs.py.
 - Not shown as a toolbar button but covered: CAM_PostSelected (uses the Post GIF), CAM_Surface and
-  CAM_Waterline (need OpenCamLib + experimental features).
+  CAM_Waterline (shown only with OpenCamLib + "Enable OCL dependent features"; recorded for real).
+- `lookup()` falls back to content/commands_el.json, so new commands without a wiki page
+  (CAM_MillFacing, CAM_OperationCopy) still get a popup.
 - Not covered yet (menu-only, rarely used): CAM_Tapping, CAM_Probe, CAM_Fixture, CAM_Comment,
   CAM_Stop, CAM_Custom, CAM_Shape, CAM_Area, CAM_ExportTemplate, ToolBit library commands.
 

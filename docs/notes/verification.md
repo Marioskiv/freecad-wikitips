@@ -101,7 +101,7 @@ tooltips, docstrings) in `Mod/CAM/Path/...`.
 | CAM_OpActiveToggle | inactive op: greyed, no path shown, ignored by Inspect and Post | wiki CAM_OpActiveToggle |
 | CAM_SimulatorGL / Simulator | GL = separate window, faster; legacy = in the 3D view and "only uses the standard end mill" | wiki CAM_SimulatorGL, CAM_Simulator, CAM_Adaptive note |
 | CAM_ToolBitDock | double click a tool bit = new tool controller in the Job | wiki CAM_ToolBitDock |
-| CAM_Profile | no selection = whole model (Contour); faces / edges; check Final Depth | wiki CAM_Profile |
+| CAM_Profile | no selection = whole model (Contour); faces / edges; check Final Depth. Selecting only the TOP face leaves Final Depth at that face's height (nothing is cut) | wiki CAM_Profile ("manually set the Final Depth" for top edges); seen in our recording: top-face profile path stayed at Z = 15 of a 15 mm plate, whole-model contour went to Z = 0 |
 | CAM_Pocket_Shape | select the pocket bottom; walls if the pocket goes through | wiki CAM_Pocket_Shape |
 | CAM_MillFacing | "machine the top surface of stock"; works on the Job stock, no base geometry | source Op/Gui/MillFacing.py tooltip, Op/MillFacing.py (uses self.stock) |
 | CAM_Helix | helical G2/G3, concentric passes by Step Over; select hole edge or wall | wiki CAM_Helix |
@@ -113,7 +113,7 @@ tooltips, docstrings) in `Mod/CAM/Path/...`.
 | CAM_Vcarve | centre line (Voronoi), depth from the inscribed circle and the V angle; needs faces | wiki CAM_Vcarve |
 | CAM_Deburr | W = chamfer width, h = extra depth of the tip | wiki CAM_Deburr Options |
 | CAM_Pocket3D | rough only; Final Depth from the geometry; finish with ball + 3D Surface | wiki CAM_Pocket3D |
-| CAM_Surface / Waterline | the wiki says OpenCamLib + experimental features + "Enable OCL dependent features"; the 26.3 source (CAM InitGui.py) adds both buttons as soon as `import ocl`/`opencamlib` works — the experimental flag only adds Planar/Rotary Surface. Our text follows the source. Verified: after `micromamba install opencamlib` the test FreeCAD 26.3 shows them | source InitGui.py (26.3); wiki CAM_Surface, CAM_Waterline |
+| CAM_Surface / Waterline | need OpenCamLib AND the preference "Enable OCL dependent features" (CAM → Advanced; parameter EnableAdvancedOCLFeatures). The wiki also asks for "experimental features": in the 26.3 source that flag only adds Planar/Rotary Surface. Verified in the test FreeCAD: with opencamlib installed the buttons appear only after setting the preference | source InitGui.py (26.3); wiki CAM_Surface, CAM_Waterline |
 | CAM_OperationCopy | `copyObject` of the op and its dressups, added to the same Job: an independent copy. NOTE: the wiki page "CAM OperationCopy" redirects to "CAM Copy" (an older *linked* copy command) — the 26.3 source is what counts | source PathCommands.py `_CopyOperation` |
 | CAM_SimpleCopy | non-parametric copy; 26.3 can combine several ops | wiki CAM_SimpleCopy |
 | CAM_Array | repeats a path at an interval; properties in Data after Apply | wiki CAM_Array |

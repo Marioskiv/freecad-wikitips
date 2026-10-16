@@ -18,6 +18,16 @@
 - tools/gifs/cam_cmd_gifs.py: drawn GIFs for Surface, Waterline (no OpenCamLib here), Axis Map
   (4th axis), Z Correct (probe file).
 - tests/check_content.py: every Greek entry has t/d and its picture.
+- Installed OpenCamLib in the test FreeCAD → 3D Surface and Waterline recorded for real. Source
+  check corrected the wiki: those buttons need OpenCamLib + "Enable OCL dependent features", not
+  the experimental flag.
+- Bug found and fixed in the addon: commands without a wiki page (CAM_MillFacing,
+  CAM_OperationCopy) had no popup even with Greek help → `lookup()` now falls back to
+  commands_el.json. Test POPUPS extended (MillFacing, OperationCopy, Helix, SelectLoop, dressups).
+- Recording mistakes caught by looking at every GIF: top-face Profile (cut nothing), drag-knife on
+  an already rounded contour (no corners), invisible tags/dogbones/lead-ins (now top/front close-ups),
+  mirror outside the part, empty Boundary/Waterline/Ramp paths (fixed).
+- Tests: tests/run_freecad_tests.sh ALL PASS, offline popup test OK, check_content OK.
 
 ## 2026-10-16 (Claude Code cloud session, second)
 - Repo published: Marios created `Marioskiv/freecad-wikitips` (private) by hand; Claude pushed the

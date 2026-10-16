@@ -97,6 +97,11 @@ def lookup(name):
     for c in candidates:
         if c in d:
             return c, d[c]
+    # new commands without a wiki page (e.g. CAM_MillFacing in 26.3): our Greek help is enough
+    el = commands_el()
+    for c in candidates:
+        if c in el:
+            return c, {"t": el[c].get("t", c)}
     return None, None
 
 

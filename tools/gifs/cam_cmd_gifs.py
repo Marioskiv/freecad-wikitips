@@ -3,17 +3,17 @@
 
     python3 tools/gifs/cam_cmd_gifs.py content/img/camcmd [names...]
 
-3D Surface / Waterline need OpenCamLib (not in the conda build, and Marios's FreeCAD
-shows them only after enabling the OCL features); Axis Map needs a 4th axis and
-Z Correct a probe file. Our own drawings, same palette as cam_gifs.py.
+Axis Map needs a 4th axis and Z Correct a probe file. Our own drawings, same palette
+as cam_gifs.py. (3D Surface / Waterline are recorded for real by cam_rec.py, with
+OpenCamLib installed in the test FreeCAD.)
 """
 import math
 import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from draw import (ACTIVE, CUT, DIM, F_LABEL, F_SMALL, H, PATH, SHANK, STOCK, STOCK_EDGE, TOOL,  # noqa: E402
-                  TOOL_HI, W, Frame, ease, lerp, save_gif)
+from draw import (ACTIVE, F_LABEL, PATH, SHANK, STOCK, STOCK_EDGE, TOOL, TOOL_HI,  # noqa: E402
+                  Frame, ease, lerp, save_gif)
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else "content/img/camcmd"
 GIFS = {}
@@ -39,102 +39,6 @@ def surf(x):
 def part_side(f, fn=surf, x0=X0, x1=X1):
     pts = [(x, fn(x)) for x in range(int(x0), int(x1) + 1, 2)]
     f.poly([(x0, BASE_Y)] + pts + [(x1, BASE_Y)], fill=(203, 213, 225), outline=STOCK_EDGE, width=1)
-
-
-def ball_tool(f, cx, cy, r=9, length=40):
-    """Ball end mill from the side: ball centre at (cx, cy)."""
-    f.metal(cx - r, cy - length, cx + r, cy, TOOL)
-    f.d.pieslice([(cx - r) * 2, (cy - r) * 2, (cx + r) * 2, (cy + r) * 2], 0, 180, fill=TOOL)
-    f.metal(cx - r * 0.7, cy - length - 14, cx + r * 0.7, cy - length, SHANK)
-    f.circle(cx, cy, 1.6, fill=TOOL_HI)
-
-
-def drop_y(fn, cx, r=9, x0=X0, x1=X1):
-    """Drop cutter: lowest ball centre that touches the surface (what OpenCamLib computes)."""
-    best = 1e9
-    for k in range(-20, 21):
-        x = cx + r * k / 20
-        if x < x0 or x > x1:
-            continue
-        dy = math.sqrt(max(0.0, r * r - (x - cx) ** 2))
-        best = min(best, fn(x) - dy)
-    return best
-
-
-@gif("CAM_Surface")
-def surface():
-    fr = []
-    r = 9
-    xs = list(range(X0 + 4, X1 - 3, 6))
-    trail = []
-    for i, cx in enumerate(xs):
-        cy = drop_y(surf, cx, r)
-        trail.append((cx, cy + r))
-        f = Frame()
-        part_side(f)
-        if len(trail) > 1:
-            f.line(trail, PATH, 2)
-        ball_tool(f, cx, cy, r)
-        f.caption("Η μπίλια ακολουθεί την 3D επιφάνεια")
-        fr.append((f, 70))
-    f = Frame()
-    part_side(f)
-    f.line(trail, PATH, 2)
-    f.caption("Φινίρισμα · θέλει OpenCamLib")
-    fr.append((f, 2200))
-    return fr
-
-
-DC, DR = 105, 72          # dome (side view): centre x, radius
-
-
-def dome(x):
-    dx = x - DC
-    return BASE_Y - max(0.0, math.sqrt(max(0.0, DR * DR - dx * dx)) * 1.15 - 4)
-
-
-@gif("CAM_Waterline")
-def waterline():
-    """Side view (left) and top view (right): one closed loop around the part per Z level."""
-    fr = []
-    levels = [188, 172, 156, 140, 126]
-    done = []
-    TX, TY = 250, 116          # top view centre
-    tr = 7                     # tool radius
-    for li, zy in enumerate(levels):
-        half = max(dx for dx in range(0, DR + 1) if dome(DC + dx) <= zy + 0.5) + tr
-        for k in range(15):
-            a = 2 * math.pi * k / 14
-            f = Frame()
-            part_side(f, dome, DC - DR - 10, DC + DR + 10)
-            f.text(DC, 34, "πλάγια", fill=DIM, font=F_LABEL, anchor="mm")
-            f.text(TX, 34, "από πάνω", fill=DIM, font=F_LABEL, anchor="mm")
-            f.circle(TX, TY, DR * 0.78, fill=(203, 213, 225), outline=STOCK_EDGE)
-            for z, h in done:
-                f.line([(DC - h, z), (DC + h, z)], PATH, 2)
-                f.circle(TX, TY, h * 0.78, outline=PATH, width=2)
-            f.dashed(DC - DR - 18, zy, DC + DR + 18, zy, ACTIVE, 1, 4, 3)
-            f.tag(16, zy - 8, "Z%d" % (li + 1), fill=ACTIVE, font=F_SMALL)
-            # tool on the right side of the side view, and going round in the top view
-            x = DC + half
-            f.metal(x - tr, zy - 38, x + tr, zy, TOOL)
-            f.metal(x - tr * 0.7, zy - 52, x + tr * 0.7, zy - 38, SHANK)
-            f.d.arc([(TX - half * 0.78) * 2, (TY - half * 0.78) * 2, (TX + half * 0.78) * 2, (TY + half * 0.78) * 2],
-                    0, max(1, math.degrees(a)), fill=PATH, width=4)
-            f.tool_top(TX + half * 0.78 * math.cos(a), TY + half * 0.78 * math.sin(a), tr)
-            f.caption("Γύρω-γύρω, σε σταθερά ύψη")
-            fr.append((f, 55))
-        done.append((zy, half))
-    fr.append((fr[-1][0], 300))
-    f = Frame()
-    part_side(f, dome, DC - DR - 10, DC + DR + 10)
-    f.circle(TX, TY, DR * 0.78, fill=(203, 213, 225), outline=STOCK_EDGE)
-    for z, h in done:
-        f.line([(DC - h, z), (DC + h, z)], PATH, 2)
-        f.circle(TX, TY, h * 0.78, outline=PATH, width=2)
-    f.caption("Σαν ισοϋψείς χάρτη · θέλει OpenCamLib")
-    fr.append((f, 2200))
-    return fr
 
 
 @gif("CAM_DressupAxisMap")

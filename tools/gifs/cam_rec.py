@@ -12,7 +12,6 @@ The operations are made with FreeCAD's own CAM Python API, so the toolpaths
 are the real ones FreeCAD 26.3 computes.
 """
 import json
-import math
 import os
 import time
 import traceback
@@ -55,6 +54,8 @@ def set_theme():
     pv.SetBool("Gradient", False)
     pv.SetBool("ShowNaviCube", False)
     pv.SetBool("CornerCoordSystem", False)
+    # 3D Surface / Waterline buttons exist only with this CAM preference (and OpenCamLib)
+    App.ParamGet("User parameter:BaseApp/Preferences/Mod/CAM").SetBool("EnableAdvancedOCLFeatures", True)
 
 
 def color(obj, rgb, transparency=0, lw=2):
@@ -144,7 +145,16 @@ class Rec:
         self.hide_tool_bodies()
         self.part.ViewObject.Visibility = False
         self.job.Stock.ViewObject.Visibility = False
+        for t in self.job.Tools.Group:
+            self.feeds(t)
         return self.job
+
+    @staticmethod
+    def feeds(tc):
+        """Example feeds (some dressups refuse to work with a zero feed)."""
+        tc.HorizFeed = "1000 mm/min"
+        tc.VertFeed = "300 mm/min"
+        tc.SpindleSpeed = 18000
 
     def hide_tool_bodies(self):
         """Tool bits bring a small PartDesign body (their shape): keep it out of the picture."""
@@ -161,7 +171,11 @@ class Rec:
         tool = tb.attach_to_doc(doc=self.doc)
         tool.ViewObject.Visibility = False
         c = Controller.Create("TC: " + tool.Label, tool=tool, toolNumber=number)
+        for old in list(self.job.Tools.Group):    # one tool controller only: with two, creating
+            self.job.Tools.removeObject(old)       # an operation opens the modal "choose" dialog
+            self.doc.removeObject(old.Name)
         self.job.Proxy.addToolController(c)
+        self.feeds(c)
         self.hide_tool_bodies()
         return c
 
@@ -213,7 +227,7 @@ class Rec:
             pass
 
     # --- view ---------------------------------------------------------------
-    def view(self, zoom=1.0, top=False, press_first=False, cap="Πάτα το κουμπί", focus=None):
+    def view(self, zoom=1.0, top=False, press_first=False, cap="Πάτα το κουμπί", focus=None, front=False):
         self.doc.recompute()
         Gui.Selection.clearSelection()
         pump(300)
@@ -221,6 +235,8 @@ class Rec:
         self.v.setCameraType("Orthographic")
         if top:
             self.v.viewTop()
+        elif front:
+            self.v.viewFront()
         else:
             self.v.viewIsometric()
         self.v.fitAll()
@@ -656,11 +672,10 @@ def op_scene(name, module, pick, clicks, text, zoom=1.25, props=None, tc=None, s
 
 @scene("CAM_Profile")
 def s_profile():
-    def pick(r):
-        f = r.face(top_face_pred)
-        return {"clicks": [((50, 64, 15), f)], "base": [(r.model, (f,))]}
-    op_scene("CAM_Profile", "Profile", pick, "Κλικ στην πάνω έδρα", "Κόβει γύρω-γύρω το περίγραμμα",
-             zoom=1.3)
+    # nothing selected = Contour of the whole model, down to its bottom. (A selected TOP face
+    # would set Final Depth to the face height: nothing would be cut. See verification.md.)
+    op_scene("CAM_Profile", "Profile", lambda r: {"clicks": [], "base": None}, None,
+             "Χωρίς επιλογή: γύρω από όλο το κομμάτι", zoom=1.3, press_first=True, frames=34)
 
 
 @scene("CAM_Pocket_Shape")
@@ -723,8 +738,8 @@ def s_thread():
         return {"clicks": [((78, 54, 8), f)], "base": [(r.model, (f,))]}
     op_scene("CAM_ThreadMilling", "ThreadMilling", pick, "Κλικ στο τοίχωμα της τρύπας",
              "Κόβει σπείρωμα με ελικοειδή κίνηση", zoom=0.6, focus=(78, 46, 8), tc="5mm-thread-cutter.fctb",
-             frames=36, props={"ThreadName": "M16", "MajorDiameter": 16.0, "MinorDiameter": 14.0,
-                               "Pitch": 2.0})
+             frames=36, props={"ThreadName": "M18", "MajorDiameter": 18.0, "MinorDiameter": 16.0,
+                               "Pitch": 2.5})
 
 
 def text_extra(r):
@@ -778,22 +793,23 @@ def s_pocket3d():
 def s_surface():
     op_scene("CAM_Surface", "Surface", lambda r: {"clicks": [], "base": None}, None,
              "Η μπίλια ακολουθεί την 3D επιφάνεια", shape=dome(), tc="6mm_Ball_End.fctb",
-             zoom=1.1, frames=40, press_first=True, props={"StepOver": 40})
+             zoom=1.1, frames=40, press_first=True, props={"StepOver": 40, "CutPattern": "ZigZag"})
 
 
 @scene("CAM_Waterline")
 def s_waterline():
     op_scene("CAM_Waterline", "Waterline", lambda r: {"clicks": [], "base": None}, None,
              "Γύρω-γύρω, σε σταθερά ύψη", shape=dome(), tc="6mm_Ball_End.fctb",
-             zoom=1.1, frames=40, press_first=True)
+             zoom=1.1, frames=40, press_first=True,
+             props={"LayerMode": "Multi-pass", "StepDown": 2.5, "FinalDepth": 9.0})
 
 
 # ---------------------------------------------------------------------------
 # Path modification: select an operation (its path), press, see the change
 # ---------------------------------------------------------------------------
 def outer_profile(r):
-    f = r.face(top_face_pred)
-    return r.op("Profile", [(r.model, (f,))])
+    """Contour of the whole model (no base geometry): cuts down to the bottom."""
+    return r.op("Profile")
 
 
 def inner_profile(r):
@@ -803,18 +819,18 @@ def inner_profile(r):
 
 
 def dressup_scene(name, base_fn, make, text, zoom=1.25, click_at=(50, 0, 0), frames=30, run=True,
-                  top=False):
+                  top=False, focus=None, front=False):
     r = Rec(name)
     r.make_job()
     o = base_fn(r)
-    r.view(zoom, top=top)
+    r.view(zoom, top=top, focus=focus, front=front)
     r.cap(1, "Κλικ στη διαδρομή")
     r.click(click_at, o)
     r.cap(2, "Πάτα το κουμπί")
     r.press()
     Gui.Selection.clearSelection()
-    d = make(r, o)
     r.see_through()
+    d = make(r, o)
     r.doc.recompute()
     r.style_path(d, NEWC)
     try:
@@ -851,37 +867,46 @@ def via_gui(cmd):
 @scene("CAM_DressupDogbone")
 def s_dogbone():
     dressup_scene("CAM_DressupDogbone", inner_profile, via_gui("CAM_DressupDogbone"),
-                  "Μικρές «τρύπες» στις εσωτερικές γωνίες", zoom=0.75, click_at=(27, 10, 9))
+                  "Μικρές «τρύπες» στις εσωτερικές γωνίες", zoom=0.22, click_at=(20, 10.5, 9), top=True,
+                  focus=(14, 14, 9))
 
 
 @scene("CAM_DressupTag")
 def s_tag():
-    dressup_scene("CAM_DressupTag", outer_profile, via_gui("CAM_DressupTag"),
-                  "Γεφυράκια: το κομμάτι δεν φεύγει", zoom=1.3, click_at=(50, -2.5, 0))
+    def make(r, o):
+        d = via_gui("CAM_DressupTag")(r, o)
+        d.Height = 6          # tall example tags, easy to see from the side
+        d.Width = 10
+        r.see_through(70)
+        return d
+    dressup_scene("CAM_DressupTag", outer_profile, make,
+                  "Γεφυράκια: το κομμάτι δεν φεύγει", zoom=1.0, click_at=(50, -2.5, 0), front=True)
 
 
 @scene("CAM_DressupLeadInOut")
 def s_leadinout():
     dressup_scene("CAM_DressupLeadInOut", outer_profile, via_gui("CAM_DressupLeadInOut"),
-                  "Ομαλή είσοδος και έξοδος", zoom=1.3, click_at=(50, -2.5, 0))
+                  "Ομαλή είσοδος και έξοδος", zoom=0.3, click_at=(90, 72.5, 0), top=True,
+                  focus=(95, 66, 0))
 
 
 @scene("CAM_DressupRampEntry")
 def s_ramp():
     dressup_scene("CAM_DressupRampEntry", inner_profile, via_gui("CAM_DressupRampEntry"),
-                  "Μπαίνει με ράμπα, όχι κάθετα", zoom=0.75, click_at=(27, 10, 9))
+                  "Μπαίνει με ράμπα, όχι κάθετα", zoom=0.55, click_at=(27, 10.5, 9), focus=(27, 22, 9))
 
 
 @scene("CAM_DressupPathBoundary")
 def s_boundary():
     def make(r, o):
         d = via_gui("CAM_DressupPathBoundary")(r, o)
-        try:
-            d.Stock.Length, d.Stock.Width = 60, 70
-            d.Stock.Height = 40
-            d.Stock.Placement.Base = V(-5, -5, -5)
-        except Exception:
-            traceback.print_exc()
+        import Path.Main.Stock as PathStock
+        old = d.Stock
+        d.Stock = PathStock.CreateBox(r.job, extent=V(55, 90, 60), placement=App.Placement(V(-10, -10, -20), App.Rotation()))
+        d.Proxy.promoteStockToBoundary(d.Stock)
+        r.doc.removeObject(old.Name)
+        d.Stock.ViewObject.Visibility = True
+        color(d.Stock, (0.96, 0.62, 0.04), 80, 1)
         return d
     dressup_scene("CAM_DressupPathBoundary", outer_profile, make,
                   "Κρατάει μόνο ό,τι είναι μέσα στο όριο", zoom=1.3, click_at=(50, -2.5, 0))
@@ -889,8 +914,9 @@ def s_boundary():
 
 @scene("CAM_DressupDragKnife")
 def s_dragknife():
-    dressup_scene("CAM_DressupDragKnife", outer_profile, via_gui("CAM_DressupDragKnife"),
-                  "Θηλιές στις γωνίες για το μαχαίρι", zoom=0.6, click_at=(50, -2.5, 0))
+    dressup_scene("CAM_DressupDragKnife", inner_profile, via_gui("CAM_DressupDragKnife"),
+                  "Θηλιές στις γωνίες για το μαχαίρι", zoom=0.22, click_at=(20, 12.5, 9), top=True,
+                  focus=(14, 14, 9))
 
 
 @scene("CAM_DressupMirror")
@@ -898,7 +924,12 @@ def s_mirror():
     def base(r):
         f = r.face(flat_at(9))
         return r.op("PocketShape", [(r.model, (f,))])
-    dressup_scene("CAM_DressupMirror", base, via_gui("CAM_DressupMirror"),
+    def make(r, o):
+        d = via_gui("CAM_DressupMirror")(r, o)
+        d.CenterModel = True
+        d.MirrorAxis = "Y" if "Y" in d.getEnumerationsOfProperty("MirrorAxis") else d.MirrorAxis
+        return d
+    dressup_scene("CAM_DressupMirror", base, make,
                   "Καθρέφτης της διαδρομής", click_at=(27, 22, 9))
 
 
@@ -974,10 +1005,13 @@ def s_opcopy():
 
 @scene("CAM_SimpleCopy")
 def s_simplecopy():
-    copy_scene("CAM_SimpleCopy", "Αντίγραφο μόνο της διαδρομής", "   ← σκέτη διαδρομή")
+    copy_scene("CAM_SimpleCopy", "Αντίγραφο μόνο της διαδρομής", "   ← νέο")
 
 
 def run_all():
+    import faulthandler
+    run_all.tb = open(os.path.join(OUT, "hang_%s.txt" % "_".join(sorted(ONLY)) if ONLY else "hang.txt"), "w")
+    faulthandler.dump_traceback_later(170, repeat=False, file=run_all.tb)   # where a hung scene waits
     log = open(os.path.join(OUT, "rec_log.txt"), "a")
     try:
         set_theme()
