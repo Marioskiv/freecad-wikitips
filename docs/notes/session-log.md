@@ -1,5 +1,34 @@
 # Session log
 
+## CAM toolbar commands (PR 7, 2026-10-16)
+- Marios asked: "I want more for CAM: Inspect, SelectLoop, Helix, Adaptive, Slot, Engrave, Deburr,
+  Vcarve, Pocket 3D, Surface, Axis Map … and all the others". Listed the real 26.3 CAM toolbars
+  (Project Setup, Tool Commands, New Operations, Path Modification + dropdowns) → 38 commands.
+- content/commands_el.json: Greek help for all of them (+ 3D Surface / Waterline, which appear only
+  with OpenCamLib). Checked against the wiki or, where the wiki page is empty/wrong, the 26.3
+  source (verification.md, new table). Found: wiki "CAM OperationCopy" redirects to the old linked
+  "CAM Copy" — the 26.3 command makes an independent copy (source); CAM_MillFacing faces the
+  stock top and takes no base geometry; Drilling ignores a selection made before the command.
+- tools/gifs/cam_rec.py: records each command in a real FreeCAD 26.3 with the CAM Python API (real
+  Job, real operations and dressups, real toolpaths; the cutter runs along the real path while the
+  path grows). One scene per FreeCAD start (tools/gifs/cam_rec.sh), because many CAM objects in one
+  session crash FreeCAD. Composer (sketcher_gifs.py) learned "panel" cards: real Inspect G-code,
+  real linuxcnc post output (legacy linuxcnc post, filename "-", --no-show-editor), report/tool
+  lists, and a small model tree where the cursor clicks the Job/operation.
+- tools/gifs/cam_cmd_gifs.py: drawn GIFs for Surface, Waterline (no OpenCamLib here), Axis Map
+  (4th axis), Z Correct (probe file).
+- tests/check_content.py: every Greek entry has t/d and its picture.
+- Installed OpenCamLib in the test FreeCAD → 3D Surface and Waterline recorded for real. Source
+  check corrected the wiki: those buttons need OpenCamLib + "Enable OCL dependent features", not
+  the experimental flag.
+- Bug found and fixed in the addon: commands without a wiki page (CAM_MillFacing,
+  CAM_OperationCopy) had no popup even with Greek help → `lookup()` now falls back to
+  commands_el.json. Test POPUPS extended (MillFacing, OperationCopy, Helix, SelectLoop, dressups).
+- Recording mistakes caught by looking at every GIF: top-face Profile (cut nothing), drag-knife on
+  an already rounded contour (no corners), invisible tags/dogbones/lead-ins (now top/front close-ups),
+  mirror outside the part, empty Boundary/Waterline/Ramp paths (fixed).
+- Tests: tests/run_freecad_tests.sh ALL PASS, offline popup test OK, check_content OK.
+
 ## 2026-10-16 (Claude Code cloud session, second)
 - Repo published: Marios created `Marioskiv/freecad-wikitips` (private) by hand; Claude pushed the
   v0.2.0 commit to `main`. Workflow agreed: PRs only.

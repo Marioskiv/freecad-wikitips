@@ -39,6 +39,8 @@ POPUPS = {  # button (defaultAction objectName) -> expected command
     "CAM_Profile": "CAM_Profile", "CAM_Pocket_Shape": "CAM_Pocket_Shape",
     "CAM_DrillingTools": "CAM_Drilling", "CAM_PostTools": "CAM_Post",
     "CAM_SimTools": None, "CAM_EngraveTools": "CAM_Engrave",
+    "CAM_MillFacing": "CAM_MillFacing", "CAM_OperationCopy": "CAM_OperationCopy", "CAM_Helix": "CAM_Helix",
+    "CAM_SelectLoop": "CAM_SelectLoop", "CAM_DressupTools": None,
 }
 IGNORE = {"", "WikiTips_Toggle", "OBTN Overlay", "OBTN Float", "OBTN Close", "OBTN Transparent", "OBTN AutoMode"}  # dock overlay buttons
 

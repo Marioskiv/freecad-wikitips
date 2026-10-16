@@ -71,6 +71,18 @@ Short, durable facts for the next Claude session. Details live in the other note
   (control run). Test one dialog per FreeCAD start: `tests/run_freecad_tests.sh`. Close dialogs
   like Cancel does: `Gui.Control.activeTaskDialog().reject()`.
 
+## CAM recording lessons (2026-10-16, PR 7)
+- Marios: "if 26.3 blocks you, use the stable 1.1". Not needed so far: everything worked in 26.3.
+  Stay on 26.3 (his version) unless something really cannot be done there.
+- 3D Surface / Waterline: `micromamba install -p <fc> -c conda-forge opencamlib` + the CAM
+  preference EnableAdvancedOCLFeatures (CAM → Advanced → "Enable OCL dependent features").
+  The "experimental features" flag is NOT needed for them (only for Planar/Rotary Surface).
+- A Job with TWO tool controllers makes `Path.Op.X.Create()` open a modal "choose tool controller"
+  dialog → the script hangs. Keep one TC per Job when scripting (cam_rec.py `tc()`).
+- Profile with only the TOP face selected keeps Final Depth at the face height (cuts nothing);
+  no selection = whole-model contour to the bottom. Ramp Entry refuses a zero HorizFeed.
+- Use `faulthandler.dump_traceback_later` to see where a hung FreeCAD script waits.
+
 ## How to test in a real FreeCAD from the cloud container
 - github.com release downloads are blocked, **conda-forge is reachable**:
   get `micromamba` from `https://conda.anaconda.org/conda-forge/linux-64/micromamba-<ver>-0.tar.bz2`,

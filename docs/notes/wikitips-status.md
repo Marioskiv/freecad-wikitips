@@ -57,6 +57,18 @@ Global toolbar "WikiTips" with an on/off command `WikiTips_Toggle`
   FreeCAD 3D view by `tools/gifs/part_rec.py` (same events.json → sketcher_gifs.py), in
   content/img/part (~0.6 MB). Part booleans show "click, Ctrl+click, press button".
 
+## CAM toolbar commands (PR 7)
+- 38 CAM commands in content/commands_el.json (all CAM toolbars of 26.3 + Surface/Waterline),
+  animations in content/img/camcmd: recorded in real FreeCAD by tools/gifs/cam_rec.py
+  (`HOME=<tmp> FREECAD=<fc> OUT=<dir> sh tools/gifs/cam_rec.sh [scene...]`, then
+  `python3 tools/gifs/sketcher_gifs.py <dir> content/img/camcmd`), 4 drawn by cam_cmd_gifs.py.
+- Not shown as a toolbar button but covered: CAM_PostSelected (uses the Post GIF), CAM_Surface and
+  CAM_Waterline (shown only with OpenCamLib + "Enable OCL dependent features"; recorded for real).
+- `lookup()` falls back to content/commands_el.json, so new commands without a wiki page
+  (CAM_MillFacing, CAM_OperationCopy) still get a popup.
+- Not covered yet (menu-only, rarely used): CAM_Tapping, CAM_Probe, CAM_Fixture, CAM_Comment,
+  CAM_Stop, CAM_Custom, CAM_Shape, CAM_Area, CAM_ExportTemplate, ToolBit library commands.
+
 ## Data pipeline (tools/)
 - Primary source: https://github.com/Reqrefusion/FreeCAD-Documentation-html (offline copy of the
   live wiki, all languages, updated daily, ~1.8 GB). Pages = `wiki/<Command>.html`, images
@@ -106,7 +118,6 @@ Text is English (wiki has no Greek translation).
 - PR 4: Sketcher + PartDesign dialog fields. GIF generator scripts go in `tools/`.
 - Greek translations for his most-used commands (Sketcher, PartDesign, Part, CAM) as an overlay file
   (hand-written, outside the generated `data/commands.json`).
-- Entries for CAM_MillFacing / CAM_OperationCopy (new commands without wiki pages).
 - Optional "Open full page" (the offline HTML page) on Ctrl+hover.
 - Publish to the Addon Manager catalog later (needs a public repo; private repos cannot be installed
   through the Addon Manager without credentials).

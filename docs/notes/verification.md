@@ -83,3 +83,46 @@ drawn in our own colours, nothing copied.
 | PartDesign_SubShapeBinder | references geometry of other bodies; using external geometry directly in a Body gives out-of-scope errors | ✔ wiki (ShapeBinder/SubShapeBinder pages) |
 | PartDesign_Clone | linked copy following edits except placement, created inside a separate Body | ✔ wiki |
 | Clone animation | the copy is drawn with a plain Part copy placed beside (same look as a moved clone) | visual only |
+
+# CAM toolbar commands (content/commands_el.json, `camcmd/` GIFs), checked 2026-10-16
+
+Command list taken from the running FreeCAD 26.3 (toolbars Project Setup, Tool Commands, New
+Operations, Path Modification + the dropdown groups). Sources: FreeCAD 26.3 wiki pages (Reqrefusion
+mirror) and, where the wiki page is empty or missing, the 26.3 source (command ToolTip, property
+tooltips, docstrings) in `Mod/CAM/Path/...`.
+
+| Command | Checked statement | Source |
+|---|---|---|
+| CAM_Job | Job = models, stock, tool controllers, setup sheet, output/post-processor; tabs General/Output/Setup/Tools/Workplan; a selected element becomes the Model | wiki CAM_Job |
+| CAM_Sanity | standalone HTML report (part, run summary/run time, stock, tools, output, coolant, fixtures, squawks); written next to the Job output file | wiki CAM_Sanity |
+| CAM_Post / PostSelected | G-code in the controller's dialect via the post-processor; PostSelected = "Post Processes the selected operations" | wiki CAM_Post; source Post/Command.py |
+| CAM_Inspect | shows the internal FreeCAD G-code dialect of an operation (not the post output) | wiki CAM_Inspect |
+| CAM_SelectLoop | select one edge, the rest of the loop is added | wiki CAM_SelectLoop |
+| CAM_OpActiveToggle | inactive op: greyed, no path shown, ignored by Inspect and Post | wiki CAM_OpActiveToggle |
+| CAM_SimulatorGL / Simulator | GL = separate window, faster; legacy = in the 3D view and "only uses the standard end mill" | wiki CAM_SimulatorGL, CAM_Simulator, CAM_Adaptive note |
+| CAM_ToolBitDock | double click a tool bit = new tool controller in the Job | wiki CAM_ToolBitDock |
+| CAM_Profile | no selection = whole model (Contour); faces / edges; check Final Depth. Selecting only the TOP face leaves Final Depth at that face's height (nothing is cut) | wiki CAM_Profile ("manually set the Final Depth" for top edges); seen in our recording: top-face profile path stayed at Z = 15 of a 15 mm plate, whole-model contour went to Z = 0 |
+| CAM_Pocket_Shape | select the pocket bottom; walls if the pocket goes through | wiki CAM_Pocket_Shape |
+| CAM_MillFacing | "machine the top surface of stock"; works on the Job stock, no base geometry | source Op/Gui/MillFacing.py tooltip, Op/MillFacing.py (uses self.stock) |
+| CAM_Helix | helical G2/G3, concentric passes by Step Over; select hole edge or wall | wiki CAM_Helix |
+| CAM_Adaptive | engagement never exceeds a maximum; deactivate with Toggle while editing | wiki CAM_Adaptive |
+| CAM_Slot | centre-line path; no lateral offset; faces/edges, two vertices or Custom Points | wiki CAM_Slot |
+| CAM_Drilling | faces selected before the command are ignored for the initial hole list; Peck, Dwell | wiki CAM_Drilling |
+| CAM_ThreadMilling | passes between minor and major diameter (tool radius subtracted); separate "ClearanceOp" clears the inside | source Op/ThreadMilling.py (wiki page empty) |
+| CAM_Engrave | follows the lines of a ShapeString / flat 2D geometry | wiki CAM_Engrave |
+| CAM_Vcarve | centre line (Voronoi), depth from the inscribed circle and the V angle; needs faces | wiki CAM_Vcarve |
+| CAM_Deburr | W = chamfer width, h = extra depth of the tip | wiki CAM_Deburr Options |
+| CAM_Pocket3D | rough only; Final Depth from the geometry; finish with ball + 3D Surface | wiki CAM_Pocket3D |
+| CAM_Surface / Waterline | need OpenCamLib AND the preference "Enable OCL dependent features" (CAM → Advanced; parameter EnableAdvancedOCLFeatures). The wiki also asks for "experimental features": in the 26.3 source that flag only adds Planar/Rotary Surface. Verified in the test FreeCAD: with opencamlib installed the buttons appear only after setting the preference | source InitGui.py (26.3); wiki CAM_Surface, CAM_Waterline |
+| CAM_OperationCopy | `copyObject` of the op and its dressups, added to the same Job: an independent copy. NOTE: the wiki page "CAM OperationCopy" redirects to "CAM Copy" (an older *linked* copy command) — the 26.3 source is what counts | source PathCommands.py `_CopyOperation` |
+| CAM_SimpleCopy | non-parametric copy; 26.3 can combine several ops | wiki CAM_SimpleCopy |
+| CAM_Array | repeats a path at an interval; properties in Data after Apply | wiki CAM_Array |
+| Dressups | Dogbone (inside corners of profile/contour, interlocking parts), Tag (hold the part, break off + file), DragKnife (offset blade: extensions + corner actions), LeadInOut (styles Arc/Tangent/Perpendicular…), RampEntry (Angle), Boundary (box/cylinder/solid, Inside) | wiki pages of each dressup + Dressup/Gui sources |
+| AxisMap, ZCorrect, Mirror, PlungeMilling, DressupArray | wiki pages empty: AxisMap "remaps one axis to another, e.g. Y→A for a 4th axis rotary", Radius = radius of the wrapped axis; ZCorrect = bilinear Z correction from a LinuxCNC G38 probe file; Mirror "Add path from base operation"; PlungeMilling: distance between passes, optional drilling cycles, peck, dwell; DressupArray types Linear1D/Linear2D/Polar | source docstrings / property tooltips |
+
+GIFs: recorded in a real FreeCAD 26.3 (`tools/gifs/cam_rec.py`, real CAM objects and real toolpaths;
+G-code cards show the real Inspect commands and the real linuxcnc post output). Drawn (not
+recordable here): CAM_DressupAxisMap, CAM_DressupZCorrect; Surface/Waterline are recorded with
+OpenCamLib 2023.01.11 (conda-forge) installed in the test FreeCAD
+(`tools/gifs/cam_cmd_gifs.py`). The Simulator GIFs show material removal made with Part booleans
+along the real path (same idea as the simulator, not a screenshot of its window).
