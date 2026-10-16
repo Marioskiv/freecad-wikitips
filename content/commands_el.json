@@ -1,0 +1,158 @@
+{
+  "_about": "Hand-written Greek help for toolbar commands (overrides the English wiki text, keeps its menu path). Kept SHORT on purpose (Marios: fewer words, the animation shows how). d = one sentence, selw = the one thing people get wrong, uses = short list. Checked against the FreeCAD 26.3 wiki (docs/notes/verification.md).",
+  "Sketcher_ConstrainSymmetric": {
+    "t": "Συμμετρία",
+    "d": "Κάνει δύο σημεία συμμετρικά γύρω από γραμμή ή σημείο. Ο εύκολος τρόπος να κεντράρεις.",
+    "i": "sketcher/Sketcher_ConstrainSymmetric.gif",
+    "selw": "Το κέντρο ή η γραμμή συμμετρίας: πάντα τελευταίο κλικ.",
+    "uses": [
+      "Κεντραρισμένη πλάκα",
+      "Τρύπες στη μέση"
+    ]
+  },
+  "Sketcher_ConstrainHorVer": {
+    "t": "Οριζόντιο / Κάθετο",
+    "d": "Γραμμή → οριζόντια ή κάθετη, ό,τι είναι πιο κοντά.",
+    "i": "sketcher/Sketcher_ConstrainHorVer.gif",
+    "uses": [
+      "Ίσιες πλευρές",
+      "Τρύπες στο ίδιο ύψος"
+    ]
+  },
+  "Sketcher_ConstrainParallel": {
+    "t": "Παράλληλες",
+    "d": "Κάνει δύο γραμμές παράλληλες.",
+    "i": "sketcher/Sketcher_ConstrainParallel.gif",
+    "uses": [
+      "Λοξά σχήματα",
+      "Κανάλια"
+    ]
+  },
+  "Sketcher_ConstrainPerpendicular": {
+    "t": "Κάθετες μεταξύ τους (90°)",
+    "d": "90° ανάμεσα σε δύο γραμμές, όπου κι αν είναι.",
+    "i": "sketcher/Sketcher_ConstrainPerpendicular.gif",
+    "selw": "Το «Κάθετο» είναι άλλο: σημαίνει κάθετο στον άξονα.",
+    "uses": [
+      "Ορθή γωνία σε λοξό σχήμα"
+    ]
+  },
+  "Sketcher_ConstrainTangent": {
+    "t": "Εφαπτόμενο",
+    "d": "Γραμμή και κύκλος (ή δύο κύκλοι) ακουμπούν ομαλά. Δύο γραμμές → στην ίδια ευθεία.",
+    "i": "sketcher/Sketcher_ConstrainTangent.gif",
+    "uses": [
+      "Ομαλή ένωση γραμμής–τόξου",
+      "Σχήμα σαν κουμπότρυπα"
+    ]
+  },
+  "Sketcher_ConstrainEqual": {
+    "t": "Ίσα",
+    "d": "Ίδιο μήκος (γραμμές) ή ίδια ακτίνα (κύκλοι).",
+    "i": "sketcher/Sketcher_ConstrainEqual.gif",
+    "selw": "Και τα δύο πρέπει να είναι ίδιου είδους.",
+    "uses": [
+      "Ίδιες τρύπες",
+      "Τετράγωνο"
+    ]
+  },
+  "Sketcher_ConstrainCoincidentUnified": {
+    "t": "Σύμπτωση / Σημείο πάνω σε στοιχείο",
+    "d": "Δύο σημεία → ένα. Σημείο + γραμμή → το σημείο πάνω στη γραμμή.",
+    "i": "sketcher/Sketcher_ConstrainCoincidentUnified.gif",
+    "uses": [
+      "Κλειστό σχήμα για Pad",
+      "Κέντρο πάνω στον άξονα"
+    ]
+  },
+  "Sketcher_ConstrainLock": {
+    "t": "Κλείδωμα θέσης",
+    "d": "Κλειδώνει ένα σημείο με δύο διαστάσεις από την αρχή.",
+    "i": "sketcher/Sketcher_ConstrainLock.gif",
+    "selw": "Με πολλά σημεία: μετράει από το τελευταίο.",
+    "uses": [
+      "Θέση τρύπας"
+    ]
+  },
+  "Sketcher_Dimension": {
+    "t": "Διάσταση (έξυπνη)",
+    "d": "Ένα κουμπί για όλες τις διαστάσεις: καταλαβαίνει τι επέλεξες.",
+    "i": "sketcher/Sketcher_Dimension.gif",
+    "selw": "M = αλλάζει είδος (π.χ. διάμετρος ↔ ακτίνα).",
+    "uses": [
+      "Μήκος πλευράς",
+      "Τρύπα για βίδα"
+    ]
+  },
+  "Sketcher_ConstrainAngle": {
+    "t": "Γωνία",
+    "d": "Η γωνία ανάμεσα σε δύο γραμμές.",
+    "i": "sketcher/Sketcher_ConstrainAngle.gif",
+    "selw": "Αρνητική τιμή = προς την άλλη μεριά.",
+    "uses": [
+      "Λοξή ακμή"
+    ]
+  },
+  "Sketcher_CreateRectangle": {
+    "t": "Ορθογώνιο",
+    "d": "Ορθογώνιο με δύο κλικ, ήδη οριζόντιο/κάθετο.",
+    "i": "sketcher/Sketcher_CreateRectangle.gif",
+    "selw": "M = άλλοι τρόποι · U = στρογγυλές γωνίες.",
+    "uses": [
+      "Βάση για Pad"
+    ]
+  },
+  "Sketcher_CreateCircle": {
+    "t": "Κύκλος",
+    "d": "Κύκλος: κέντρο και μετά ακτίνα.",
+    "i": "sketcher/Sketcher_CreateCircle.gif",
+    "uses": [
+      "Τρύπα",
+      "Κύλινδρος"
+    ]
+  },
+  "Sketcher_CreatePolyline": {
+    "t": "Πολυγραμμή",
+    "d": "Συνεχόμενες γραμμές με διαδοχικά κλικ.",
+    "i": "sketcher/Sketcher_CreatePolyline.gif",
+    "selw": "Κλείσε στο πρώτο σημείο, αλλιώς το Pad δεν δουλεύει.",
+    "uses": [
+      "Προφίλ με πολλές γωνίες"
+    ]
+  },
+  "Sketcher_CreateArc": {
+    "t": "Τόξο (από κέντρο)",
+    "d": "Τόξο: κέντρο, αρχή, τέλος.",
+    "i": "sketcher/Sketcher_CreateArc.gif",
+    "uses": [
+      "Στρογγυλή άκρη"
+    ]
+  },
+  "Sketcher_Trimming": {
+    "t": "Κόψιμο (Trim)",
+    "d": "Κόβει ένα κομμάτι ως τις τομές του.",
+    "i": "sketcher/Sketcher_Trimming.gif",
+    "selw": "Πρώτα το κουμπί, μετά κλικ στο κομμάτι.",
+    "uses": [
+      "Καθάρισμα διασταυρώσεων"
+    ]
+  },
+  "Sketcher_CreateFillet": {
+    "t": "Στρογγύλεμα γωνίας (Fillet)",
+    "d": "Στρογγυλεύει μια γωνία. M = λοξοτομή.",
+    "i": "sketcher/Sketcher_CreateFillet.gif",
+    "selw": "Μετά βάλε ακτίνα για ακριβή τιμή.",
+    "uses": [
+      "Στρογγυλές γωνίες πλάκας"
+    ]
+  },
+  "Sketcher_ToggleConstruction": {
+    "t": "Βοηθητική γεωμετρία (Construction)",
+    "d": "Μπλε βοηθητική γραμμή: βοηθά, αλλά δεν γίνεται στερεό.",
+    "i": "sketcher/Sketcher_ToggleConstruction.gif",
+    "selw": "Πρώτα επιλέγεις, μετά πατάς.",
+    "uses": [
+      "Διαγώνιος για κέντρο"
+    ]
+  }
+}

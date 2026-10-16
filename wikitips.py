@@ -152,6 +152,53 @@ def action_name(action):
 
 
 _FIELDS = None
+_COMMANDS_EL = None
+
+
+def commands_el():
+    """Greek help written by hand for toolbar commands (overrides the English wiki text)."""
+    global _COMMANDS_EL
+    if _COMMANDS_EL is None:
+        try:
+            with open(os.path.join(CONTENT_DIR, "commands_el.json"), encoding="utf-8") as f:
+                _COMMANDS_EL = {k: v for k, v in json.load(f).items() if not k.startswith("_")}
+        except Exception as e:  # pragma: no cover
+            App.Console.PrintError("WikiTips: cannot read Greek help: %s\n" % e)
+            _COMMANDS_EL = {}
+    return _COMMANDS_EL
+
+
+def with_greek(key, entry):
+    """Wiki entry with the Greek hand-written help on top, if we have one."""
+    g = commands_el().get(key)
+    if not g:
+        return entry
+    merged = dict(entry or {})
+    merged.update(g)
+    merged["_el"] = True
+    return merged
+
+
+def _box(rows, bar, fill):
+    """A rich-text box with a coloured bar on the left (Qt rich text has no border-left)."""
+    cells = "".join("<tr><td width='4' bgcolor='%s'></td><td bgcolor='%s'>%s</td></tr>" % (bar, fill, r)
+                    for r in rows)
+    return "<table width='100%%' cellspacing='0' cellpadding='6' style='margin-top:2px'>%s</table>" % cells
+
+
+def sections_html(entry, dark=False, compact=False):
+    """Short on purpose: the animation shows how. One sentence, the one trap, where it helps."""
+    warn_bg, warn = ("#3B2F1A", "#FBBF24") if dark else ("#FFF7E6", "#B45309")
+    use_bg, use = ("#16302A", "#34D399") if dark else ("#ECFDF5", "#047857")
+    html = "<p style='font-size:10pt'>%s</p>" % entry.get("d", "")
+    if entry.get("selw"):
+        html += _box(["⚠ %s" % entry["selw"]], "#F59E0B", warn_bg).replace("<td bgcolor='%s'>" % warn_bg,
+                                                                             "<td bgcolor='%s' style='color:%s'>" % (warn_bg, warn))
+    uses = entry.get("uses") or []
+    if uses and not compact:
+        html += _box(["<b>Χρήσιμο:</b> " + " · ".join(uses)], "#10B981", use_bg).replace(
+            "<td bgcolor='%s'>" % use_bg, "<td bgcolor='%s' style='color:%s'>" % (use_bg, use))
+    return html
 
 
 def fields():
@@ -284,7 +331,9 @@ class TipPopup(QtWidgets.QFrame):
             "#WikiTipsPopup QLabel { background:transparent; color:%s; }"
             "#wtTitle { font-size:12pt; font-weight:bold; }"
             "#wtSmall { color:gray; font-size:8pt; }"
-            "#wtImage { background:white; border:1px solid #bbb; }" % (bg, fg, hl, fg))
+            "#wtImage { background:white; border:1px solid #bbb; }"
+            "#wtKey { background:%s; color:%s; border:1px solid #94A3B8; border-radius:4px; padding:2px 7px; font-weight:bold; font-size:9pt; }"
+            % (bg, fg, hl, fg, "#334155" if self._dark(bg) else "#E2E8F0", fg))
 
         lay = QtWidgets.QVBoxLayout(self)
         lay.setContentsMargins(10, 8, 10, 8)
@@ -296,8 +345,11 @@ class TipPopup(QtWidgets.QFrame):
         self.title = QtWidgets.QLabel()
         self.title.setObjectName("wtTitle")
         self.title.setWordWrap(True)
+        self.key = QtWidgets.QLabel()
+        self.key.setObjectName("wtKey")
         head.addWidget(self.icon)
         head.addWidget(self.title, 1)
+        head.addWidget(self.key, 0, _enum(Qt, "AlignTop", "AlignmentFlag"))
         lay.addLayout(head)
 
         self.meta = QtWidgets.QLabel()
@@ -327,32 +379,36 @@ class TipPopup(QtWidgets.QFrame):
         self._watch.setInterval(250)
         self._watch.timeout.connect(self._check_cursor)
 
+    @staticmethod
+    def _dark(color_name):
+        return QtGui.QColor(color_name).lightness() < 128
+
     # -- content -----------------------------------------------------------
-    def fill(self, key, entry, action):
+    def fill(self, key, entry, action, compact=False):
         self._stop_movie()
         field = action is None   # help for a field of a dialog, from content/
+        el = bool(entry.get("_el"))   # hand-written Greek help for a command
         label = clean_label(action.text()) if action is not None else ""
-        self.title.setText(label or entry.get("t", key))
+        self.title.setText(entry["t"] if el else (label or entry.get("t", key)))
         if action is not None and not action.icon().isNull():
             self.icon.setPixmap(action.icon().pixmap(32, 32))
             self.icon.show()
         else:
             self.icon.hide()
 
-        meta = [] if field else ["<i>%s</i>" % key]
+        meta = [] if field else ["<i>%s</i>" % (label if el and label else key)]
         if field and entry.get("f"):
             meta.append("Στο Fusion 360: <b>%s</b>" % entry["f"])
         if entry.get("m"):
             meta.append("Μενού: " + entry["m"])
-        sc = action.shortcut().toString() if action is not None else ""
-        if sc:
-            meta.append("Συντόμευση: <b>%s</b>" % sc)
-        elif entry.get("k"):
-            meta.append("Συντόμευση: " + entry["k"])
         self.meta.setText(" · ".join(meta))
+        sc = action.shortcut().toString() if action is not None else ""
+        sc = sc or entry.get("k", "")
+        self.key.setText(sc.replace(", ", " ").replace(",", " "))
+        self.key.setVisible(bool(sc))
 
         img = entry.get("i")
-        path = os.path.join(CONTENT_IMG_DIR if field else IMG_DIR, img) if img else ""
+        path = os.path.join(CONTENT_IMG_DIR if (field or el) else IMG_DIR, img) if img else ""
         if img and os.path.exists(path):
             if img.lower().endswith(".gif"):
                 self._movie = QtGui.QMovie(path)
@@ -375,15 +431,19 @@ class TipPopup(QtWidgets.QFrame):
             self.image.clear()
             self.image.hide()
 
-        html = entry.get("d", "") if field else short_html(entry.get("d", ""))
+        if el:
+            html = sections_html(entry, self._dark(QtWidgets.QApplication.palette().color(
+                _enum(QtGui.QPalette, "Base", "ColorRole")).name()), compact)
+        else:
+            html = entry.get("d", "") if field else short_html(entry.get("d", ""))
         if entry.get("w"):
             html += "<p style='color:#c0392b'><b>⚠ </b>%s</p>" % entry["w"]
-        if field and entry.get("en"):
-            html += "<p style='color:gray; font-size:8pt'>FreeCAD: %s</p>" % entry["en"].replace("\n", "<br>")
         self.footer.setText("WikiTips · δικά μας σχέδια και κείμενα" if field else
+                            "WikiTips · ελέγχθηκε με το FreeCAD wiki · Shift+F1 και κλικ: ολόκληρη η σελίδα"
+                            if el else
                             "Ολόκληρη η σελίδα: Shift+F1 και κλικ στο κουμπί · "
                             "Πηγή: FreeCAD wiki (CC-BY 3.0)")
-        steps = (entry.get("u") or [])[:MAX_STEPS]
+        steps = [] if el else (entry.get("u") or [])[:MAX_STEPS]
         if steps:
             html += "<p><b>Πώς χρησιμοποιείται:</b></p><ol style='margin-left:-20px'>%s</ol>" % "".join(
                 "<li>%s</li>" % s for s in steps)
@@ -397,7 +457,8 @@ class TipPopup(QtWidgets.QFrame):
             h = lbl.heightForWidth(inner) if lbl.text() else 0
             lbl.setFixedHeight(max(0, h))
             lbl.setVisible(h > 0)
-        tw = inner - (40 if not self.icon.isHidden() else 0)
+        tw = inner - (40 if not self.icon.isHidden() else 0) - (
+            self.key.sizeHint().width() + 6 if not self.key.isHidden() else 0)
         self.title.setFixedWidth(tw)
         self.title.setFixedHeight(max(self.title.heightForWidth(tw), self.title.sizeHint().height()))
         self.layout().activate()
@@ -422,6 +483,8 @@ class TipPopup(QtWidgets.QFrame):
         # small screens (laptops): smaller picture so the popup always fits
         self._max_image_h = 260 if geo.height() >= 900 else 170
         self.fill(key, entry, action)
+        if self.height() > geo.height() - 30 and entry.get("_el"):
+            self.fill(key, entry, action, compact=True)   # small screen: drop examples and tip
         x, y = gpos.x() + 16, gpos.y() + 22
         w, h = self.width(), self.height()
         if x + w > geo.right():
@@ -484,6 +547,7 @@ class ButtonFilter(QtCore.QObject):
             if not key:
                 return False
             _, entry = lookup(key)
+            entry = with_greek(key, entry)
             gpos = ev.globalPos() if hasattr(ev, "globalPos") else QtGui.QCursor.pos()
             # a fresh popup every time keeps the size right for each entry
             self.popup.dismiss()

@@ -11,7 +11,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from draw import (ACTIVE, BG, CAP_H, DIM, F_LABEL, F_SMALL, FEED, H, LEFT, PART,  # noqa: E402
+from draw import (ACTIVE, BG, CAP_H, CUT, DIM, F_BIG, F_LABEL, F_SMALL, FEED, H, LEFT, PART,  # noqa: E402
                   PART_EDGE, PATH, RAPID, SHANK, STOCK, STOCK_EDGE, TOOL, W, Frame,
                   ease, lerp, save_gif)
 
@@ -140,10 +140,10 @@ def clearance_height():
     s = Side()
     fr = []
     a = ("clear",)
-    hold(fr, s.frame(a, 50, LEVELS["clear"], "Clearance: το ψηλό επίπεδο για γρήγορες μετακινήσεις"), 1600)
+    hold(fr, s.frame(a, 50, LEVELS["clear"], "Clearance: ψηλά, γρήγορα"), 1600)
     move(s, fr, 50, LEVELS["clear"], 250, LEVELS["clear"], 14, RAPID, active=a,
-         caption="Περνάει ΠΑΝΩ από σφιγκτήρες και κομμάτι, χωρίς φόβο")
-    hold(fr, s.frame(a, 250, LEVELS["clear"], "Περνάει ΠΑΝΩ από σφιγκτήρες και κομμάτι, χωρίς φόβο"), 900)
+         caption="Περνά πάνω από όλα")
+    hold(fr, s.frame(a, 250, LEVELS["clear"], "Περνά πάνω από όλα"), 900)
     # what goes wrong if it is too low
     s2 = Side()
 
@@ -152,8 +152,8 @@ def clearance_height():
         f.text(CLAMP[1] + 14, zy(7) - 30, "ΜΠΑΜ!", fill=ACTIVE, font=F_LABEL)
     for i in range(9):
         x = lerp(250, CLAMP[1] + TOOL_D / 2 - 2, ease(i / 8))
-        fr.append((s2.frame(a, x, 6, "Αν ήταν πιο χαμηλά από τον σφιγκτήρα...", warn=True), 80))
-    hold(fr, s2.frame(a, CLAMP[1] + TOOL_D / 2 - 2, 6, "...θα τον χτυπούσε. Βάλ' το πάνω από όλα!",
+        fr.append((s2.frame(a, x, 6, "Πιο χαμηλά από τον σφιγκτήρα…", warn=True), 80))
+    hold(fr, s2.frame(a, CLAMP[1] + TOOL_D / 2 - 2, 6, "…θα τον χτυπούσε ✗",
                       warn=True, extra=bang), 2000)
     return fr
 
@@ -161,36 +161,36 @@ def clearance_height():
 @gif("safe_height")
 def safe_height():
     return pocket_run(("safe",), {
-        "intro": "Safe Height: ως εδώ κατεβαίνει ΓΡΗΓΟΡΑ (πράσινο)",
-        "traverse": "Γρήγορη μετακίνηση πάνω από το κομμάτι",
-        "down_rapid": "Γρήγορα κάτω ως το Safe Height (λίγο πάνω από το ξύλο)",
-        "layer": "Από εκεί και κάτω ΑΡΓΑ, με ταχύτητα κοπής (πορτοκαλί)",
-        "finish": "Από εκεί και κάτω ΑΡΓΑ, με ταχύτητα κοπής (πορτοκαλί)",
-        "bottom": "Πράσινο = γρήγορα στον αέρα · πορτοκαλί = αργά, κόβει",
-        "end": "Στο τέλος ανεβαίνει πάλι γρήγορα"}, layers=(-4.0, -8.0, -12.0))
+        "intro": "Safe Height: ως εδώ γρήγορα",
+        "traverse": "Γρήγορα, ψηλά",
+        "down_rapid": "Γρήγορα ως το Safe Height",
+        "layer": "Από εκεί και κάτω ΑΡΓΑ",
+        "finish": "Από εκεί και κάτω ΑΡΓΑ",
+        "bottom": "Πράσινο γρήγορα · πορτοκαλί κόβει",
+        "end": "Πάνω, γρήγορα"}, layers=(-4.0, -8.0, -12.0))
 
 
 @gif("start_depth")
 def start_depth():
     return pocket_run(("start",), {
-        "intro": "Start Depth: από ποιο ύψος αρχίζει να κόβει",
-        "traverse": "Συνήθως = η πάνω επιφάνεια του υλικού (ή της επιλεγμένης έδρας)",
-        "down_rapid": "Συνήθως = η πάνω επιφάνεια του υλικού (ή της επιλεγμένης έδρας)",
-        "layer": "Τα περάσματα μετρούν από το Start Depth και κάτω",
-        "finish": "Τα περάσματα μετρούν από το Start Depth και κάτω",
-        "bottom": "Αν το υλικό είναι πιο ψηλό από το μοντέλο, ανέβασέ το",
-        "end": "Το FreeCAD το βάζει αυτόματα από τη γεωμετρία"}, layers=(-4.0, -8.0, -12.0))
+        "intro": "Start Depth: η αρχή",
+        "traverse": "Συνήθως η πάνω επιφάνεια",
+        "down_rapid": "Συνήθως η πάνω επιφάνεια",
+        "layer": "Από εδώ ξεκινούν τα περάσματα",
+        "finish": "Από εδώ ξεκινούν τα περάσματα",
+        "bottom": "Πιο ψηλό υλικό; Ανέβασέ το",
+        "end": "Μπαίνει αυτόματα"}, layers=(-4.0, -8.0, -12.0))
 
 
 @gif("step_down")
 def step_down():
     return pocket_run((), {
-        "intro": "Step Down: πόσο βαθιά κόβει σε κάθε πέρασμα",
-        "traverse": "Ολικό βάθος 12 mm, Step Down 4 mm → 3 περάσματα",
-        "down_rapid": "Ολικό βάθος 12 mm, Step Down 4 mm → 3 περάσματα",
-        "layer": "Πέρασμα {n} από {N}: κατεβαίνει {dz} mm (Step Down)",
-        "bottom": "Μικρότερο Step Down = πιο αργά αλλά πιο ήπια για τη φρέζα",
-        "end": "Για αρχή: μισή διάμετρο (φρέζα 6 mm → 3 mm ανά πέρασμα)"},
+        "intro": "Step Down: βάθος ανά πέρασμα",
+        "traverse": "12 mm ÷ 4 mm = 3 περάσματα",
+        "down_rapid": "12 mm ÷ 4 mm = 3 περάσματα",
+        "layer": "Πέρασμα {n}/{N}: −{dz} mm",
+        "bottom": "Μικρότερο = πιο ήπιο",
+        "end": "Για αρχή: μισή διάμετρο φρέζας"},
         layers=(-4.0, -8.0, -12.0), extra=step_bracket)
 
 
@@ -206,29 +206,29 @@ def step_bracket(f):
 @gif("finish_depth")
 def finish_depth():
     return pocket_run(("final",), {
-        "intro": "Finish Depth: ένα τελευταίο ΛΕΠΤΟ πέρασμα στον πάτο",
-        "traverse": "Εδώ: Step Down 4 mm, Finish Depth 1 mm",
-        "down_rapid": "Εδώ: Step Down 4 mm, Finish Depth 1 mm",
-        "layer": "Πέρασμα {n}: χοντρό κόψιμο ({dz} mm)",
-        "finish": "Τελευταίο πέρασμα: μόνο {dz} mm → καθαρός, λείος πάτος",
+        "intro": "Finish Depth: λεπτό τελευταίο",
+        "traverse": "Step Down 4 · Finish 1 mm",
+        "down_rapid": "Step Down 4 · Finish 1 mm",
+        "layer": "Πέρασμα {n}: −{dz} mm",
+        "finish": "Τελευταίο: μόνο {dz} mm → λείος πάτος",
         "bottom": "0 = χωρίς ξεχωριστό τελικό πέρασμα",
-        "end": "Χρήσιμο όταν θέλεις ωραία επιφάνεια στον πάτο"},
+        "end": "Για ωραίο πάτο"},
         layers=(-4.0, -8.0, -11.0, -12.0))
 
 
 @gif("final_depth")
 def final_depth():
     fr = pocket_run(("final",), {
-        "intro": "Final Depth: το πιο χαμηλό σημείο που θα φτάσει",
-        "traverse": "Εδώ: τσέπη βάθους 12 mm",
-        "down_rapid": "Εδώ: τσέπη βάθους 12 mm",
-        "layer": "Κατεβαίνει πέρασμα-πέρασμα ως το Final Depth",
-        "bottom": "Ο πάτος της τσέπης = Final Depth",
-        "end": "Για διαμπερές κόψιμο: λίγο πιο κάτω από το υλικό (π.χ. −0.3 mm)"},
+        "intro": "Final Depth: ο πάτος",
+        "traverse": "Τσέπη 12 mm",
+        "down_rapid": "Τσέπη 12 mm",
+        "layer": "Πέρασμα-πέρασμα ως κάτω",
+        "bottom": "Ο πάτος = Final Depth",
+        "end": "Διαμπερές: λίγο πιο κάτω (−0.3 mm)"},
         layers=(-4.0, -8.0, -12.0))
     s = Side()
     hold(fr, s.frame(("final", "start"), LX, 0.5,
-                     "⚠ Αν Final Depth = Start Depth, δεν κόβει ΤΙΠΟΤΑ!", warn=True), 2600)
+                     "⚠ Final = Start → δεν κόβει τίποτα", warn=True), 2600)
     return fr
 
 
@@ -271,7 +271,7 @@ def run_path(fr, base, segments, r, steps=40, caption="", ms=60, cleared=True, l
             p, done = point_at(pts, min(dist, L))
             if kind == "cut":
                 if cleared:
-                    f.line(done, (236, 228, 214), r * 2)
+                    f.line(done, CUT, r * 2)
                 f.line(done, PATH, 1.5)
             else:
                 for a, b in zip(done, done[1:]):
@@ -337,15 +337,15 @@ def step_over():
             f.line([(TX1 + 6, y + step), (TX1 + 14, y + step)], ACTIVE, 2)
             f.text(TX1 + 18, y + step / 2, "%d%%" % pct, fill=ACTIVE, font=F_LABEL, anchor="lm")
             f.text(TX1 + 18, y + step / 2 + 14, "= %.1f mm" % (6 * pct / 100), fill=ACTIVE, anchor="lm")
-        cap = ("Step Over %d%%: κάθε πέρασμα πάει %.1f mm πιο δίπλα" % (pct, 6 * pct / 100))
+        cap = ("Step Over %d%% = %.1f mm" % (pct, 6 * pct / 100))
         run_path(fr, face_base, [(pts, "cut")], R_TOP, steps=46 if pct == 50 else 70, caption=cap, label=lab)
         f = Frame()
         face_base(f)
-        f.line(pts, (236, 228, 214), R_TOP * 2)
+        f.line(pts, CUT, R_TOP * 2)
         f.line(pts, PATH, 1.5)
         lab(f)
-        f.caption("50% = γρήγορο ξεχόνδρισμα · 10–25% = πιο λεία επιφάνεια" if pct == 50 else
-                  "Μικρότερο Step Over = περισσότερα περάσματα, πιο λείο")
+        f.caption("50% γρήγορο · 10–25% λείο" if pct == 50 else
+                  "Μικρότερο = πιο λείο")
         fr.append((f, 1800))
     return fr
 
@@ -356,7 +356,7 @@ def pattern_frames(fr, name, gr, segs, total_steps=50):
     face_base(f, name)
     for pts, kind in segs:
         if kind == "cut":
-            f.line(pts, (236, 228, 214), R_TOP * 2)
+            f.line(pts, CUT, R_TOP * 2)
             f.line(pts, PATH, 1.5)
         else:
             for a, b in zip(pts, pts[1:]):
@@ -370,18 +370,18 @@ def pocket_patterns():
     fr = []
     st = R_TOP * 1.0
     zz = zigzag(TX0, TY0, TX1, TY1, st, R_TOP)
-    pattern_frames(fr, "ZigZag", "ZigZag: πάει-έρχεται σε ευθείες γραμμές", [(zz, "cut")])
+    pattern_frames(fr, "ZigZag", "ZigZag: πάει-έρχεται", [(zz, "cut")])
     off = offsets(TX0, TY0, TX1, TY1, st, R_TOP)
     segs = []
     for i, lp in enumerate(off):
         segs.append((lp, "cut"))
         if i + 1 < len(off):
             segs.append(([lp[-1], off[i + 1][0]], "cut"))
-    pattern_frames(fr, "Offset", "Offset: γύρους που ακολουθούν το σχήμα", segs)
+    pattern_frames(fr, "Offset", "Offset: γύροι σαν το σχήμα", segs)
     ring = [(TX0 + R_TOP, TY0 + R_TOP), (TX1 - R_TOP, TY0 + R_TOP), (TX1 - R_TOP, TY1 - R_TOP),
             (TX0 + R_TOP, TY1 - R_TOP), (TX0 + R_TOP, TY0 + R_TOP)]
     inner = zigzag(TX0 + R_TOP, TY0 + R_TOP, TX1 - R_TOP, TY1 - R_TOP, st, R_TOP)
-    pattern_frames(fr, "ZigZagOffset", "ZigZagOffset: ZigZag + ένας γύρος στα τοιχώματα",
+    pattern_frames(fr, "ZigZagOffset", "ZigZagOffset: + γύρος στα τοιχώματα",
                    [(inner, "cut"), ([inner[-1], ring[0]], "rapid"), (ring, "cut")])
     segs = []
     y = TY0 + R_TOP
@@ -390,10 +390,10 @@ def pocket_patterns():
         segs.append(([(TX1 - R_TOP, y), (TX0 + R_TOP, y + st)], "rapid"))
         y += st
     segs.pop()
-    pattern_frames(fr, "Line", "Line: όλες οι γραμμές προς την ίδια μεριά", segs, 60)
+    pattern_frames(fr, "Line", "Line: όλες προς μία μεριά", segs, 60)
     gx = zigzag(TX0, TY0, TX1, TY1, st * 1.6, R_TOP)
     gy = [(p[1], p[0]) for p in zigzag(TY0, TX0, TY1, TX1, st * 1.6, R_TOP)]
-    pattern_frames(fr, "Grid", "Grid: γραμμές και στις δύο κατευθύνσεις",
+    pattern_frames(fr, "Grid", "Grid: και προς τις δύο",
                    [(gx, "cut"), ([gx[-1], gy[0]], "rapid"), (gy, "cut")], 60)
     return fr
 
@@ -403,7 +403,7 @@ def facing_patterns():
     fr = []
     st = R_TOP * 1.4
     zz = zigzag(TX0 - 8, TY0, TX1 + 8, TY1, st, R_TOP)
-    pattern_frames(fr, "ZigZag", "ZigZag: συνεχόμενο πάνω-κάτω, δεν σηκώνεται", [(zz, "cut")])
+    pattern_frames(fr, "ZigZag", "ZigZag: χωρίς σήκωμα", [(zz, "cut")])
     # Bidirectional: alternately from the bottom and the top edge towards the middle
     ys = []
     y = TY0 + R_TOP
@@ -423,15 +423,15 @@ def facing_patterns():
             segs.append(([prev, (a, y)], "rapid"))
         segs.append(([(a, y), (b, y)], "cut"))
         prev = (b, y)
-    pattern_frames(fr, "Bidirectional", "Bidirectional: εναλλάξ από κάτω και από πάνω", segs, 60)
+    pattern_frames(fr, "Bidirectional", "Bidirectional: εναλλάξ", segs, 60)
     segs = []
     for i, y in enumerate(ys):
         segs.append(([(TX0 - 8, y), (TX1 + 8, y)], "cut"))
         if i + 1 < len(ys):
             segs.append(([(TX1 + 8, y), (TX0 - 8, ys[i + 1])], "rapid"))
-    pattern_frames(fr, "Directional", "Directional: πάντα ίδια φορά → ίδιο φινίρισμα", segs, 60)
+    pattern_frames(fr, "Directional", "Directional: πάντα ίδια φορά", segs, 60)
     sp = spiral(TX0, TY0, TX1, TY1, st, R_TOP)
-    pattern_frames(fr, "Spiral", "Spiral: σπείρα από έξω προς τα μέσα", [(sp, "cut")])
+    pattern_frames(fr, "Spiral", "Spiral: σπείρα", [(sp, "cut")])
     return fr
 
 
@@ -470,11 +470,11 @@ def pattern_angle():
 
     for stop, nxt in ((0, 45), (45, 90), (90, 0)):
         for i in range(11):
-            fr.append((scene(stop, i / 10, "Angle %d°: οι γραμμές του μοτίβου πάνε έτσι" % stop), 70))
+            fr.append((scene(stop, i / 10, "Angle %d°" % stop), 70))
         steps = 12
         for i in range(1, steps + 1):
             ang = lerp(stop, nxt, ease(i / steps)) if nxt else lerp(stop, 0, ease(i / steps))
-            fr.append((scene(ang, None, "Αλλάζοντας το Angle γυρίζουν όλες οι γραμμές"), 60))
+            fr.append((scene(ang, None, "Γυρίζουν όλες οι γραμμές"), 60))
     return fr
 
 
@@ -506,21 +506,15 @@ def cut_mode():
             f.tag(30, 8, mode, fill=ACTIVE)
             f.text(30 + (60 if mode == "Climb" else 110), 13, "(ομόρροπη)" if mode == "Climb" else "(αντίρροπη)",
                    fill=DIM)
-            f.caption("Climb: το δόντι μπαίνει χοντρά και βγαίνει λεπτά" if mode == "Climb" else
-                      "Conventional: το δόντι μπαίνει λεπτά και βγαίνει χοντρά")
+            f.caption("Climb: μπαίνει χοντρά" if mode == "Climb" else
+                      "Conventional: μπαίνει λεπτά")
             fr.append((f, 90))
         f = fr[-1][0]
         fr.append((f, 400))
     f = Frame()
-    f.title("Ποιο να διαλέξω;")
-    lines = ["Climb (ομόρροπη)", "  • πιο καθαρά τοιχώματα, λιγότερη φθορά φρέζας",
-             "  • η συνήθης επιλογή στα CNC router (ξύλο/MDF)",
-             "Conventional (αντίρροπη)", "  • για μηχανές με τζόγο (μπόσικες βίδες/ιμάντες)",
-             "  • μερικές φορές πιο ήρεμο σε σκληρά υλικά"]
-    for k, s in enumerate(lines):
-        f.text(14, 36 + k * 26, s, fill=ACTIVE if not s.startswith(" ") else (40, 40, 40),
-               font=F_LABEL if not s.startswith(" ") else F_SMALL)
-    f.caption("Ο άξονας γυρίζει δεξιόστροφα (M3), όπως σχεδόν πάντα")
+    f.tag(W / 2, 70, "Climb  ✓  CNC router, ξύλο", fill=RAPID, anchor="mm", font=F_BIG)
+    f.tag(W / 2, 120, "Conventional  →  μηχανή με τζόγο", fill=DIM, anchor="mm", font=F_BIG)
+    f.caption("Άξονας δεξιόστροφα (M3)")
     fr.append((f, 4200))
     return fr
 
@@ -536,7 +530,7 @@ def part_base(f, hole=False):
     f.rect(20, 20, W - 20, TY1 + 8, fill=STOCK, outline=STOCK_EDGE)
     f.rrect(x0, y0, x1, y1, 10, fill=PART, outline=PART_EDGE, width=2)
     if hole:
-        f.circle((x0 + x1) / 2, (y0 + y1) / 2, 26, fill=(236, 228, 214), outline=PART_EDGE, width=2)
+        f.circle((x0 + x1) / 2, (y0 + y1) / 2, 26, fill=CUT, outline=PART_EDGE, width=2)
 
 
 def loop_rect(x0, y0, x1, y1, d, cw=True):
@@ -555,10 +549,10 @@ def cut_side():
     r = 11
     x0, y0, x1, y1 = PART_R
     run_path(fr, lambda f: part_base(f, True), [(loop_rect(x0, y0, x1, y1, r), "cut")], r, 40,
-             "Outside: η φρέζα γυρίζει ΕΞΩ από τη γραμμή → κρατάς το κομμάτι",
+             "Outside: γύρω-γύρω ΕΞΩ",
              label=lambda f: f.tag(24, 26, "Cut side = Outside"))
     run_path(fr, lambda f: part_base(f, True), [(loop_circle((x0 + x1) / 2, (y0 + y1) / 2, 26 - r), "cut")], r, 30,
-             "Inside: η φρέζα μένει ΜΕΣΑ στη γραμμή → για τρύπες/ανοίγματα",
+             "Inside: ΜΕΣΑ (για τρύπες)",
              label=lambda f: f.tag(24, 26, "Cut side = Inside"))
     fr.append((fr[-1][0], 1500))
     return fr
@@ -573,10 +567,10 @@ def use_compensation():
     def eaten(f):
         f.rrect(x0, y0, x1, y1, 10, outline=ACTIVE, width=2)
     run_path(fr, part_base, [(loop_rect(x0, y0, x1, y1, r), "cut")], r, 36,
-             "Με Compensation: το κέντρο της φρέζας μένει μισή διάμετρο έξω",
+             "Με Compensation: σωστό μέγεθος ✓",
              label=lambda f: f.tag(24, 26, "Use Compensation ✓"))
     run_path(fr, part_base, [(loop_rect(x0, y0, x1, y1, 0), "cut")], r, 36,
-             "Χωρίς: το κέντρο πάει ΠΑΝΩ στη γραμμή → τρώει το κομμάτι",
+             "Χωρίς: τρώει το κομμάτι ✗",
              label=lambda f: (f.tag(24, 26, "Use Compensation ✗", fill=DIM), eaten(f)))
     fr.append((fr[-1][0], 1600))
     return fr
@@ -588,18 +582,15 @@ def profile_direction():
     r = 11
     x0, y0, x1, y1 = PART_R
     run_path(fr, part_base, [(loop_rect(x0, y0, x1, y1, r, cw=True), "cut")], r, 36,
-             "CW (δεξιόστροφα) γύρω από το κομμάτι = Climb",
+             "CW έξω = Climb",
              label=lambda f: f.tag(24, 26, "Direction = CW"))
     run_path(fr, part_base, [(loop_rect(x0, y0, x1, y1, r, cw=False), "cut")], r, 36,
-             "CCW (αριστερόστροφα) γύρω από το κομμάτι = Conventional",
+             "CCW έξω = Conventional",
              label=lambda f: f.tag(24, 26, "Direction = CCW"))
     f = Frame()
-    f.title("Direction (κατεύθυνση)")
-    for k, s in enumerate(["Εξωτερικό περίγραμμα:  CW = Climb,  CCW = Conventional",
-                           "Εσωτερικό (τρύπα):       CCW = Climb,  CW = Conventional",
-                           "(με τον άξονα να γυρίζει κανονικά, M3)"]):
-        f.text(14, 50 + k * 30, s, fill=(40, 40, 40), font=F_LABEL if k < 2 else F_SMALL)
-    f.caption("Δες και το «Cut mode» για το τι σημαίνει Climb")
+    f.tag(W / 2, 70, "Έξω:  CW = Climb", fill=RAPID, anchor="mm", font=F_BIG)
+    f.tag(W / 2, 120, "Τρύπα:  CCW = Climb", fill=RAPID, anchor="mm", font=F_BIG)
+    f.caption("Με άξονα M3")
     fr.append((f, 3600))
     return fr
 
@@ -612,7 +603,7 @@ def profile_passes():
     segs = []
     for k, d in enumerate((r + 16, r + 8, r)):
         segs.append((loop_rect(x0, y0, x1, y1, d), "cut"))
-    run_path(fr, part_base, segs, r, 70, "Number of passes 3, Pass stepover 8 mm: 3 γύροι",
+    run_path(fr, part_base, segs, r, 70, "3 περάσματα = 3 γύροι",
              label=lambda f: f.tag(24, 26, "3 περάσματα"))
     fr.append((fr[-1][0], 1600))
     return fr
@@ -633,10 +624,10 @@ def stock_to_leave():
         part_base(f)
         thin(f)
     run_path(fr, base, [(loop_rect(x0, y0, x1, y1, r + leave), "cut")], r, 36,
-             "Stock to leave: αφήνει λίγο υλικό (μπλε) στα τοιχώματα",
+             "Αφήνει λίγο υλικό (κίτρινο)",
              label=lambda f: f.tag(24, 26, "Radial stock to leave = 0.5 mm"))
     run_path(fr, part_base, [(loop_rect(x0, y0, x1, y1, r), "cut")], r, 36,
-             "Μετά ένα ελαφρύ τελικό πέρασμα το καθαρίζει → λεία τοιχώματα",
+             "Ένα τελικό πέρασμα → λεία τοιχώματα",
              label=lambda f: f.tag(24, 26, "τελικό πέρασμα (finishing)"))
     fr.append((fr[-1][0], 1500))
     return fr
@@ -652,10 +643,10 @@ def axial_stock_to_leave():
     def floor(f):
         f.rect(PX0, zy(-11.0), PX1, zy(-12.0), fill=LEFT)
         f.tag(PX0 + 4, zy(-11.0) - 18, "0.5–1 mm μένει", fill=PATH)
-    hold(fr, s.frame(a, RX, -11.0, "Axial stock to leave: αφήνει λίγο υλικό στον πάτο", extra=floor), 2200)
+    hold(fr, s.frame(a, RX, -11.0, "Αφήνει λίγο στον πάτο", extra=floor), 2200)
     s.cleared[-1] = (PX0, 0, PX1, -12.0)
-    move(s, fr, LX, -12.0, RX, -12.0, 12, FEED, active=a, caption="Ένα επόμενο πέρασμα το καθαρίζει στο σωστό βάθος")
-    hold(fr, s.frame(a, RX, -12.0, "Ένα επόμενο πέρασμα το καθαρίζει στο σωστό βάθος"), 1500)
+    move(s, fr, LX, -12.0, RX, -12.0, 12, FEED, active=a, caption="Μετά: τελικό πέρασμα")
+    hold(fr, s.frame(a, RX, -12.0, "Μετά: τελικό πέρασμα"), 1500)
     return fr
 
 
@@ -683,10 +674,10 @@ def use_outline():
                     segs.append(([(s0, y), (s1, y)], "cut"))
         else:
             segs.append(([a, b], "cut"))
-    run_path(fr, base_island, segs, R_TOP, 50, "Χωρίς: σέβεται το «νησί» στη μέση της τσέπης",
+    run_path(fr, base_island, segs, R_TOP, 50, "Χωρίς ✓: κρατά το νησί",
              label=lambda f: f.tag(TX1 + 8, TY0, "Use outline ✗", fill=DIM))
     fr.append((fr[-1][0], 900))
-    run_path(fr, base_island, [(zz, "cut")], R_TOP, 50, "Με Use outline: αγνοεί τρύπες/νησιά, κόβει όλο το περίγραμμα",
+    run_path(fr, base_island, [(zz, "cut")], R_TOP, 50, "Με ✓: κόβει και το νησί",
              label=lambda f: f.tag(TX1 + 8, TY0, "Use outline ✓"))
     fr.append((fr[-1][0], 1500))
     return fr
@@ -696,8 +687,8 @@ def use_outline():
 def pass_extension():
     fr = []
     st = R_TOP * 1.4
-    for ext, cap in ((0, "Pass Extension 0: κάθε γραμμή σταματά στην άκρη"),
-                     (16, "Pass Extension 3 mm: βγαίνει λίγο έξω → καθαρή άκρη")):
+    for ext, cap in ((0, "0: σταματά στην άκρη"),
+                     (16, "3 mm έξω → καθαρή άκρη")):
         zz = zigzag(TX0 + R_TOP - ext - 4, TY0, TX1 - R_TOP + ext + 4, TY1, st, 0)
 
         def lab(f, ext=ext):
@@ -730,24 +721,24 @@ def peck():
     def rline(f):
         f.dashed(HOLE_X - 40, zy(R), HOLE_X + 40, zy(R), PATH, 1.5)
         f.text(HOLE_X + 44, zy(R), "R", fill=PATH, font=F_LABEL, anchor="lm")
-    fr.append((drill_scene(("final",), LEVELS["safe"], 0, "Peck: τρυπάει λίγο-λίγο και βγαίνει να καθαρίσει", extra=rline), 1600))
+    fr.append((drill_scene(("final",), LEVELS["safe"], 0, "Peck: λίγο-λίγο", extra=rline), 1600))
     first = True
     while depth > LEVELS["final"]:
         nd = max(LEVELS["final"], depth - q)
         if not first:   # G83: rapid back down to just above the last depth, then feed again
             for i in range(4):
                 fr.append((drill_scene(("final",), lerp(R, depth + 0.3, ease(i / 3)), depth,
-                                       "Γρήγορα κάτω ως λίγο πάνω από το προηγούμενο βάθος", extra=rline), 60))
+                                       "Γρήγορα ως το προηγούμενο βάθος", extra=rline), 60))
         first = False
         for i in range(6):
             fr.append((drill_scene(("final",), lerp(depth, nd, i / 5), min(depth, lerp(depth, nd, i / 5)),
-                                   "Κατεβαίνει %g mm (Peck depth)" % q, extra=rline), 70))
+                                   "−%g mm (Peck depth)" % q, extra=rline), 70))
         depth = nd
         for i in range(5):
             fr.append((drill_scene(("final",), lerp(depth, R, i / 4), depth,
-                                   "Βγαίνει ως το R → φεύγουν τα ρινίσματα", extra=rline), 60))
+                                   "Βγαίνει: φεύγουν τα ρινίσματα", extra=rline), 60))
         fr.append((fr[-1][0], 250))
-    fr.append((drill_scene(("final",), R, depth, "Χωρίς Peck θα πήγαινε μονορούφι → κινδυνεύει να σπάσει", extra=rline), 2000))
+    fr.append((drill_scene(("final",), R, depth, "Λίγο-λίγο = δεν σπάει το τρυπάνι", extra=rline), 2000))
     return fr
 
 
@@ -756,14 +747,14 @@ def dwell():
     fr = []
     for i in range(8):
         z = lerp(LEVELS["safe"], LEVELS["final"], i / 7)
-        fr.append((drill_scene(("final",), z, min(0, z), "Κατεβαίνει στον πάτο της τρύπας"), 70))
+        fr.append((drill_scene(("final",), z, min(0, z), "Κάτω ως τον πάτο"), 70))
     for k in range(3, 0, -1):
         def clock(f, k=k):
             f.tag(HOLE_X + 22, zy(-9), "περιμένει… %d" % k, fill=PATH)
-        fr.append((drill_scene(("final",), LEVELS["final"], LEVELS["final"], "Dwell: σταματά λίγο στον πάτο (Dwell time)", extra=clock), 600))
+        fr.append((drill_scene(("final",), LEVELS["final"], LEVELS["final"], "Dwell: περιμένει στον πάτο", extra=clock), 600))
     for i in range(6):
         z = lerp(LEVELS["final"], LEVELS["safe"], i / 5)
-        fr.append((drill_scene(("final",), z, LEVELS["final"], "Καθαρός, ίσιος πάτος → μετά ανεβαίνει"), 70))
+        fr.append((drill_scene(("final",), z, LEVELS["final"], "Ίσιος πάτος ✓"), 70))
     fr.append((fr[-1][0], 1200))
     return fr
 
@@ -781,7 +772,7 @@ def drilled(f, bottom, d=14):
 def drill_extra_offset():
     fr = []
     fin, extra = LEVELS["final"], -1.6
-    cap1 = "Το τρυπάνι έχει μύτη (κώνο) στην άκρη"
+    cap1 = "Το τρυπάνι έχει μύτη"
 
     def at(z, cap, marks=None, warn=False):
         def ex(f):
@@ -805,12 +796,12 @@ def drill_extra_offset():
 
     for i in range(10):
         fr.append((at(lerp(LEVELS["safe"], fin, i / 9), cap1), 70))
-    fr.append((at(fin, "Στο Final Depth η τρύπα στενεύει προς τα κάτω", narrow, True), 2000))
+    fr.append((at(fin, "Στενεύει στο κάτω μέρος ✗", narrow, True), 2000))
     for i in range(8):
-        fr.append((at(lerp(LEVELS["safe"], 0, i / 7), "Extra Offset: ίδια τρύπα, λίγο πιο βαθιά"), 50))
+        fr.append((at(lerp(LEVELS["safe"], 0, i / 7), "Extra Offset: λίγο πιο βαθιά"), 50))
     for i in range(10):
-        fr.append((at(lerp(0, fin + extra, i / 9), "Extra Offset: ίδια τρύπα, λίγο πιο βαθιά"), 70))
-    fr.append((at(fin + extra, "Η μύτη περνά πιο κάτω → σωστή διάμετρος στο βάθος", full), 2400))
+        fr.append((at(lerp(0, fin + extra, i / 9), "Extra Offset: λίγο πιο βαθιά"), 70))
+    fr.append((at(fin + extra, "Σωστή διάμετρος ως κάτω ✓", full), 2400))
     return fr
 
 
@@ -828,21 +819,21 @@ def peck_retract():
         return drill_scene((), z, depth, cap, extra=rline, show=show)
 
     for i in range(6):
-        fr.append((fr_(lerp(LEVELS["clear"], R, ease(i / 5)), 0, "Πρώτα γρήγορα κάτω ως το R"), 70))
-    fr.append((fr_(R, 0, "R = λίγο πάνω από το υλικό (συνήθως 1–2 mm)"), 1200))
+        fr.append((fr_(lerp(LEVELS["clear"], R, ease(i / 5)), 0, "Γρήγορα ως το R"), 70))
+    fr.append((fr_(R, 0, "R: 1–2 mm πάνω από το υλικό"), 1200))
     depth = 0.0
     for nd in (-4.0, -8.0, -12.0):
         if depth < 0:
             for i in range(4):
-                fr.append((fr_(lerp(R, depth + 0.3, ease(i / 3)), depth, "Ξανά κάτω, γρήγορα ως το προηγούμενο βάθος"), 60))
+                fr.append((fr_(lerp(R, depth + 0.3, ease(i / 3)), depth, "Γρήγορα ως το προηγούμενο βάθος"), 60))
         for i in range(6):
             z = lerp(depth, nd, i / 5)
-            fr.append((fr_(z, min(0, z), "Τρυπάει αργά 4 mm"), 70))
+            fr.append((fr_(z, min(0, z), "Τρυπάει 4 mm"), 70))
         depth = nd
         for i in range(5):
-            fr.append((fr_(lerp(depth, R, ease(i / 4)), depth, "Βγαίνει ως το R (όχι πιο ψηλά) → κερδίζει χρόνο"), 60))
+            fr.append((fr_(lerp(depth, R, ease(i / 4)), depth, "Βγαίνει μόνο ως το R"), 60))
         fr.append((fr[-1][0], 300))
-    fr.append((fr_(R, depth, "Δεν είναι το Safe Height της εργασίας"), 2200))
+    fr.append((fr_(R, depth, "R ≠ Safe Height"), 2200))
     return fr
 
 
@@ -870,9 +861,9 @@ def helix_entry():
         s.trail = [(sub, FEED)]
         x, y = sub[-1]
         z_now = (TOP_Y - y) / MM
-        fr.append((s.frame(("final",), x, z_now, "Helix: μπαίνει στο υλικό σαν βίδα, όχι κάθετα"), 70))
+        fr.append((s.frame(("final",), x, z_now, "Helix: μπαίνει σαν βίδα"), 70))
     fr.append((fr[-1][0], 1500))
-    fr.append((s.frame(("final",), cx, LEVELS["final"], "Max pitch / ramp angle: πόσο απότομα κατεβαίνει"), 2200))
+    fr.append((s.frame(("final",), cx, LEVELS["final"], "Max pitch: πόσο απότομα"), 2200))
     return fr
 
 
@@ -882,15 +873,15 @@ def retract_threshold():
     fr = []
     a = ()
     s.cleared = [(60, 0, 130, -6), (170, 0, 250, -6)]
-    hold(fr, s.frame(a, 95, -6, "Δύο κοντινές περιοχές: πώς πάει από τη μία στην άλλη;"), 1500)
-    move(s, fr, 95, -6, 95, LEVELS["clear"], 6, RAPID, caption="Χωρίς: ανεβαίνει ψηλά, πάει, ξανακατεβαίνει (αργό)")
-    move(s, fr, 95, LEVELS["clear"], 210, LEVELS["clear"], 8, RAPID, caption="Χωρίς: ανεβαίνει ψηλά, πάει, ξανακατεβαίνει (αργό)")
-    move(s, fr, 210, LEVELS["clear"], 210, -6, 6, RAPID, caption="Χωρίς: ανεβαίνει ψηλά, πάει, ξανακατεβαίνει (αργό)")
+    hold(fr, s.frame(a, 95, -6, "Δύο κοντινές περιοχές"), 1500)
+    move(s, fr, 95, -6, 95, LEVELS["clear"], 6, RAPID, caption="Χωρίς: ανεβαίνει ως πάνω (αργό)")
+    move(s, fr, 95, LEVELS["clear"], 210, LEVELS["clear"], 8, RAPID, caption="Χωρίς: ανεβαίνει ως πάνω (αργό)")
+    move(s, fr, 210, LEVELS["clear"], 210, -6, 6, RAPID, caption="Χωρίς: ανεβαίνει ως πάνω (αργό)")
     s.trail = []
-    move(s, fr, 95, -6, 95, 1, 3, RAPID, caption="Retract threshold: αν είναι κοντά, πάει «χαμηλά»")
-    move(s, fr, 95, 1, 210, 1, 8, RAPID, caption="Retract threshold: αν είναι κοντά, πάει «χαμηλά»")
-    move(s, fr, 210, 1, 210, -6, 3, RAPID, caption="Retract threshold: αν είναι κοντά, πάει «χαμηλά»")
-    hold(fr, s.frame(a, 210, -6, "Λιγότερες άσκοπες ανεβοκατεβάσεις = πιο γρήγορα"), 1600)
+    move(s, fr, 95, -6, 95, 1, 3, RAPID, caption="Με threshold: πάει χαμηλά")
+    move(s, fr, 95, 1, 210, 1, 8, RAPID, caption="Με threshold: πάει χαμηλά")
+    move(s, fr, 210, 1, 210, -6, 3, RAPID, caption="Με threshold: πάει χαμηλά")
+    hold(fr, s.frame(a, 210, -6, "Πιο γρήγορα ✓"), 1600)
     return fr
 
 

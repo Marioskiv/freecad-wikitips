@@ -30,26 +30,29 @@ F_CAP = _font("DejaVuSans-Bold.ttf", 12)
 F_BIG = _font("DejaVuSans-Bold.ttf", 14)
 
 # palette (kept in one place so every animation looks the same)
-# v2 (2026-10-16): same roles Marios liked, slightly more modern (cooler white, richer wood,
-# metallic tools, slate caption bar).
-BG = (247, 248, 250)
-STOCK = (221, 182, 132)
-STOCK_EDGE = (166, 124, 74)
-GRAIN = (205, 162, 110)
-PART = (203, 213, 225)
-PART_EDGE = (100, 116, 139)
-TOOL = (96, 120, 156)
-TOOL_HI = (168, 186, 212)
-SHANK = (61, 72, 92)
-ACTIVE = (228, 52, 70)
-DIM = (140, 152, 170)
-RAPID = (16, 170, 120)
-FEED = (240, 150, 20)
-PATH = (37, 99, 235)
-LEFT = (125, 190, 245)   # material left on purpose (stock to leave)
-CAP_BG = (30, 41, 59)
-WARN_BG = (176, 36, 52)
-SHADOW = (222, 226, 232)
+# v4 (2026-10-16): Marios found the wood-brown stock old-fashioned. Modern CAM look: a light
+# slate block, graphite tool with an amber ring, indigo tool paths, rose = setting explained.
+BG = (248, 250, 252)
+STOCK = (214, 222, 233)          # block (drawn with a soft top-to-bottom gradient)
+STOCK_BOTTOM = (178, 191, 209)
+STOCK_EDGE = (100, 116, 139)
+CUT = (255, 255, 255)            # floor of what has been cut, seen from above
+PART = (224, 231, 255)
+PART_EDGE = (79, 70, 229)
+TOOL = (71, 85, 105)
+TOOL_HI = (148, 163, 184)
+SHANK = (30, 41, 59)
+RING = (245, 158, 11)
+ACTIVE = (225, 29, 72)           # rose: the setting being explained
+DIM = (148, 163, 184)
+RAPID = (16, 185, 129)
+FEED = (245, 158, 11)
+PATH = (79, 70, 229)
+LEFT = (253, 224, 120)           # material left on purpose (stock to leave)
+CAP_BG = (15, 23, 42)            # caption pill (slate 900)
+WARN_BG = (190, 18, 60)
+AMBER = (245, 158, 11)
+SHADOW = (226, 232, 240)
 WHITE = (255, 255, 255)
 
 
@@ -72,18 +75,16 @@ class Frame:
                          fill=fill, outline=outline, width=width * SS)
 
     def wood(self, x0, y0, x1, y1, outline=None):
+        """The stock block: soft gradient, light top edge, small shadow (no wood grain)."""
         x0, x1 = min(x0, x1), max(x0, x1)
         y0, y1 = min(y0, y1), max(y0, y1)
         self.d.rounded_rectangle([(x0 + 3) * SS, (y0 + 4) * SS, (x1 + 3) * SS, (y1 + 4) * SS], 3 * SS, fill=SHADOW)
-        self.d.rectangle([x0 * SS, y0 * SS, x1 * SS, y1 * SS], fill=STOCK)
-        k = 0
-        y = y0 + 7
-        while y < y1 - 3:      # gentle wavy grain lines
-            pts = [(x, y + 1.6 * math.sin((x + k * 37) / 23.0)) for x in range(int(x0) + 4, int(x1) - 3, 6)]
-            if len(pts) > 1:
-                self.line(pts, GRAIN, 1)
-            y += 9 + (k % 3) * 3
-            k += 1
+        n = max(2, int((y1 - y0) * SS))
+        for i in range(n):
+            t = i / (n - 1)
+            c = tuple(int(a + (b - a) * t) for a, b in zip(STOCK, STOCK_BOTTOM))
+            self.d.line([(x0 * SS, y0 * SS + i), (x1 * SS, y0 * SS + i)], fill=c)
+        self.d.line([(x0 * SS, y0 * SS + SS), (x1 * SS, y0 * SS + SS)], fill=(241, 245, 249), width=SS)
         self.d.rectangle([x0 * SS, y0 * SS, x1 * SS, y1 * SS], outline=outline or STOCK_EDGE, width=SS)
 
     def rrect(self, x0, y0, x1, y1, r, fill=None, outline=None, width=1):
@@ -134,9 +135,17 @@ class Frame:
         self.d.text((x * SS, y * SS), s, fill=fill, font=font, anchor=anchor)
 
     def caption(self, s, warn=False):
-        self.rect(0, H - CAP_H, W, H, fill=WARN_BG if warn else CAP_BG)
-        self.rect(0, H - CAP_H, 4, H, fill=ACTIVE if not warn else (255, 210, 120))
-        self.text(12, H - CAP_H / 2, s, fill=WHITE, font=F_CAP, anchor="lm")
+        """Floating rounded caption, like the Sketcher animations."""
+        font = F_CAP
+        tw = self.d.textlength(s, font=font) / SS
+        if tw > W - 44:
+            font = F_LABEL
+            tw = self.d.textlength(s, font=font) / SS
+        w = min(W - 12, tw + 34)
+        x0, y0, h = (W - w) / 2, H - CAP_H + 4, CAP_H - 8
+        self.rrect(x0, y0, x0 + w, y0 + h, h / 2, fill=WARN_BG if warn else CAP_BG)
+        self.circle(x0 + 12, y0 + h / 2, 4, fill=(255, 210, 120) if warn else AMBER)
+        self.text(x0 + 22, y0 + h / 2, s, fill=WHITE, font=font, anchor="lm")
 
     def title(self, s, color=CAP_BG):
         self.text(8, 6, s, fill=color, font=F_BIG)
@@ -150,6 +159,7 @@ class Frame:
             yy = ytip - 4 - k * 9
             self.line([(x - r, yy), (x + r, yy - 5)], TOOL_HI, 1.5)
         self.metal(x - r * 0.7, ytip - flute_len - 16, x + r * 0.7, ytip - flute_len, SHANK)
+        self.rect(x - r * 0.7, ytip - flute_len - 3, x + r * 0.7, ytip - flute_len, fill=RING)
 
     def metal(self, x0, y0, x1, y1, color):
         """Rectangle shaded like a round bar lit from the left."""
