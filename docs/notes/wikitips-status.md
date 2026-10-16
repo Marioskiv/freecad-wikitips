@@ -46,8 +46,10 @@ Global toolbar "WikiTips" with an on/off command `WikiTips_Toggle`
 - `content/img/sketcher/*.gif`: 17 animations recorded in REAL FreeCAD 26.3
   (`tools/gifs/sketcher_rec.py`, light theme via View preferences) and composed with cursor,
   click rings and numbered step badges (`tools/gifs/sketcher_gifs.py`). ~0.9 MB.
-- All GIFs (CAM + Sketcher) share one look: background #F4F6FA, floating slate caption pill,
-  amber accents (palette v3, draw.py).
+- All GIFs (CAM + Sketcher) share one look (palette v4, draw.py): light background, slate stock
+  block, floating slate caption pill with amber dot. Sketcher GIFs show the real toolbar icon being
+  pressed first (icon saved by sketcher_rec.py from Gui.Command.get(name).getAction()).
+- Popups are short by design: commands = d + selw (⚠) + uses; fields = d + w + Fusion name.
 
 ## Data pipeline (tools/)
 - Primary source: https://github.com/Reqrefusion/FreeCAD-Documentation-html (offline copy of the

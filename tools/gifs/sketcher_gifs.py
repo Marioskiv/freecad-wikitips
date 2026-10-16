@@ -61,6 +61,20 @@ def draw_caption(d, n, text, size):
     d.text((tx, y0 + h / 2), text, font=font, fill=(255, 255, 255), anchor="lm")
 
 
+BTN = (22, 22, 92)    # x, y, size of the toolbar button drawn top-left (2x pixels)
+
+
+def draw_button(base_rgba, icon, pressed):
+    """The command's real icon as a toolbar button; amber frame once it is pressed."""
+    d = ImageDraw.Draw(base_rgba)
+    x, y, s = BTN
+    d.rounded_rectangle([x + 3, y + 4, x + s + 3, y + s + 4], 16, fill=(0, 0, 0, 40))
+    d.rounded_rectangle([x, y, x + s, y + s], 16, fill=(255, 247, 230) if pressed else (255, 255, 255),
+                        outline=ACCENT if pressed else (203, 213, 225), width=5 if pressed else 2)
+    if icon is not None:
+        base_rgba.alpha_composite(icon, (int(x + (s - icon.width) / 2), int(y + (s - icon.height) / 2)))
+
+
 def load(path):
     """Key frame with thicker lines: FreeCAD draws 1 px lines and the GIF is half size."""
     return Image.open(path).convert("RGB").filter(ImageFilter.MinFilter(3))
@@ -74,9 +88,15 @@ def render(rec_dir, out_path):
     base = load(os.path.join(rec_dir, first["f"]))
     cur = [size[0] * 0.82, size[1] * 0.2]
     cap = (0, "")
+    icon = None
+    if meta.get("icon"):
+        icon = Image.open(os.path.join(rec_dir, meta["icon"])).convert("RGBA").resize((64, 64), Image.LANCZOS)
+    pressed = [False]
 
     def emit(ms, ring=None, img=None):
         im = (img or base).convert("RGBA")
+        if icon is not None:
+            draw_button(im, icon, pressed[0])
         ov = Image.new("RGBA", size, (0, 0, 0, 0))
         d = ImageDraw.Draw(ov)
         if ring is not None:
@@ -109,6 +129,18 @@ def render(rec_dir, out_path):
         elif t == "click":
             for k in range(5):
                 emit(60, ring=k / 4)
+        elif t == "press" and icon is not None:
+            x0, y0 = cur
+            x1, y1 = BTN[0] + BTN[2] * 0.55, BTN[1] + BTN[2] * 0.6
+            n = 10
+            for k in range(1, n + 1):
+                e = ease(k / n)
+                cur = [x0 + (x1 - x0) * e, y0 + (y1 - y0) * e]
+                emit(FRAME_MS)
+            pressed[0] = True
+            for k in range(5):
+                emit(60, ring=k / 4)
+            emit(350)
         elif t == "hold":
             emit(ev["ms"])
     emit(1200)

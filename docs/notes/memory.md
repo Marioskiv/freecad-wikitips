@@ -46,8 +46,12 @@ Short, durable facts for the next Claude session. Details live in the other note
   click ring + numbered Greek step badge; then "what it does", "ΠΩΣ ΕΠΙΛΕΓΕΙΣ", "ΠΟΥ ΧΡΗΣΙΜΕΥΕΙ",
   💡 tip, shortcut badge. Implemented for commands in content/commands_el.json.
 - PRs: base each PR on `main` (PR 2 once got merged into the PR 1 branch by mistake).
-- He wants modern colours: palette v3 (draw.py) for drawn GIFs, light theme for FreeCAD recordings
-  (sketcher_rec.py THEME).
+- He wants modern colours: palette v4 (draw.py) — NO wood-brown stock (he disliked it): light slate
+  block, graphite tool with amber ring, indigo paths, rose = setting explained; light theme for the
+  FreeCAD recordings (sketcher_rec.py THEME).
+- FEWER WORDS (2026-10-16): "write less, let the mouse show the right way". Captions 2–5 words,
+  popup = one sentence + the one trap (⚠) + "Χρήσιμο:" line. Sketcher GIFs start by clicking the
+  real toolbar icon (tool-first), then the clicks; numbered step badges.
 - Videos: YouTube is blocked here; ask him to upload the file (frames can then be extracted).
 - Open question to ask him: which cutters (flat/ball/V-bit) and materials (wood/alu/plastic) he uses,
   so the examples match his work.

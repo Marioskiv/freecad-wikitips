@@ -187,30 +187,17 @@ def _box(rows, bar, fill):
 
 
 def sections_html(entry, dark=False, compact=False):
-    """What it does / how to select / where it is useful / tip (layout idea from other CAD help)."""
-    c = {"head": "#94A3B8" if dark else "#64748B",
-         "amber": "#F59E0B", "amber_bg": "#3B2F1A" if dark else "#FFF7E6",
-         "green": "#10B981", "green_bg": "#16302A" if dark else "#ECFDF5",
-         "gray_bg": "#262B33" if dark else "#F1F5F9", "warn": "#F87171" if dark else "#B91C1C"}
-
-    def head(t):
-        return ("<p style='margin-top:8px; margin-bottom:2px; color:%s; font-size:8pt; "
-                "font-weight:bold; letter-spacing:1px'>%s</p>" % (c["head"], t))
-
-    html = "<p>%s</p>" % entry.get("d", "")
-    sel = entry.get("sel") or []
-    if sel:
-        steps = "".join("<b>%d.</b> %s<br>" % (i + 1, t) for i, t in enumerate(sel))
-        if entry.get("selw"):
-            steps += "<span style='color:%s'>%s</span>" % (c["warn"], entry["selw"])
-        html += head("ΠΩΣ ΕΠΙΛΕΓΕΙΣ") + _box([steps], c["amber"], c["amber_bg"])
-    uses = [] if compact else (entry.get("uses") or [])
-    if uses:
-        html += head("ΠΟΥ ΧΡΗΣΙΜΕΥΕΙ") + _box(
-            ["<b>%s %s</b><br>%s" % ("①②③④"[i], u[0], u[1]) for i, u in enumerate(uses[:4])],
-            c["green"], c["green_bg"])
-    if entry.get("tip") and not compact:
-        html += "<br>" + _box(["💡 %s" % entry["tip"]], c["gray_bg"], c["gray_bg"])
+    """Short on purpose: the animation shows how. One sentence, the one trap, where it helps."""
+    warn_bg, warn = ("#3B2F1A", "#FBBF24") if dark else ("#FFF7E6", "#B45309")
+    use_bg, use = ("#16302A", "#34D399") if dark else ("#ECFDF5", "#047857")
+    html = "<p style='font-size:10pt'>%s</p>" % entry.get("d", "")
+    if entry.get("selw"):
+        html += _box(["⚠ %s" % entry["selw"]], "#F59E0B", warn_bg).replace("<td bgcolor='%s'>" % warn_bg,
+                                                                             "<td bgcolor='%s' style='color:%s'>" % (warn_bg, warn))
+    uses = entry.get("uses") or []
+    if uses and not compact:
+        html += _box(["<b>Χρήσιμο:</b> " + " · ".join(uses)], "#10B981", use_bg).replace(
+            "<td bgcolor='%s'>" % use_bg, "<td bgcolor='%s' style='color:%s'>" % (use_bg, use))
     return html
 
 
@@ -345,7 +332,7 @@ class TipPopup(QtWidgets.QFrame):
             "#wtTitle { font-size:12pt; font-weight:bold; }"
             "#wtSmall { color:gray; font-size:8pt; }"
             "#wtImage { background:white; border:1px solid #bbb; }"
-            "#wtKey { background:%s; color:%s; border-radius:4px; padding:2px 6px; font-weight:bold; font-size:8pt; }"
+            "#wtKey { background:%s; color:%s; border:1px solid #94A3B8; border-radius:4px; padding:2px 7px; font-weight:bold; font-size:9pt; }"
             % (bg, fg, hl, fg, "#334155" if self._dark(bg) else "#E2E8F0", fg))
 
         lay = QtWidgets.QVBoxLayout(self)
@@ -451,8 +438,6 @@ class TipPopup(QtWidgets.QFrame):
             html = entry.get("d", "") if field else short_html(entry.get("d", ""))
         if entry.get("w"):
             html += "<p style='color:#c0392b'><b>⚠ </b>%s</p>" % entry["w"]
-        if field and entry.get("en"):
-            html += "<p style='color:gray; font-size:8pt'>FreeCAD: %s</p>" % entry["en"].replace("\n", "<br>")
         self.footer.setText("WikiTips · δικά μας σχέδια και κείμενα" if field else
                             "WikiTips · ελέγχθηκε με το FreeCAD wiki · Shift+F1 και κλικ: ολόκληρη η σελίδα"
                             if el else

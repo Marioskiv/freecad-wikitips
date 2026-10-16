@@ -40,6 +40,11 @@
   FreeCAD + Greek texts checked against the wiki (Lock text corrected), CAM GIFs restyled
   (palette v3). Tests ALL PASS (1920x1200 and 1366x768 screens).
 - YouTube is blocked in the container (no youtube.com/youtu.be); videos must be uploaded as files.
+- Feedback round: "fewer words, the mouse should show the right way; CAM colours not nice (the
+  brown wood)". Done on PR 4: palette v4 (slate block), all CAM captions shortened to 2–5 words,
+  Sketcher GIFs now begin with the press of the real toolbar icon, popups cut to one sentence +
+  ⚠ + "Χρήσιμο:" (Symmetric popup 714 → 464 px), English FreeCAD tooltip removed from field popups.
+  Facts unchanged (verification.md still valid). Tests ALL PASS.
 
 ## 2026-10-11 → 2026-10-16 (Cowork, one long conversation)
 

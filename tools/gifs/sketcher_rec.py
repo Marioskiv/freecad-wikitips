@@ -53,8 +53,9 @@ def set_theme():
 class Rec:
     """One scenario: a sketch in edit mode, a fixed camera and a list of events."""
 
-    def __init__(self, name, center=(25, 10), height=70):
+    def __init__(self, name, center=(25, 10), height=70, tool_first=True):
         self.name = name
+        self.tool_first = tool_first
         self.dir = os.path.join(OUT, name)
         os.makedirs(self.dir, exist_ok=True)
         self.doc = App.newDocument(name)
@@ -62,6 +63,16 @@ class Rec:
         self.events = []
         self.n = 0
         self.center, self.height = center, height
+        self.save_icon()
+
+    def save_icon(self):
+        """The command's own toolbar icon, shown in the GIF as the button to press."""
+        try:
+            act = Gui.Command.get(self.name).getAction()[0]
+            act.icon().pixmap(64, 64).save(os.path.join(self.dir, "icon.png"))
+            self.icon = "icon.png"
+        except Exception:
+            self.icon = None
 
     # -- setup ---------------------------------------------------------------
     def edit(self):
@@ -82,6 +93,9 @@ class Rec:
         pump(300)
         self.W, self.H = self.v.getSize()
         self.img()   # the untouched scene: first frame of the GIF
+        if self.tool_first:   # the right way: press the tool, then click the geometry
+            self.cap(0, "Πάτα το κουμπί")
+            self.press()
 
     def line(self, a, b, construction=False):
         i = self.sk.addGeometry(Part.LineSegment(V(*a, 0), V(*b, 0)), construction)
@@ -118,7 +132,15 @@ class Rec:
         self.events.append({"t": "img", "f": self.shot(), "blend": blend})
 
     def cap(self, n, text):
+        if n and self.tool_first and text != "Πάτα το κουμπί":
+            n += 1                          # step 1 is always "press the button"
+        if not n and text == "Πάτα το κουμπί":
+            n = 1
         self.events.append({"t": "cap", "n": n, "text": text})
+
+    def press(self):
+        """Cursor goes to the toolbar button and clicks it (drawn by sketcher_gifs.py)."""
+        self.events.append({"t": "press"})
 
     def move(self, x, y, ms=500):
         self.events.append({"t": "move", "to": self.px(x, y), "ms": ms})
@@ -143,7 +165,7 @@ class Rec:
         self.hold(ms)
 
     def save(self, tool_px=None):
-        meta = {"name": self.name, "size": [self.W, self.H], "events": self.events}
+        meta = {"name": self.name, "size": [self.W, self.H], "icon": self.icon, "events": self.events}
         with open(os.path.join(self.dir, "events.json"), "w", encoding="utf-8") as f:
             json.dump(meta, f, ensure_ascii=False, indent=1)
         Gui.ActiveDocument.resetEdit()
@@ -174,8 +196,6 @@ def s_symmetric():
     r.sk.addConstraint(C("DistanceX", ids[0], 1, ids[0], 2, 40))
     r.sk.addConstraint(C("DistanceY", ids[1], 1, ids[1], 2, 24))
     r.edit()
-    r.cap(0, "Ορθογώνιο εκτός κέντρου")
-    r.hold(1200)
     r.cap(1, "Κλικ στη μία γωνία")
     r.click(6, -6, "Vertex1")
     r.cap(2, "Κλικ στην απέναντι γωνία")
@@ -193,8 +213,6 @@ def s_horver():
     a = r.line((2, 4), (44, 12))
     b = r.line((52, 0), (58, 30))
     r.edit()
-    r.cap(0, "Δύο γραμμές λίγο στραβές")
-    r.hold(1000)
     r.cap(1, "Κλικ στη γραμμή")
     r.click(23, 8, "Edge%d" % (a + 1))
     r.apply(lambda: r.sk.addConstraint(C("Horizontal", a)), 2, "Γίνεται οριζόντια", 1300)
@@ -471,14 +489,14 @@ def s_fillet():
 
 @scene("Sketcher_ToggleConstruction")
 def s_construction():
-    r = Rec("Sketcher_ToggleConstruction", center=(20, 10), height=44)
+    r = Rec("Sketcher_ToggleConstruction", center=(20, 10), height=44, tool_first=False)
     ids = r.rect(0, 0, 36, 22)
     d = r.line((0, 0), (36, 22))
     r.edit()
     r.cap(1, "Επίλεξε μια γραμμή βοηθό")
     r.click(18, 11, "Edge%d" % (d + 1))
-    r.cap(2, "Πάτα το κουμπί Construction")
-    r.hold(700)
+    r.cap(2, "Πάτα το κουμπί")
+    r.press()
     r.apply(lambda: r.sk.toggleConstruction(d), 3, "Μπλε = βοηθητική γραμμή")
     r.save()
 
