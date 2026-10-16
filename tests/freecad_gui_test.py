@@ -199,7 +199,9 @@ def run():
                 key = wikitips.command_name(a, b)
                 if not key:
                     missing.append(name)
-                if a.objectName() in POPUPS:
+                # only toolbar buttons get popups: buttons in task panels (QFrame) are
+                # created/destroyed with the panel and are left alone on purpose
+                if a.objectName() in POPUPS and isinstance(b.parentWidget(), QtWidgets.QToolBar):
                     pop = hover(wikitips, b)
                     want = POPUPS[a.objectName()]
                     ok = pop is not None and (want is None or key == want)

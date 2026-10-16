@@ -45,6 +45,18 @@
   MillFacing: clearingPattern, cutMode, angle, reverse, stepOver, passExtension, stockExtension,
   axialStockToLeave; Depths/Heights (Path/Op/Gui/Base.py): startDepth, finalDepth, stepDown,
   finishDepth, clearanceHeight, safeHeight. → usable for per-field help.
+- **PySide crash trap (26.3):** wrapping all widgets of a CAM task dialog from Python
+  (`mw.findChildren(QWidget)` without a name), even just iterating, made FreeCAD segfault later in
+  CAM `Base.py` (`pageCleanup`, `populateCombobox`, "Signal source has been deleted"). Lookup by
+  objectName did not. Scripted open/close of several CAM dialogs in one session also crashes
+  WITHOUT any addon; `Gui.Control.activeTaskDialog().reject()` is the cleanest way to close.
+  PartDesign's task panel shows command buttons (Pad, Pocket...) in a QFrame: short-lived.
+- CAM enums (26.3 source): Pocket ClearingPattern ZigZag/Offset/ZigZagOffset/Line/Grid, CutMode
+  Climb/Conventional, StartAt Center/Edge; MillFacing ClearingPattern ZigZag/Bidirectional
+  (alternating from both edges to the middle, constant milling direction)/Directional (one
+  direction, retract between passes)/Spiral; Adaptive Side Outside/Inside, OperationType
+  Clearing/Profiling. Drilling panel: peck (G73/G83, Q), dwell (G82, P), chip break (G73),
+  feed retract (G85), keep tool down (G99), peckRetract (R), ExtraOffset (tip through bottom).
 - MainWindow handles What's-This mode; Std_WhatsThis (Shift+F1) opens the help page of the clicked
   command through the built-in Help module.
 

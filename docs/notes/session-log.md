@@ -12,8 +12,18 @@
   (scripted FreeCAD frames) and CAM heights/depths (drawn diagram with Greek captions).
 - Marios asked for: GIFs (preferred), help for unusual buttons, help on every dialog field (CAM
   depths/heights/stepover..., 3D ops), careful study, re-use of licensed material.
+- PR 2 (branch feature/cam-field-help): Greek help + 25 animations for CAM dialog fields
+  (heights/depths, step over, patterns, cut mode, cut side, compensation, passes, stock to leave,
+  facing extensions, drilling peck/dwell/R/extra offset, adaptive helix, retract threshold).
+  Found and fixed a crash risk (stale PySide wrappers of dialog widgets) by switching to polling;
+  proved with a control run that scripted CAM dialog cycling crashes FreeCAD 26.3 by itself.
+  Test suite: tests/run_freecad_tests.sh → ALL PASS.
+- Research (web): Fusion help pages for heights, SolidWorks 2020 animated tooltips, Onshape
+  two-stage tooltips → ideas recorded in memory.md. Marios: ideas only, our own drawings.
 - Open: Marios has not installed it on Windows yet (needs the Mod path from the Python console);
-  ask about his cutters and materials.
+  ask about his cutters and materials; Fusion names in fields_el.json are from Claude's knowledge
+  (Fusion help pages checked only for the heights) — verify the rest if possible.
+- Next (PR 3): GIFs for unusual Part/PartDesign buttons (Binders, Boolean, Clone, Datums...).
 
 ## 2026-10-11 → 2026-10-16 (Cowork, one long conversation)
 
