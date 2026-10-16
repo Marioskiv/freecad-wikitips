@@ -93,6 +93,13 @@ def bowl():
     return s
 
 
+def dome():
+    """Plate with a smooth bump: the shape for 3D Surface / Waterline."""
+    s = Part.makeBox(80, 60, 8)
+    cap = Part.makeSphere(30, V(40, 30, -10)).common(Part.makeBox(80, 60, 40, V(0, 0, 8)))
+    return s.fuse(cap).removeSplitter()
+
+
 def text_plate(doc, text="CNC"):
     import Draft
     s = Part.makeBox(90, 40, 10)
@@ -765,6 +772,20 @@ def s_pocket3d():
         return {"clicks": [((40, 30, 14), f)], "base": [(r.model, (f,))]}
     op_scene("CAM_Pocket3D", "Pocket", pick, "Κλικ στην καμπύλη επιφάνεια",
              "Ξεχοντρίζει τρισδιάστατη τσέπη", shape=bowl(), zoom=1.2, frames=34)
+
+
+@scene("CAM_Surface")
+def s_surface():
+    op_scene("CAM_Surface", "Surface", lambda r: {"clicks": [], "base": None}, None,
+             "Η μπίλια ακολουθεί την 3D επιφάνεια", shape=dome(), tc="6mm_Ball_End.fctb",
+             zoom=1.1, frames=40, press_first=True, props={"StepOver": 40})
+
+
+@scene("CAM_Waterline")
+def s_waterline():
+    op_scene("CAM_Waterline", "Waterline", lambda r: {"clicks": [], "base": None}, None,
+             "Γύρω-γύρω, σε σταθερά ύψη", shape=dome(), tc="6mm_Ball_End.fctb",
+             zoom=1.1, frames=40, press_first=True)
 
 
 # ---------------------------------------------------------------------------

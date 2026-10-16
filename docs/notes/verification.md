@@ -113,7 +113,7 @@ tooltips, docstrings) in `Mod/CAM/Path/...`.
 | CAM_Vcarve | centre line (Voronoi), depth from the inscribed circle and the V angle; needs faces | wiki CAM_Vcarve |
 | CAM_Deburr | W = chamfer width, h = extra depth of the tip | wiki CAM_Deburr Options |
 | CAM_Pocket3D | rough only; Final Depth from the geometry; finish with ball + 3D Surface | wiki CAM_Pocket3D |
-| CAM_Surface / Waterline | need OpenCamLib + experimental + "Enable OCL dependent features" (that is why they are missing from the toolbar of our test build) | wiki CAM_Surface, CAM_Waterline |
+| CAM_Surface / Waterline | the wiki says OpenCamLib + experimental features + "Enable OCL dependent features"; the 26.3 source (CAM InitGui.py) adds both buttons as soon as `import ocl`/`opencamlib` works — the experimental flag only adds Planar/Rotary Surface. Our text follows the source. Verified: after `micromamba install opencamlib` the test FreeCAD 26.3 shows them | source InitGui.py (26.3); wiki CAM_Surface, CAM_Waterline |
 | CAM_OperationCopy | `copyObject` of the op and its dressups, added to the same Job: an independent copy. NOTE: the wiki page "CAM OperationCopy" redirects to "CAM Copy" (an older *linked* copy command) — the 26.3 source is what counts | source PathCommands.py `_CopyOperation` |
 | CAM_SimpleCopy | non-parametric copy; 26.3 can combine several ops | wiki CAM_SimpleCopy |
 | CAM_Array | repeats a path at an interval; properties in Data after Apply | wiki CAM_Array |
@@ -122,6 +122,7 @@ tooltips, docstrings) in `Mod/CAM/Path/...`.
 
 GIFs: recorded in a real FreeCAD 26.3 (`tools/gifs/cam_rec.py`, real CAM objects and real toolpaths;
 G-code cards show the real Inspect commands and the real linuxcnc post output). Drawn (not
-recordable here): CAM_Surface, CAM_Waterline (no OpenCamLib), CAM_DressupAxisMap, CAM_DressupZCorrect
+recordable here): CAM_DressupAxisMap, CAM_DressupZCorrect; Surface/Waterline are recorded with
+OpenCamLib 2023.01.11 (conda-forge) installed in the test FreeCAD
 (`tools/gifs/cam_cmd_gifs.py`). The Simulator GIFs show material removal made with Part booleans
 along the real path (same idea as the simulator, not a screenshot of its window).
