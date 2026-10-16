@@ -1,0 +1,35 @@
+#!/bin/sh
+# SPDX-License-Identifier: LGPL-2.1-or-later
+# Run tests/freecad_gui_test.py in a real FreeCAD, one CAM dialog per FreeCAD start.
+#
+#   FREECAD=/path/to/bin/freecad OUT=/tmp/wt sh tests/run_freecad_tests.sh
+#
+# One dialog per process: opening and closing many CAM dialogs from a script in one
+# session crashed FreeCAD 26.3 even WITHOUT WikiTips installed (control run, 2026-10-16).
+set -u
+FREECAD=${FREECAD:-freecad}
+OUT=${OUT:-/tmp/wikitips-test}
+HERE=$(cd "$(dirname "$0")" && pwd)
+rm -rf "$OUT"
+mkdir -p "$OUT"
+status=0
+
+run() {  # name, extra env assignments...
+    name=$1; shift
+    env "$@" WT_OUT="$OUT/$name" xvfb-run -a -s "-screen 0 1920x1200x24" \
+        "$FREECAD" "$HERE/freecad_gui_test.py" > "$OUT/$name.log" 2>&1
+    code=$?
+    result=$(grep RESULT "$OUT/$name/result.txt" 2>/dev/null || echo "RESULT: no result")
+    echo "$name: exit=$code $result"
+    case "$code $result" in
+        "0 RESULT: PASS") ;;
+        *) status=1 ;;
+    esac
+}
+
+run toolbars WT_CAM_OPS=
+for op in CAM_Profile: CAM_Pocket_Shape:Face6 CAM_MillFacing:Face6 CAM_Adaptive:Face6 CAM_Drilling:Face7; do
+    run "${op%%:*}" WT_SKIP_WB=1 WT_CAM_OPS="$op"
+done
+[ $status -eq 0 ] && echo "ALL PASS" || echo "SOME FAILED (see $OUT)"
+exit $status

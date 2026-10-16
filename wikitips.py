@@ -22,6 +22,8 @@ except ImportError:  # very old PySide shim
 HERE = os.path.dirname(os.path.abspath(__file__))
 DATA_DIR = os.path.join(HERE, "data")
 IMG_DIR = os.path.join(DATA_DIR, "img")
+CONTENT_DIR = os.path.join(HERE, "content")   # hand-written help (Greek), not generated
+CONTENT_IMG_DIR = os.path.join(CONTENT_DIR, "img")
 PARAM_PATH = "User parameter:BaseApp/Preferences/Mod/WikiTips"
 
 Qt = QtCore.Qt
@@ -149,6 +151,47 @@ def action_name(action):
     return ""
 
 
+_FIELDS = None
+
+
+def fields():
+    """Greek help for fields of task panels, keyed by the field's Qt objectName."""
+    global _FIELDS
+    if _FIELDS is None:
+        try:
+            with open(os.path.join(CONTENT_DIR, "fields_el.json"), encoding="utf-8") as f:
+                _FIELDS = {k: v for k, v in json.load(f).items() if not k.startswith("_")}
+        except Exception as e:  # pragma: no cover
+            App.Console.PrintError("WikiTips: cannot read field help: %s\n" % e)
+            _FIELDS = {}
+    return _FIELDS
+
+
+def _field_names():
+    return {k.split(":")[-1] for k in fields()}
+
+
+def current_op():
+    """Module name of the object being edited, e.g. 'MillFacing' for Path.Op.MillFacing."""
+    for name in App.listDocuments():
+        try:
+            vp = Gui.getDocument(name).getInEdit()
+            if vp is None:
+                continue
+            proxy = getattr(vp.Object, "Proxy", None)
+            if proxy is not None:
+                return type(proxy).__module__.rsplit(".", 1)[-1]
+            return vp.Object.TypeId.split("::")[-1]
+        except Exception:
+            continue
+    return ""
+
+
+def field_entry(name):
+    f = fields()
+    return f.get(current_op() + ":" + name) or f.get(name)
+
+
 def command_name(action, button=None):
     """Find the FreeCAD command name behind a toolbar button.
 
@@ -228,6 +271,7 @@ class TipPopup(QtWidgets.QFrame):
         self.setObjectName("WikiTipsPopup")
         self.setFixedWidth(POPUP_WIDTH)
         self._owner = None
+        self._rect = None
         self._movie = None
         self._max_image_h = 260
 
@@ -286,6 +330,7 @@ class TipPopup(QtWidgets.QFrame):
     # -- content -----------------------------------------------------------
     def fill(self, key, entry, action):
         self._stop_movie()
+        field = action is None   # help for a field of a dialog, from content/
         label = clean_label(action.text()) if action is not None else ""
         self.title.setText(label or entry.get("t", key))
         if action is not None and not action.icon().isNull():
@@ -294,7 +339,9 @@ class TipPopup(QtWidgets.QFrame):
         else:
             self.icon.hide()
 
-        meta = ["<i>%s</i>" % key]
+        meta = [] if field else ["<i>%s</i>" % key]
+        if field and entry.get("f"):
+            meta.append("Στο Fusion 360: <b>%s</b>" % entry["f"])
         if entry.get("m"):
             meta.append("Μενού: " + entry["m"])
         sc = action.shortcut().toString() if action is not None else ""
@@ -303,10 +350,9 @@ class TipPopup(QtWidgets.QFrame):
         elif entry.get("k"):
             meta.append("Συντόμευση: " + entry["k"])
         self.meta.setText(" · ".join(meta))
-        self.meta.setVisible(bool(meta))
 
         img = entry.get("i")
-        path = os.path.join(IMG_DIR, img) if img else ""
+        path = os.path.join(CONTENT_IMG_DIR if field else IMG_DIR, img) if img else ""
         if img and os.path.exists(path):
             if img.lower().endswith(".gif"):
                 self._movie = QtGui.QMovie(path)
@@ -329,17 +375,31 @@ class TipPopup(QtWidgets.QFrame):
             self.image.clear()
             self.image.hide()
 
-        html = short_html(entry.get("d", ""))
+        html = entry.get("d", "") if field else short_html(entry.get("d", ""))
+        if entry.get("w"):
+            html += "<p style='color:#c0392b'><b>⚠ </b>%s</p>" % entry["w"]
+        if field and entry.get("en"):
+            html += "<p style='color:gray; font-size:8pt'>FreeCAD: %s</p>" % entry["en"].replace("\n", "<br>")
+        self.footer.setText("WikiTips · δικά μας σχέδια και κείμενα" if field else
+                            "Ολόκληρη η σελίδα: Shift+F1 και κλικ στο κουμπί · "
+                            "Πηγή: FreeCAD wiki (CC-BY 3.0)")
         steps = (entry.get("u") or [])[:MAX_STEPS]
         if steps:
             html += "<p><b>Πώς χρησιμοποιείται:</b></p><ol style='margin-left:-20px'>%s</ol>" % "".join(
                 "<li>%s</li>" % s for s in steps)
         self.text.setText(html)
         inner = POPUP_WIDTH - 24
+        self.ensurePolished()   # style sheet fonts (bigger title) must apply before measuring
+        for lbl in (self.title, self.meta, self.text, self.footer):
+            lbl.ensurePolished()
         for lbl in (self.meta, self.text, self.footer):
             lbl.setFixedWidth(inner)
-            lbl.setFixedHeight(lbl.heightForWidth(inner))
-        self.title.setFixedHeight(self.title.heightForWidth(inner - 40))
+            h = lbl.heightForWidth(inner) if lbl.text() else 0
+            lbl.setFixedHeight(max(0, h))
+            lbl.setVisible(h > 0)
+        tw = inner - (40 if not self.icon.isHidden() else 0)
+        self.title.setFixedWidth(tw)
+        self.title.setFixedHeight(max(self.title.heightForWidth(tw), self.title.sizeHint().height()))
         self.layout().activate()
         self.setFixedHeight(self.layout().sizeHint().height())
 
@@ -350,8 +410,9 @@ class TipPopup(QtWidgets.QFrame):
             self._movie = None
 
     # -- show / hide -------------------------------------------------------
-    def show_for(self, owner, key, entry, action, gpos):
+    def show_for(self, owner, key, entry, action, gpos, rect=None):
         self._owner = owner
+        self._rect = rect      # fields: only a screen rectangle, never the widget
         screen = None
         if hasattr(QtGui.QGuiApplication, "screenAt"):
             screen = QtGui.QGuiApplication.screenAt(gpos)
@@ -379,6 +440,10 @@ class TipPopup(QtWidgets.QFrame):
         self.hide()
 
     def _check_cursor(self):
+        if self._rect is not None:
+            if not self._rect.contains(QtGui.QCursor.pos()):
+                self.dismiss()
+            return
         o = self._owner
         try:
             if o is None or not o.isVisible():
@@ -437,14 +502,139 @@ _SCAN_TIMER = None
 
 
 def _scan():
-    """Attach the filter to every toolbar button of the main window."""
+    """Attach the filter to the buttons of the main window's toolbars.
+
+    Only toolbar buttons: they live as long as FreeCAD. Wrapping short-lived
+    widgets (e.g. of task dialogs) in Python leaves stale PySide wrappers that
+    crashed FreeCAD 26.3 when a CAM dialog was closed (found 2026-10-16).
+    """
     mw = Gui.getMainWindow()
     if mw is None or _FILTER is None:
         return
-    for btn in mw.findChildren(QtWidgets.QToolButton):
-        if not btn.property("wikitips"):
-            btn.installEventFilter(_FILTER)
-            btn.setProperty("wikitips", True)
+    for tb in mw.findChildren(QtWidgets.QToolBar):
+        for btn in tb.findChildren(QtWidgets.QToolButton):
+            if not btn.property("wikitips"):
+                btn.installEventFilter(_FILTER)
+                btn.setProperty("wikitips", True)
+
+
+# --------------------------------------------------------------------------
+# help for fields of task dialogs (CAM operations ...)
+# --------------------------------------------------------------------------
+LABEL_ROLE = _enum(QtWidgets.QFormLayout, "LabelRole", "ItemRole")
+FIELD_ROLE = _enum(QtWidgets.QFormLayout, "FieldRole", "ItemRole")
+REST_MS = 450   # mouse must rest this long on a field (FreeCAD's own tooltip comes at ~700 ms)
+
+
+def _label_field(label):
+    """The field next to a label in a form/grid layout, or None."""
+    parent = label.parentWidget()
+    lay = parent.layout() if parent is not None else None
+    if isinstance(lay, QtWidgets.QFormLayout):
+        row, role = lay.getWidgetPosition(label)
+        if row >= 0 and role == LABEL_ROLE:
+            item = lay.itemAt(row, FIELD_ROLE)
+            return item.widget() if item is not None else None
+    elif isinstance(lay, QtWidgets.QGridLayout):
+        i = lay.indexOf(label)
+        if i >= 0:
+            row, col, _, _ = lay.getItemPosition(i)
+            for c in range(col + 1, lay.columnCount()):
+                item = lay.itemAtPosition(row, c)
+                if item is not None and item.widget() is not None:
+                    return item.widget()
+    return None
+
+
+def field_under_cursor():
+    """(field name, field widget) under the mouse, if we have help for it.
+
+    Spin boxes: the cursor is over their inner line edit, so look at parents too.
+    Labels: use the field in the same row. Nothing is kept: the widgets are only
+    used inside this call.
+    """
+    names = _field_names()
+    w = QtWidgets.QApplication.widgetAt(QtGui.QCursor.pos())
+    if w is None:
+        return None, None
+    cand = w
+    for _ in range(3):
+        if cand is None:
+            break
+        n = cand.objectName()
+        if n in names:
+            return n, cand
+        if n.endswith("Label") and n[:-5] in names:   # e.g. startDepthLabel
+            return n[:-5], cand
+        if isinstance(cand, QtWidgets.QLabel) and not n:
+            f = _label_field(cand)
+            if f is not None and f.objectName() in names:
+                return f.objectName(), cand
+        cand = cand.parentWidget()
+    return None, None
+
+
+class FieldWatcher(QtCore.QObject):
+    """Shows help when the mouse rests on a field of an open task dialog.
+
+    Polls the widget under the cursor instead of installing event filters on
+    dialog widgets: dialogs are destroyed when closed, and Python filters or
+    wrappers on them are a crash risk. The popup remembers only a screen
+    rectangle, never the widget.
+    """
+
+    def __init__(self, popup_owner):
+        super().__init__()
+        self.owner = popup_owner          # ButtonFilter: shares its popup
+        self.name = None
+        self.since = QtCore.QElapsedTimer()
+        self.since.start()
+        self.shown = False
+        self.timer = QtCore.QTimer(self)
+        self.timer.setInterval(150)
+        self.timer.timeout.connect(self.tick)
+
+    def tick(self):
+        try:
+            self._tick()
+        except Exception:
+            pass
+
+    def _tick(self):
+        if not is_enabled() or not Gui.Control.activeDialog():
+            self._hide()
+            self.name = None
+            return
+        if QtWidgets.QApplication.mouseButtons() != _enum(Qt, "NoButton", "MouseButton"):
+            self._hide()
+            return
+        name, w = field_under_cursor()
+        if name != self.name:
+            self._hide()
+            self.name = name
+            self.since.restart()
+            return
+        if not name or self.shown or self.since.elapsed() < REST_MS:
+            return
+        entry = field_entry(name)
+        if not entry:
+            return
+        tip = (w.toolTip() or "").strip()
+        if tip:
+            w.setToolTip("")   # our popup replaces FreeCAD's tooltip; its text goes into the popup
+            entry = dict(entry, en=tip)
+        rect = QtCore.QRect(w.mapToGlobal(QtCore.QPoint(0, 0)), w.size())
+        f = self.owner
+        f.popup.dismiss()
+        f.popup.deleteLater()
+        f.popup = TipPopup()
+        f.popup.show_for(None, name, entry, None, QtGui.QCursor.pos(), rect=rect)
+        self.shown = True
+
+    def _hide(self):
+        if self.shown:
+            self.owner.popup.dismiss()
+        self.shown = False
 
 
 def _ensure_toolbar():
@@ -488,6 +678,8 @@ def install():
     Gui.addCommand("WikiTips_Toggle", ToggleCommand())
     _ensure_toolbar()
     _FILTER = ButtonFilter()
+    _FILTER.watcher = FieldWatcher(_FILTER)
+    _FILTER.watcher.timer.start()
     _SCAN_TIMER = QtCore.QTimer()
     _SCAN_TIMER.setInterval(2000)  # new toolbars appear when switching workbench
     _SCAN_TIMER.timeout.connect(_scan)

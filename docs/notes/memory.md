@@ -29,20 +29,41 @@ Short, durable facts for the next Claude session. Details live in the other note
    Pattern, stock to leave; Pad/Pocket options) → Greek explanation + small animation.
    CAM: Face, Pocket, Profile, Adaptive, Drilling, 3D Surface/Waterline.
 4. Greek translations for Sketcher, Part Design, Part, CAM.
-- Re-use existing material when the licence allows (FreeCAD wiki = CC-BY 3.0). Media from
-  closed-source CAD/CAM (Fusion, SolidWorks...) is copyrighted → do NOT copy; make our own.
+- Re-use existing material when the licence allows (FreeCAD wiki = CC-BY 3.0). From other CAD/CAM
+  (Fusion, SolidWorks, Onshape...) take only IDEAS of how they explain things and draw our own,
+  in our own style (Marios, 2026-10-16: "ideas, not stealing, a slightly different style").
+- Ideas adopted: Fusion-style per-field diagram with the active level in red; show the Fusion 360
+  name of each CAM setting (he also uses Fusion); ⚠ warnings for beginner traps.
+  Ideas for later: SolidWorks-style tooltip size setting (big+GIF / big / small); Onshape-style
+  two stages (short line first, GIF after ~1.5 s).
+- Style he liked: light background, wood-colour stock, blue-grey tool, red = the setting being
+  explained, dark caption bar with a Greek sentence (tools/gifs/draw.py holds the palette).
+  v2 palette (he asked "a bit more modern"): wood grain, metallic tools, soft shadows.
+- The Claude app shows only the FIRST FRAME of a GIF: to show him animations, publish an HTML
+  artifact with the GIFs embedded (gallery: https://claude.ai/artifact/UGYx8Sx1bjfUHiosRUoYjw).
+- Accuracy: every help text needs a source in docs/notes/verification.md ("no errors" — Marios).
 - Open question to ask him: which cutters (flat/ball/V-bit) and materials (wood/alu/plastic) he uses,
   so the examples match his work.
+
+## Crash lesson (2026-10-16) — never forget
+- Do NOT wrap short-lived widgets in Python: `mw.findChildren(QWidget)` over a CAM dialog, or event
+  filters on dialog fields, left stale PySide wrappers and FreeCAD crashed when the dialog closed.
+  Toolbar buttons only (children of QToolBar); dialog fields are found by polling
+  `QApplication.widgetAt(cursor)` and the popup keeps only a screen rectangle.
+- Opening/closing many CAM dialogs from one script crashes FreeCAD 26.3 even WITHOUT WikiTips
+  (control run). Test one dialog per FreeCAD start: `tests/run_freecad_tests.sh`. Close dialogs
+  like Cancel does: `Gui.Control.activeTaskDialog().reject()`.
 
 ## How to test in a real FreeCAD from the cloud container
 - github.com release downloads are blocked, **conda-forge is reachable**:
   get `micromamba` from `https://conda.anaconda.org/conda-forge/linux-64/micromamba-<ver>-0.tar.bz2`,
   then `micromamba create -p <dir>/fc -c conda-forge freecad=2026.09.16 python=3.13`
   (that build reports itself as **FreeCAD 26.3.0**, same as Marios). ~2.5 GB download.
-- Install the addon in `$HOME/.local/share/FreeCAD/v26-3/Mod/WikiTips`, then
-  `WT_OUT=<dir> xvfb-run -a <fc>/bin/freecad tests/freecad_gui_test.py` → `result.txt` must say PASS.
+- Install the addon in `$HOME/.local/share/FreeCAD/v26-3/Mod/WikiTips` (copy wikitips.py, InitGui.py,
+  package.xml, data, content, Resources), then
+  `FREECAD=<fc>/bin/freecad OUT=<dir> sh tests/run_freecad_tests.sh` → must print ALL PASS.
 - Offline mock test: `QT_QPA_PLATFORM=offscreen <fc>/bin/python tests/run_popup_test.py tests/shim . <out>`
   (system PySide6 lacks libEGL; FreeCAD's own Python works).
 - GIF prototypes: real FreeCAD scene → `ActiveView.saveImage()` frames → ffmpeg palette GIF (~70 KB),
-  or Pillow-drawn diagrams with DejaVu fonts (Greek OK) (~200 KB). Prototype scripts are not in the
-  repo yet (PR 2 will add the generator under `tools/`).
+  or Pillow-drawn diagrams with DejaVu fonts (Greek OK). Generator for the CAM field GIFs:
+  `python3 tools/gifs/cam_gifs.py content/img/cam [names...]` (needs Pillow + DejaVu, build time only).

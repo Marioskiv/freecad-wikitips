@@ -5,6 +5,7 @@ Dates are when the fact was checked. Newest session first in `session-log.md`.
 
 | File | What is in it |
 |---|---|
+| `verification.md` | Fact check of every CAM help text, with sources (keep it in sync) |
 | `memory.md` | **Read first.** Decisions, Marios's preferences, workflow (PRs), how to test in real FreeCAD |
 | `session-log.md` | Chronological log of sessions: what was asked, what was done, results |
 | `wikitips-status.md` | The WikiTips addon: design, data pipeline, verified vs not verified, open items |
