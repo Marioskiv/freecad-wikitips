@@ -1,5 +1,10 @@
 # Session log
 
+## 2026-10-17: priorities and a separate CAM addon (notes)
+- Marios: what matters now is that GIFs, error translations and knurling work correctly; we go on
+  only when Claude is sure. CAM + 4th axis + polar converter: a SEPARATE addon later.
+- Final check: fresh clone of main installed like the README says, full real-FreeCAD suite.
+
 ## 2026-10-17: knurl 4-8x faster, no boolean (PR 18)
 - Marios: "find a way to make it very fast without crashes".
 - Measured first: splitting the band into slices or cutting only the band slab was SLOWER (the

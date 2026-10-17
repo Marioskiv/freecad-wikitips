@@ -19,7 +19,12 @@ Short, durable facts for the next Claude session. Details live in the other note
   (tests/freecad_error_test.py lists them). He does NOT want a Greek search.
 
 ## Pending (do later, he asked to wait)
+- **Current priority (Marios, 2026-10-17):** GIFs, Greek error explanations and Knurl must work
+  correctly. Next step only after he hears "I am sure" and tries it on his PC.
 - **NEXT PHASE: CAM (Marios, 2026-10-17: "not now, in another phase"; do NOT start before he says).**
+  DECISION (2026-10-17): this will be a SEPARATE addon, not part of WikiTips ("I don't want
+  everything in one addon"). New repo/addon, its own notes; WikiTips stays help + error
+  explainer + Knurl + Wrap. Start it only after Marios confirms WikiTips works on his PC.
   Do nothing more for CAM until then. Plan he described:
   1. Try to bring his polar-coordinate converter (his separate repo `Marioskiv/polar-cnc-converter`)
      into the FreeCAD CAM workflow (e.g. as a post-processing step or a WikiTips tool).
