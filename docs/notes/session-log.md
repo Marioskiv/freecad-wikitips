@@ -1,5 +1,22 @@
 # Session log
 
+## 2026-10-17: knurl 4-8x faster, no boolean (PR 18)
+- Marios: "find a way to make it very fast without crashes".
+- Measured first: splitting the band into slices or cutting only the band slab was SLOWER (the
+  cost is OCC's per-face work in the boolean, ~1 ms per tooth face, already run in parallel).
+- New: direct_knurl() builds the result without a boolean on the teeth: the part gets a plain
+  groove (analytic cut, instant), the groove faces are replaced by the tooth triangles (one mesh)
+  and two end faces, and everything is sewn into one shell. Same volume as the boolean in every
+  case tested (solid, tube, margins, band at the part's end, flange, rotated+moved part, straight
+  and diamond); booleans with the result behave the same. When the band is crossed by a hole or
+  a flat (checked with a cheap analytic common) it falls back to the boolean.
+- First version moved the part to a local frame and back: some faces stayed behind (volume was
+  right, the solid was not) - caught by the Body test (margins check); rewritten to work in the
+  part's own coordinates, plus inside-point checks that return None (= boolean) on any defect.
+- Speed: D20 x 30, pitch 1 in the GUI 10.8 s -> 4.6 s; D50 x 40, pitch 1: 80 s (morning) -> 34 s
+  (audit) -> 9 s, 640 MB. Limits: 60 000 faces direct (19 s, 1.2 GB), 30 000 for the boolean.
+- Cheap checks instead of isValid() (5 s on 29k faces) and no Python object per tooth face (4 s).
+
 ## 2026-10-17: full audit (code, GIFs, resources) (PR 17)
 - Marios: check the whole project for mistakes, the GIFs too, whether anything can use too many
   resources or crash his PC (especially knurling), and research more helpful addons.

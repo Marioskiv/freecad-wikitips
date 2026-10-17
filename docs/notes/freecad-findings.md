@@ -124,4 +124,8 @@
 - TechDraw hatch patterns (share/examples/FCPAT.pat) include Diamond, Diamond2, Diamond4.
 - A compound "solid + edges" as a PartDesign feature shape breaks later dressups (Fillet "not
   possible on selected shapes"): never put helper lines into a Body feature's Shape.
+- Building a solid by sewing: Part.Compound([shapes...]).sewShape(tol) then Part.Solid(shell) is fast
+  (1.2 s for 29k faces) if whole shapes go in (not 29k Python face objects). transformShape() on a
+  copy and back again left faces at the old place in a sewn result: work in the real coordinates.
+- Shape.isValid() costs ~5 s on a 29k-face solid; Shape.isInside(point, tol, False) is cheap.
 

@@ -92,9 +92,12 @@ def _grid(R, L, pitch, angle, straight):
     return n, rows, L / rows
 
 
-# Real teeth above this many faces take more than ~35 s and ~1 GB (measured in FreeCAD 26.3,
-# D50 x 40 mm, pitch 1 = 28 888 faces: 34 s, 860 MB); bigger ones could freeze a laptop.
-MAX_FACES = 30000
+# Limits measured in FreeCAD 26.3 (2026-10-17). Direct build: ~0.3 ms and ~20 KB per tooth face
+# (D50 x 40 mm, pitch 1 = 28 888 faces: 9 s, 640 MB; 59 136 faces: 19 s, 1.2 GB). The boolean
+# fallback (band crossed by a hole or a flat) is ~4x slower and uses more memory.
+MAX_FACES = 60000
+MAX_FACES_BOOLEAN = 30000
+LAST_METHOD = ""
 PEAK_INSET = 0.002   # teeth tips 2 µm inside the cylinder: no tangent faces, boolean 3-5x faster
 
 
@@ -107,7 +110,7 @@ def face_count(R, L, pitch, angle, straight=False):
 
 
 def seconds_for(faces):
-    return max(1, int(round(faces * 35.0 / 28888)))
+    return max(1, int(round(faces * 12.0 / 28888)))   # 9 s to build + ~3 s to show (measured)
 
 
 def knurl_tool(R, L, pitch, angle, depth, straight=False):
@@ -160,6 +163,111 @@ def knurl_tool(R, L, pitch, angle, depth, straight=False):
     solid = Part.Solid(mesh if mesh.ShapeType == "Shell" else Part.Shell(mesh.Faces))
     if solid.Volume < 0:
         solid.reverse()
+    return solid
+
+
+def direct_knurl(base, pl, R, L, pitch, angle, depth, straight=False):
+    """Knurled solid built directly, without the slow boolean (4-8x faster).
+
+    The band is the cylinder of radius R from pl.Base along pl's Z for a length L.
+    Works when the band is a clean full ring of material (no hole, flat or slot
+    crossing it): the part gets a plain groove (an analytic cut, instant), whose
+    faces are replaced by the tooth triangles and two end faces, all sewn into
+    one shell. Everything is built in the part's own coordinates (moving shapes
+    back and forth left some faces behind, found in a Body test). Returns None
+    when not possible; the caller then uses the boolean.
+    Checked in FreeCAD 26.3: same volume as the boolean, valid solid, booleans
+    with the result behave.
+    """
+    origin = V(pl.Base)
+    axis = pl.Rotation.multVec(V(0, 0, 1))
+    rin = R - depth - 0.05
+    ring = Part.makeCylinder(R + 1, L, origin, axis).cut(Part.makeCylinder(rin, L, origin, axis))
+    full = math.pi * (R * R - rin * rin) * L
+    if abs(base.common(ring).Volume - full) > 1e-6 * full:
+        return None                      # something crosses the band: use the boolean
+
+    def along(p):
+        return (p - origin).dot(axis)
+
+    def radial(p):
+        d = p - origin
+        return (d - axis * d.dot(axis)).Length
+
+    grooved = base.cut(ring)
+    wall = math.pi * (R * R - rin * rin)
+    # at each end the band either meets more material (a groove wall is left) or the end of
+    # the part (the part's end face, now a disc of radius rin, must become the knurl outline)
+    probe = R - depth / 2
+    outside = {0.0: base.isInside(pl.multVec(V(probe, 0, -1e-3)), 1e-9, False),
+               L: base.isInside(pl.multVec(V(probe, 0, L + 1e-3)), 1e-9, False)}
+    keep, holes = [], {0.0: [], L: []}
+    for f in grooved.Faces:
+        srf, c = f.Surface, f.CenterOfMass
+        z = along(c)
+        if srf.TypeId == "Part::GeomCylinder" and abs(srf.Radius - rin) < 1e-7 and -1e-7 < z < L + 1e-7:
+            continue                     # groove bottom
+        if srf.TypeId == "Part::GeomPlane":
+            end = 0.0 if abs(z) < 1e-7 else L if abs(z - L) < 1e-7 else None
+            if end is not None and outside[end] and abs(f.Area - wall) < 1e-6 * wall:
+                continue                 # groove wall
+            if end is not None and not outside[end] and radial(c) < rin:
+                holes[end] += [w for w in f.Wires if not w.isSame(f.OuterWire)]
+                continue                 # the part's end face: replaced by the knurl outline
+        keep.append(f)
+    n, rows, dz = _grid(R, L, pitch, angle, straight)
+    na = 2 * n
+    dth = 2 * math.pi / n
+    pts, index = [], {}
+
+    def node(a, b):
+        a %= na
+        key = (a, b)
+        if key not in index:
+            valley = (a % 2 == 0) if straight else ((a + b) % 2 == 0)
+            r = R - depth if valley else R - PEAK_INSET
+            t = a * dth / 2
+            index[key] = len(pts)
+            pts.append(pl.multVec(V(r * math.cos(t), r * math.sin(t), b * dz)))
+        return index[key]
+
+    tris = []
+    for b in range(rows):
+        for a in range(na):
+            p00, p10, p11, p01 = node(a, b), node(a + 1, b), node(a + 1, b + 1), node(a, b + 1)
+            if straight or (a + b) % 2 == 0:
+                tris += [(p00, p10, p11), (p00, p11, p01)]
+            else:
+                tris += [(p00, p10, p01), (p10, p11, p01)]
+    teeth = Part.Shape()
+    teeth.makeShapeFromMesh((pts, tris), 1e-7)
+    ends = []
+    for b, z in ((0, 0.0), (rows, L)):
+        zig = Part.makePolygon([pts[node(a, b)] for a in range(na)] + [pts[node(0, b)]])
+        if outside[z]:
+            wires = [Part.Wire(Part.makeCircle(R, pl.multVec(V(0, 0, z)), axis)), zig]
+        else:
+            wires = [zig] + holes[z]
+        ends += Part.makeFace(wires, "Part::FaceMakerBullseye").Faces
+    # whole shapes go into the compound: no Python object per tooth face (that alone took 4 s)
+    shell = Part.Compound([Part.Compound(keep), teeth, Part.Compound(ends)])
+    shell.sewShape(1e-5)
+    shells = shell.Shells
+    if len(shells) != 1 or not shells[0].isClosed():
+        return None
+    solid = Part.Solid(shells[0])
+    if solid.Volume < 0:
+        solid.reverse()
+    # cheap sanity instead of a full isValid() (5 s on 29k faces): the volume must lie between
+    # the part with a plain groove and the untouched part, and the far ends must still be solid
+    if not (grooved.Volume < solid.Volume < base.Volume):
+        return None
+    core = (R - depth) / 2
+    checks = [pl.multVec(V(core, 0, L / 2))] + [pl.multVec(V(probe, 0, z)) for z, inside in
+                                                ((-1e-3, outside[0.0]), (L + 1e-3, outside[L])) if inside]
+    for pt in checks:
+        if base.isInside(pt, 1e-9, False) and not solid.isInside(pt, 1e-9, False):
+            return None                  # a defective solid: let the boolean do it
     return solid
 
 
@@ -306,11 +414,23 @@ class Knurl:
             faces = face_count(radius, length, pitch, obj.Angle.Value, straight)
             if faces > MAX_FACES:
                 raise RuntimeError("WikiTips Knurl: too many teeth (%d faces, max %d)" % (faces, MAX_FACES))
-            tool = knurl_tool(radius, length, pitch, obj.Angle.Value, depth, straight)
-            tool.Placement = pl
-            result = base.cut(tool)
-            if len(result.Solids) == 1:
-                result = result.Solids[0]
+            try:
+                result = direct_knurl(base, pl, radius, length, pitch, obj.Angle.Value, depth, straight)
+            except Exception:
+                result = None
+            global LAST_METHOD
+            LAST_METHOD = "direct" if result is not None else "boolean"   # for tests and notes
+            if result is not None:
+                tool = None
+            else:                         # band not clean (hole, flat...): the slower boolean
+                if faces > MAX_FACES_BOOLEAN:
+                    raise RuntimeError("WikiTips Knurl: too many teeth for a band with holes or flats "
+                                       "(%d faces, max %d)" % (faces, MAX_FACES_BOOLEAN))
+                tool = knurl_tool(radius, length, pitch, obj.Angle.Value, depth, straight)
+                tool.Placement = pl
+                result = base.cut(tool)
+                if len(result.Solids) == 1:
+                    result = result.Solids[0]
         if hasattr(obj, "AddSubShape"):
             obj.AddSubShape = tool if tool is not None else Part.Shape()
         obj.Shape = result
