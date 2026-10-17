@@ -126,7 +126,7 @@ Text is English (wiki has no Greek translation).
 - Document observer marks recomputed documents/objects; a 700 ms timer (only when no task dialog is
   open) finds red objects, picks the first one whose dependencies are fine, matches its status
   string against content/errors_el.json and shows ErrorCard (child widget of the main window,
-  bottom left of the central area, the 26.3 task panel is on the right). Unknown message → generic card.
+  bottom CENTRE of the central area since 2026-10-17, Marios's choice). Unknown message → generic card.
 - Card is Greek only: FreeCAD's message translated sentence by sentence ("translations"); untranslated
   sentences are left out. Pref ShowEnglish=true adds the English text and glossary words.
 - Notifications: status bar button 'notificationArea' count + top-level QLabel 'NotificationBox_label'
@@ -145,13 +145,18 @@ Text is English (wiki has no Greek translation).
 ## Knurl tool (PR 14, 2026-10-17)
 - wikitips_knurl.py (geometry without GUI + command/panel/view provider when the GUI is up).
   WikiTips_Knurl is added to the global WikiTips toolbar (also for existing installs).
-- Real teeth: direct_knurl (groove + sewn teeth, no boolean) when the band is a clean ring, else the
-  boolean. Limits: MAX_FACES 60000 (direct, ~19 s, 1.2 GB), MAX_FACES_BOOLEAN 30000; bigger is
-  refused with a Greek card. Light kind: lines drawn by the view provider only; the solid is unchanged.
+- Real teeth: direct_knurl (groove, then the teeth and the rest of the part written as one BREP
+  text, see _Brep; no sewing, no boolean) when the band is a clean ring, else the boolean.
+  Limits: MAX_FACES 60000 (direct), MAX_FACES_BOOLEAN 25000; bigger is refused with a Greek card.
+  Light kind: lines drawn by the view provider only; the solid is unchanged.
+- Teeth: 90° flanks with a flat top (5 faces a diamond tooth, 3 a straight ridge). Depth 0 = auto
+  = 75 % of the full height (0.5 x pitch x cos(angle)); any depth is held between 20 % and 100 %
+  of it (Marios's 0.8 on pitch 0.3 was impossible and took 10 minutes); also capped at half the radius.
+- Panel: Ok | Apply | Cancel. Apply computes and stays open, OK closes, Cancel restores all values.
 - Default pitch by diameter: ≤8 mm 0.6, ≤16 mm 0.8, ≤32 mm 1.0, else 1.2 (ideas from DIN 82 tables).
-- Depth 0 = automatic (90° teeth: 0.5 x pitch x cos(angle)), capped at half the radius.
 - Verified in real FreeCAD 26.3 (tests/freecad_knurl_test.py): button, wrong selection card, panel,
-  preview, real teeth valid, Tip, Pocket after it, Part cylinder, save + reopen.
+  preview, Apply/OK, depth limits, real teeth valid, Tip, Pocket after it, Part cylinder,
+  cross hole (boolean), pitch 0.3 / depth 0.8, save + reopen.
 - Not done: inner (bore) knurling, G-code for a 4th axis, a GIF for the button.
 
 ## Drawing on a cylinder (PR 14, 2026-10-17)

@@ -129,3 +129,14 @@
   copy and back again left faces at the old place in a sewn result: work in the real coordinates.
 - Shape.isValid() costs ~5 s on a 29k-face solid; Shape.isInside(point, tol, False) is cheap.
 
+- Many flat faces fast (2026-10-17, measured): Part.Face(wire) ~0.1-0.2 ms each, Part.Shell(faces)
+  runs BRepCheck on the whole shell (36k faces: 12 s; if the check fails it also sews), sewing a mesh
+  compound with shared edges is still slow (15k triangles: 6-10 s). Fastest: write the shape as
+  OpenCASCADE BREP text in Python and load it with Part.Shape().importBrepFromString(text, False):
+  36k faces in ~3 s. Format notes: records are numbered from the END (last record = 1), a ref is
+  "+N loc"; a face made from a wire follows the wire's turning (normal by the right-hand rule);
+  Part.Wire runs the way its FIRST edge runs. Existing faces/wires can be reused by exporting
+  Part.Compound([...]).exportBrepToString() and appending new records after them (old refs shift by
+  the number of new records; new curve/surface numbers start after the old ones).
+- Assigning a big shape to a feature (obj.Shape = shape) costs ~0.2 ms per face in 26.3 (element
+  names): 20k faces ~4 s on top of the build.

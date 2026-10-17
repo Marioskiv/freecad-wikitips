@@ -275,7 +275,7 @@ def message_html(message):
 
 
 class ErrorCard(QtWidgets.QFrame):
-    """Child of the main window, bottom left over the 3D view: no window manager involved."""
+    """Child of the main window, bottom centre over the 3D view: no window manager involved."""
 
     def __init__(self, mw):
         super().__init__(mw)
@@ -403,9 +403,10 @@ class ErrorCard(QtWidgets.QFrame):
         try:
             mw = self.parentWidget()
             area = mw.centralWidget().geometry() if mw.centralWidget() is not None else mw.rect()
-            # bottom left of the 3D view: the task panel (26.3 overlay) is on the right
+            # bottom centre of the 3D view (Marios's choice)
             y = area.bottom() - self.height() - 16
-            self.move(area.left() + 16, max(area.top(), y))
+            x = area.left() + (area.width() - self.width()) // 2
+            self.move(max(area.left(), x), max(area.top(), y))
         except Exception:
             pass
 

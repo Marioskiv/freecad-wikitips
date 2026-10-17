@@ -550,6 +550,8 @@ class ButtonFilter(QtCore.QObject):
         if t == EV_TOOLTIP:
             if not is_enabled():
                 return False
+            if self.popup.isVisible() and self.popup._owner is obj:
+                return True   # already showing for this button: moving the mouse must not restart it
             try:
                 action = obj.defaultAction()
             except AttributeError:
