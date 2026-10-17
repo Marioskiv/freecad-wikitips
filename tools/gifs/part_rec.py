@@ -94,7 +94,18 @@ class Rec:
             act.icon().pixmap(64, 64).save(os.path.join(self.dir, "icon.png"))
             self.icon = "icon.png"
         except Exception:
-            pass
+            # commands inside a dropdown group have no own action: use their icon resource
+            try:
+                from PySide import QtGui
+                cmd = Gui.Command.get(name)
+                pix = cmd.getInfo()["pixmap"] if cmd is not None else name   # e.g. sub-items of a group
+                for path in (":/icons/%s.svg" % pix, ":/icons/%s.png" % pix, pix):
+                    ic = QtGui.QIcon(path)
+                    if not ic.isNull() and ic.pixmap(64, 64).save(os.path.join(self.dir, "icon.png")):
+                        self.icon = "icon.png"
+                        break
+            except Exception:
+                pass
 
     def view(self, zoom=1.0):
         self.doc.recompute()
@@ -502,4 +513,5 @@ def run():
 
 
 os.makedirs(OUT, exist_ok=True)
-QtCore.QTimer.singleShot(3500, run)
+if not os.environ.get("WT_NO_AUTORUN"):     # part_more.py imports this module and adds scenes
+    QtCore.QTimer.singleShot(3500, run)
