@@ -82,3 +82,22 @@ Ranked ideas for WikiTips (ours to build, no code taken):
 8. "Did you know" tip on workbench change.
 Recording only: show key presses in the GIFs (Blender Screencast Keys idea).
 Not verified: Fusion official docs on animated tooltips, Onshape hover videos, KiCad/Kiri:Moto help.
+
+## Third survey (2026-10-17): tested in a real FreeCAD 26.3 (conda build, Linux)
+Source list: FreeCAD/FreeCAD-addons AddonCatalog.json (169 entries). Addons cloned from GitHub and
+loaded in FreeCAD 26.3; one basic command run each. Python modules in the conda build: numpy yes,
+scipy NO, networkx NO (Marios's Windows build: to check with `import scipy, networkx`).
+| Addon | Last commit | Result in 26.3 | Needs | Verdict for Marios |
+|---|---|---|---|---|
+| Fasteners (shaise) | 2026-09-10 | workbench loads; ISO 4017 screw created, valid | nothing extra | RECOMMENDED: screws, nuts, washers, threaded holes |
+| freecad.gears (looooo) | 2026-09-15 | loads; involute gear valid; inside an active Body it creates a PartDesign::FeaturePython (the type that does NOT crash 26.3) | nothing extra | recommended when he needs gears |
+| SheetMetal (shaise) | 2026-10-17 | loads; Base bend from a sketch works; unfold needs networkx (missing here) | networkx | only if he does sheet metal; check networkx first |
+| Curves (tomate44) | 2026-10-12 | loads, 13 commands; some tools need scipy | numpy, scipy | later, for surfaces; not needed now (our Wrap covers text on cylinders) |
+| Manipulator (easyw) | 2026-03-25 | loads, but shows a "check for updates" box on start and goes online (fails without SSL/proxy) | - | not now (annoying box; set Mod/Manipulator checkUpdates = False if used) |
+| FreeCAD-Ribbon (APEbbers) | 2026-10-15 | not tested (changes the whole UI) | optional git | not now: would move every button WikiTips explains |
+| 3D_Printing_Tools | 2019-06-30 | not tested | - | not recommended (abandoned) |
+- Addon Manager and no SSL: the Addon Manager downloads through Qt (QNetworkAccessManager), not
+  Python's ssl, so installing addons may work for him; pip installs of Python packages will NOT
+  (FreeCAD tracker 4306: "pip ... requires TLS/SSL, however the ssl module in Python is not
+  available"). Safe manual way: download the GitHub zip, unzip into Mod\, restart.
+- TechDraw already has knurl hatch patterns (Diamond / Diamond2 / Diamond4 in FCPAT.pat).
