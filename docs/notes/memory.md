@@ -21,6 +21,16 @@ Short, durable facts for the next Claude session. Details live in the other note
 ## Pending (do later, he asked to wait)
 - **Current priority (Marios, 2026-10-17):** GIFs, Greek error explanations and Knurl must work
   correctly. Next step only after he hears "I am sure" and tries it on his PC.
+- **Feedback round 1 (2026-10-17, after his first install on Windows), still open:** GIFs must be
+  sharper (re-record at 2x and show them with devicePixelRatio; do not shrink them to 170 px on
+  small screens). Done in PR 20: no flicker, Knurl Apply button, cards bottom centre, knurl depth
+  limits + flat tops + BREP speed-up.
+- **Install through the Addon Manager (his question):** possible only if the repo is PUBLIC. Then:
+  Addon Manager → ⚙ (Preferences) → Custom repositories → add
+  `https://github.com/Marioskiv/freecad-wikitips`, branch `main` → WikiTips shows in the list,
+  Install / Update like any addon (the manual copy in Mod must be removed first). A private repo
+  cannot be used (no password support). Bump `package.xml` <version> on every release so the
+  Addon Manager offers the update. Making the repo public is HIS decision.
 - **NEXT PHASE: CAM (Marios, 2026-10-17: "not now, in another phase"; do NOT start before he says).**
   DECISION (2026-10-17): this will be a SEPARATE addon, not part of WikiTips ("I don't want
   everything in one addon"). New repo/addon, its own notes; WikiTips stays help + error

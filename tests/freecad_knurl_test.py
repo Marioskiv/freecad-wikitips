@@ -110,14 +110,25 @@ def run():
     check("επιφάνειες" in wk._PANEL.size.text(), "panel shows the size of the real teeth (%r)" % wk._PANEL.size.text())
     shot("preview")
     panel = wk._PANEL
+    boxes = [bx for bx in Gui.getMainWindow().findChildren(QtWidgets.QDialogButtonBox) if bx.isVisible()]
+    names = [b.text() for bx in boxes for b in bx.buttons()]
+    check(any(bx.button(QtWidgets.QDialogButtonBox.Apply) is not None for bx in boxes),
+          "panel has an Apply button (%s)" % names)
+    check("μέγιστο" in panel.limits.text(), "panel shows the depth limits (%r)" % panel.limits.text())
     panel.start.setValue(5)
     panel.end.setValue(3)
     pump(500)
     t = time.time()
-    panel.accept()
+    panel.clicked(QtWidgets.QDialogButtonBox.Apply)
     pump(800)
     P("     real teeth in %.1f s" % (time.time() - t))
-    check(not Gui.Control.activeDialog(), "panel closed")
+    check(bool(Gui.Control.activeDialog()) and k.Kind == "Πραγματικό" and "Invalid" not in k.State,
+          "Apply computes the real teeth and the panel stays open")
+    t = time.time()
+    panel.accept()
+    pump(300)
+    check(not Gui.Control.activeDialog() and time.time() - t < 2,
+          "OK only closes the panel (%.1f s, nothing computed again)" % (time.time() - t))
     sh = k.Shape
     check(k.Kind == "Πραγματικό" and "Invalid" not in k.State, "real knurl computed (%s)" % k.getStatusString())
     check(sh.isValid() and len(sh.Solids) == 1, "one valid solid")
@@ -196,6 +207,31 @@ def run():
     doc.recompute()
     check(wk.LAST_METHOD == "boolean" and k3.Shape.isValid() and len(k3.Shape.Solids) == 1,
           "band with a cross hole: boolean fallback, valid (%s)" % wk.LAST_METHOD)
+
+    # Marios's try: pitch 0.3 with depth 0.8 (deeper than the teeth can be): the depth is held at the
+    # full height of the pitch, the teeth come out fast and valid (it took 10 minutes before)
+    small = doc.addObject("Part::Cylinder", "Small")
+    small.Radius, small.Height = 5, 10
+    small.Placement = App.Placement(V(0, -40, 0), App.Rotation())
+    doc.recompute()
+    sf = next(f for f in small.Shape.Faces if wk.cylinder_of(f))
+    k4 = wk.make_knurl(small, sf)
+    k4.Pitch, k4.Depth = 0.3, 0.8
+    full = wk.depth_for(0.3, k4.Pattern, k4.Angle.Value)
+    check(abs(wk.tooth_depth(0.8, 0.3, k4.Pattern, k4.Angle.Value) - full) < 1e-9,
+          "depth 0.8 held at the full height %.3f mm for pitch 0.3" % full)
+    t = time.time()
+    doc.recompute()
+    took = time.time() - t
+    sh4 = k4.Shape
+    check("Invalid" not in k4.State and sh4.isValid() and len(sh4.Solids) == 1 and took < 30,
+          "pitch 0.3 / depth 0.8 knurl in %.1f s, valid (%s)" % (took, wk.LAST_METHOD))
+    k4.Depth = 0
+    t = time.time()
+    doc.recompute()
+    planar = sum(1 for f in k4.Shape.Faces if f.Surface.TypeId == "Part::GeomPlane")
+    check("Invalid" not in k4.State and k4.Shape.isValid() and planar > 1000,
+          "automatic depth: flat-topped teeth, %d flat faces, %.1f s" % (planar, time.time() - t))
 
     # save and open again
     path = os.path.join(OUT, "knurl.FCStd")

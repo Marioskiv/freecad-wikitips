@@ -1,5 +1,30 @@
 # Session log
 
+## 2026-10-17: Marios's first install on Windows - feedback round 1 (PR 20)
+- Installed by hand in `C:\Users\mario\AppData\Roaming\FreeCAD\v26-3\Mod`: it works. His points:
+  1. GIFs low resolution / not sharp -> NOT done yet (next: re-record at 2x, show with devicePixelRatio).
+  2. The GIF flickered while the mouse moved over the button -> fixed: a new ToolTip event for the
+     button that already shows the popup is swallowed (wikitips.py ButtonFilter).
+  3. Knurl panel: Apply button wanted, OK only to finish -> done (Ok | Apply | Cancel). Changing a
+     value shows fast lines, Apply computes the real teeth and the panel stays open, OK closes
+     (computes only if a value changed after the last Apply), Cancel puts all values back.
+  4. Cards at the bottom centre, not bottom left -> done (wikitips_errors.ErrorCard placement).
+  5. Pitch 0.30 + depth 0.80 diamond took ~10 min and froze FreeCAD; depth 0.3 fast but sharp
+     crests -> the depth was impossible (deeper than the teeth are high). Now: depth held between
+     20 % and 100 % of the full height of the pitch (depth_for), default 75 %: teeth with a FLAT TOP
+     like a real rolled knurl; sharp tips only when the full height is asked. The panel shows
+     "auto / max" and says when a depth does not fit.
+  6. Install like other addons? -> answer: the Addon Manager can add a custom repository only if it
+     can download it without a password, i.e. the repo must be public (see memory.md).
+- Speed of the flat-topped teeth: Part faces one by one + Part.Shell were slow (Shell runs
+  BRepCheck on every face; D50 x 40, pitch 1 = 36k faces: 33 s, 1.6 GB; sewing a mesh: worse).
+  New: the teeth (and the rest of the part, exported as it is) are written straight into
+  OpenCASCADE BREP text (_Brep) and read back in one call: 36k faces 8.6 s / 410 MB; the boolean
+  tool 3.3 s (was ~20 s). Same volume as the boolean in all 10 test cases, valid, a hole through
+  the knurl afterwards works. Limits: 60 000 faces direct, 25 000 boolean (0.9 ms/face).
+- Verified in real FreeCAD 26.3: knurl test PASS (Apply / OK / Cancel, depth clamp, pitch 0.3 with
+  depth 0.8 in 4.6 s); full suite: see below.
+
 ## 2026-10-17: priorities and a separate CAM addon (notes)
 - Marios: what matters now is that GIFs, error translations and knurling work correctly; we go on
   only when Claude is sure. CAM + 4th axis + polar converter: a SEPARATE addon later.
