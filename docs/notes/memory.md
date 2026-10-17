@@ -71,6 +71,10 @@ Short, durable facts for the next Claude session. Details live in the other note
   (control run). Test one dialog per FreeCAD start: `tests/run_freecad_tests.sh`. Close dialogs
   like Cancel does: `Gui.Control.activeTaskDialog().reject()`.
 
+## Speed of the animations (2026-10-17)
+- Marios: "a bit slower, but not too slow" → `draw.SLOWER = 1.3` multiplies every frame duration
+  (all generators use draw.save_gif). Change only that number if he asks again.
+
 ## CAM recording lessons (2026-10-16, PR 7)
 - Marios: "if 26.3 blocks you, use the stable 1.1". Not needed so far: everything worked in 26.3.
   Stay on 26.3 (his version) unless something really cannot be done there.
@@ -82,6 +86,10 @@ Short, durable facts for the next Claude session. Details live in the other note
 - Profile with only the TOP face selected keeps Final Depth at the face height (cuts nothing);
   no selection = whole-model contour to the bottom. Ramp Entry refuses a zero HorizFeed.
 - Use `faulthandler.dump_traceback_later` to see where a hung FreeCAD script waits.
+- A selected path is drawn in the selection colour (green): clear the selection before a shot.
+- Dressup GIFs show the original path light indigo ("πριν") and the dressed path rose ("μετά"),
+  with a legend; rapids are light slate and the first rapid from the origin is hidden
+  (CAM prefs DefaultRapidPathColor, HideFirstRapid).
 
 ## How to test in a real FreeCAD from the cloud container
 - github.com release downloads are blocked, **conda-forge is reachable**:

@@ -122,6 +122,22 @@ def draw_panel(d, panel, size):
         d.text((x0 + 22, y0 + 74 + i * lh + lh / 2 - 4), ln, font=font, fill=col, anchor="lm")
 
 
+def draw_legend(d, items, size):
+    """Colour key top right: a short line in each colour + a word."""
+    if not items:
+        return
+    Wb = size[0]
+    w = sum(d.textlength(t, font=F_PTXT) + 64 for _, t in items) + 20
+    x0, y0 = Wb - w - 26, 26
+    d.rounded_rectangle([x0, y0, x0 + w, y0 + 48], 24, fill=(255, 255, 255, 235), outline=(203, 213, 225), width=2)
+    x = x0 + 20
+    for col, t in items:
+        rgb = tuple(int(col[i:i + 2], 16) for i in (1, 3, 5))
+        d.rounded_rectangle([x, y0 + 16, x + 34, y0 + 32], 6, fill=rgb)
+        d.text((x + 44, y0 + 24), t, font=F_PTXT, fill=(30, 41, 59), anchor="lm")
+        x += d.textlength(t, font=F_PTXT) + 64
+
+
 def load(path):
     """Key frame with thicker lines: FreeCAD draws 1 px lines and the GIF is half size."""
     return Image.open(path).convert("RGB").filter(ImageFilter.MinFilter(3))
@@ -140,6 +156,7 @@ def render(rec_dir, out_path):
         icon = Image.open(os.path.join(rec_dir, meta["icon"])).convert("RGBA").resize((64, 64), Image.LANCZOS)
     pressed = [False]
     panel = [None]
+    legend = [None]
 
     def emit(ms, ring=None, img=None):
         im = (img or base).convert("RGBA")
@@ -150,6 +167,7 @@ def render(rec_dir, out_path):
         if ring is not None:
             draw_ring(d, cur[0], cur[1], ring)
         draw_panel(d, panel[0], size)
+        draw_legend(d, legend[0], size)
         draw_cursor(d, cur[0], cur[1])
         draw_caption(d, cap[0], cap[1], size)
         im = Image.alpha_composite(im, ov).convert("RGB")
@@ -193,6 +211,8 @@ def render(rec_dir, out_path):
         elif t == "panel":
             panel[0] = ev if ev.get("title") else None
             emit(300)
+        elif t == "legend":
+            legend[0] = ev["items"]
         elif t == "pick" and panel[0]:
             # click a row of the card (e.g. the Job in the tree), then show it selected
             probe = ImageDraw.Draw(Image.new("RGBA", (8, 8)))

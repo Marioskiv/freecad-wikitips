@@ -207,12 +207,16 @@ class Frame:
         return self.im.resize((W, H), Image.LANCZOS)
 
 
+SLOWER = 1.3   # Marios (2026-10-17): "a bit slower, but not too slow" — all animations
+
+
 def save_gif(frames, path):
     """frames: list of (Frame or PIL image, duration_ms)."""
     ims = [(f.image() if isinstance(f, Frame) else f) for f, _ in frames]
-    durs = [ms for _, ms in frames]
+    durs = [int(ms * SLOWER) for _, ms in frames]
     # one shared palette (from a sample of all frames) keeps colours stable and the file small
     sample = ims[::max(1, len(ims) // 12)]
+    sample += [im for im, ms in zip(ims, durs) if ms >= 1000][:8]   # the held frames carry the labels
     sheet = Image.new("RGB", (W, H * len(sample)))
     for i, im in enumerate(sample):
         sheet.paste(im, (0, H * i))

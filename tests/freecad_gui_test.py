@@ -163,12 +163,24 @@ def cam_fields(wikitips):
     for spec in CAM_OPS:
         cmd, face = (spec.split(":") + [""])[:2]
         Gui.Selection.clearSelection()
-        if face:
+        if cmd.startswith("CAM_Dressup"):
+            # a dressup panel needs a path to dress up: a whole-model Profile, made without a dialog
+            import Path.Op.Profile as Profile
+            base = Profile.Create("Profile")
+            doc.recompute()
+            Gui.Selection.addSelection(base)
+        elif face:
             Gui.Selection.addSelection(model, face)
         else:
             Gui.Selection.addSelection(model)
         Gui.runCommand(cmd)
-        pump(2800)   # dialog opens, then the 2 s scan finds its fields
+        pump(800)
+        if cmd.startswith("CAM_Dressup") and Gui.Control.activeTaskDialog() is None:
+            # e.g. Dogbone creates the dressup without opening it: open it like a double click
+            made = [o for o in doc.Objects if o.Name.startswith("Dressup")]
+            if made:
+                Gui.ActiveDocument.setEdit(made[-1].Name)
+        pump(2000)   # dialog opens, then the 2 s scan finds its fields
         failures += hover_fields(wikitips, mw, cmd)   # keeps no Python wrappers of the dialog
         pump(300)
         close_dialog()
