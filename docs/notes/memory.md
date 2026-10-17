@@ -40,6 +40,15 @@ Short, durable facts for the next Claude session. Details live in the other note
   26.3 facts: libraries import .fctl (bits from the sibling Bit folder), .fctb, YAML, Camotics
   JSON; LinuxCNC .tbl export only; NO Fusion 360 import (Better Tool Library addon did it,
   deprecated after 1.0.1). Feeds/speeds live in the Tool Controller, not in the bit.
+  More libraries sent the same day (zips, not in this repo; all loaded and checked in 26.3):
+  IZAR_Aluminio (85 bits: HSSE 4454 Autolock Ø2-20 = his own Ø5 is T5 / art. 44858, 4464, 4420,
+  4410, 4411 from his IZAR_235.pdf p.241/242/245, plus carbide 9427/9429/9416/9417/9413/9414 from
+  the Carbide Programme 2018); Stepcraft (3 single-flute bits converted from his Fusion .tools);
+  Amana_Aluminio (the 34 "Aluminum Cutting" bits of Amana's Fusion library, inch → mm; Amana's file
+  has 2 inconsistencies: 51470 flutes, 51408 cutting length). RobbJack: he said NOT to make it.
+  A Fusion .tools file is a zip with tools.json (geometry DC/LCF/OAL/SFDM/NOF in the tool's unit,
+  presets n / v_f / v_f_plunge); converting it to .fctb/.fctl is a few lines of Python.
+  Clarkson: no catalog or library found; ask him for codes or a PDF.
 - **NEXT PHASE: CAM (Marios, 2026-10-17: "not now, in another phase"; do NOT start before he says).**
   DECISION (2026-10-17): this will be a SEPARATE addon, not part of WikiTips ("I don't want
   everything in one addon"). New repo/addon, its own notes; WikiTips stays help + error
