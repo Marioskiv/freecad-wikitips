@@ -126,7 +126,11 @@ Text is English (wiki has no Greek translation).
 - Document observer marks recomputed documents/objects; a 700 ms timer (only when no task dialog is
   open) finds red objects, picks the first one whose dependencies are fine, matches its status
   string against content/errors_el.json and shows ErrorCard (child widget of the main window,
-  bottom right of the central area). Unknown message → generic card with the original text.
+  bottom left of the central area, the 26.3 task panel is on the right). Unknown message → generic card.
+- Card is Greek only: FreeCAD's message translated sentence by sentence ("translations"); untranslated
+  sentences are left out. Pref ShowEnglish=true adds the English text and glossary words.
+- Notifications: status bar button 'notificationArea' count + top-level QLabel 'NotificationBox_label'
+  rows (newest first); modal QMessageBox text via activeModalWidget. Note/log cards hide after 30 s.
 - Silent checks on recomputed Part Design features: same volume as BaseFeature → "_nochange";
   more solids than before → "_split".
 - Report view: new lines are matched only against rules with "src": "log" (CAM messages).

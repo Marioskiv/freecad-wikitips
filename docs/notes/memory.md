@@ -12,6 +12,12 @@ Short, durable facts for the next Claude session. Details live in the other note
   to merge; you have my permission to put it on main"): merge only after the real-FreeCAD tests
   say ALL PASS, base every PR on `main`, merge in order. Still never push to `main` directly.
 
+## Error explainer wishes (2026-10-17)
+- FreeCAD stays in English, but the error cards must be ONLY Greek (he asked 2026-10-17, after first
+  wanting English + Greek). The English text appears only with the pref Mod/WikiTips ShowEnglish.
+- "The more problems it solves the better": keep adding rules from REAL probed messages
+  (tests/freecad_error_test.py lists them). He does NOT want a Greek search.
+
 ## Pending (do later, he asked to wait)
 - CAM animations: **more colour contrast** (he likes the v4 look, but the stock/tool/paths need
   stronger contrast). Ideas: darker stock edge + darker tool, stronger path colour, darker labels.

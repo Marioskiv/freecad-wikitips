@@ -12,6 +12,7 @@ Everything here runs from a timer or a document observer; every entry point
 is wrapped in try/except so that WikiTips can never break FreeCAD.
 """
 
+import html as htmllib
 import json
 import os
 import re
@@ -30,6 +31,10 @@ CARD_WIDTH = 400
 TICK_MS = 700
 _CMD = re.compile(r"\{([A-Za-z]+_[A-Za-z0-9_]+)\}")
 _STAMP = re.compile(r"^\d\d:\d\d:\d\d\s+")
+_TAGS = re.compile(r"<[^>]+>")
+# one row of FreeCAD's notification popup: icon, notifier, message (FreeCAD 26.3, newest row first)
+_NOTE_ROW = re.compile(r"icons/([\w-]+)\.svg'?\"?></td>\s*<td[^>]*>.*?</td>\s*<td[^>]*><p>(.*?)</p></td>", re.S)
+NOTE_SHOW_MS = 30000   # notification / log cards go away by themselves
 
 WA_MOUSE_THROUGH = wt._enum(Qt, "WA_TransparentForMouseEvents", "WidgetAttribute")
 ANTIALIAS = wt._enum(QtGui.QPainter, "Antialiasing", "RenderHint")
@@ -39,6 +44,7 @@ KEEP_ANCHOR = wt._enum(QtGui.QTextCursor, "KeepAnchor", "MoveMode")
 # Part Design features that must change the solid of the Body (silent "nothing happened" check)
 SILENT_TYPES = re.compile(r"^PartDesign::(Pad|Pocket|Revolution|Groove|Hole|Additive|Subtractive|"
                           r"LinearPattern|PolarPattern|Mirrored|MultiTransform|Thickness|Fillet|Chamfer|Draft)")
+DRESSUP = re.compile(r"::(Fillet|Chamfer|Thickness|Draft)$")
 NOT_ROOT = re.compile(r"^(PartDesign::Body|App::Part|App::Origin|App::Line|App::Plane|App::Point)$")
 WORKBENCH_HINT = {
     "Sketcher_": "Το κουμπί φαίνεται μόνο μέσα σε σκαρίφημα: άνοιξέ το με διπλό κλικ.",
@@ -55,22 +61,28 @@ def enabled():
 # --------------------------------------------------------------------------
 # rules
 # --------------------------------------------------------------------------
-_RULES = None
+_DATA = None
+
+
+def _data():
+    global _DATA
+    if _DATA is None:
+        try:
+            with open(ERRORS_FILE, encoding="utf-8") as f:
+                _DATA = json.load(f)
+            for r in _DATA["rules"]:
+                if r.get("re"):
+                    r["_re"] = re.compile(r["re"], re.I)
+            _DATA["_glossary"] = [(re.compile(r"\b%ss?\b" % re.escape(k), re.I), k, v)
+                                  for k, v in _DATA.get("glossary", {}).items()]
+        except Exception as e:  # pragma: no cover
+            App.Console.PrintError("WikiTips: cannot read error help: %s\n" % e)
+            _DATA = {"rules": [], "translations": {}, "_glossary": []}
+    return _DATA
 
 
 def rules():
-    global _RULES
-    if _RULES is None:
-        try:
-            with open(ERRORS_FILE, encoding="utf-8") as f:
-                _RULES = json.load(f)["rules"]
-            for r in _RULES:
-                if r.get("re"):
-                    r["_re"] = re.compile(r["re"], re.I)
-        except Exception as e:  # pragma: no cover
-            App.Console.PrintError("WikiTips: cannot read error help: %s\n" % e)
-            _RULES = []
-    return _RULES
+    return _data()["rules"]
 
 
 def special(rule_id):
@@ -83,20 +95,57 @@ def special(rule_id):
 def explain(message, type_id="", src="doc"):
     """The Greek rule for one English error message (first match wins).
 
-    Report view lines ("log") match only rules marked "src": "log", so that
-    ordinary messages there never raise a card; red objects get the generic
-    rule when nothing matches.
+    src: "doc" = status of a red object (all rules except notifications),
+    "log" = a Report view line, "note" = a notification or message box; these
+    two match only their own rules, so that ordinary messages never raise a
+    card. Red objects get the generic rule when nothing matches.
     """
     for r in rules():
-        if "_re" not in r:
+        kind = r.get("src", "doc")
+        if src == "doc" and kind == "note" or src in ("log", "note") and kind != src:
             continue
-        if src == "log" and r.get("src") != "log":
+        if "_re" not in r and not r.get("type"):
             continue
         if r.get("type") and not re.search(r["type"], type_id):
             continue
-        if r["_re"].search(message):
+        if "_re" not in r or r["_re"].search(message):
             return r
-    return None if src == "log" else special("_generic")
+    return special("_generic") if src == "doc" else None
+
+
+_SENTENCE = re.compile(r"(?<=[.!?])\s+|\n+")
+
+
+def _key(sentence):
+    s = re.sub(r"^\w+: ", "", sentence.strip())   # "Pad: Wire is not closed." from the log
+    s = re.sub(r"\d", "#", s.lower())
+    return re.sub(r"[\s.!:,]+$", "", re.sub(r"\s+", " ", s))
+
+
+def translate(message):
+    """(Greek translation of the known sentences, [(English word, Greek)] for the rest).
+
+    Marios keeps FreeCAD in English to learn the real terms: the card shows the
+    English message, its Greek meaning and the key words.
+    """
+    tr = _data().get("translations", {})
+    greek, rest = [], []
+    for part in _SENTENCE.split(message.strip()):
+        if not part.strip() or re.fullmatch(r"[\d,\s]+", part):
+            continue
+        k = _key(part)
+        hit = tr.get(k) or next((v for e, v in tr.items() if k.startswith(e)), None)
+        if hit:
+            greek.append(hit)
+        else:
+            rest.append(part)
+    words = []
+    for rx, en, el in _data()["_glossary"]:
+        if any(rx.search(p) for p in (rest or [message])) and en not in [w for w, _ in words]:
+            words.append((en, el))
+    # "base feature" also contains "feature": keep the longest term only
+    words = [(w, g) for w, g in words if not any(w != o and w in o for o, _ in words)]
+    return greek, words[:6]
 
 
 def constraint_numbers(message):
@@ -201,8 +250,29 @@ def steps_html(steps):
     return "<ol style='margin-left:-22px'>%s</ol>" % "".join("<li>%s</li>" % _CMD.sub(link, s) for s in steps)
 
 
+def message_html(message):
+    """What FreeCAD said, in Greek only (Marios: the card must be all Greek).
+
+    Known sentences are translated; the English text is never shown. The
+    preference ShowEnglish (Mod/WikiTips) adds it back for whoever wants it.
+    """
+    if not message.strip():
+        return ""
+    greek, words = translate(message)
+    html = ""
+    if greek:
+        html = "<b>Το FreeCAD λέει:</b> %s" % " ".join(greek)
+    if wt.params().GetBool("ShowEnglish", False):
+        esc = " ".join(message.split())[:220].replace("&", "&amp;").replace("<", "&lt;")
+        html += ("<br>" if html else "") + "<i>%s</i>" % esc
+        if words:
+            html += "<br><span style='color:gray'>%s</span>" % " · ".join(
+                "<b>%s</b> = %s" % (en, el) for en, el in words)
+    return "<span style='font-size:9pt'>%s</span>" % html if html else ""
+
+
 class ErrorCard(QtWidgets.QFrame):
-    """Child of the main window, bottom right over the 3D view: no window manager involved."""
+    """Child of the main window, bottom left over the 3D view: no window manager involved."""
 
     def __init__(self, mw):
         super().__init__(mw)
@@ -245,15 +315,16 @@ class ErrorCard(QtWidgets.QFrame):
         self.image = QtWidgets.QLabel()
         self.image.setObjectName("wteImage")
         self.image.setAlignment(wt.ALIGN_CENTER)
+        self.orig = self._label("wteMsg")      # the English message, its Greek meaning, key words
         lay.addWidget(self.where)
+        lay.addWidget(self.orig)
         lay.addWidget(self.image)
         self.text = self._label(None)
         self.text.setOpenExternalLinks(False)
         self.text.linkActivated.connect(self._link)
         self.note = self._label("wteNote")
-        self.orig = self._label("wteSmall")
         self.footer = self._label("wteSmall")
-        for w in (self.text, self.note, self.orig, self.footer):
+        for w in (self.text, self.note, self.footer):
             lay.addWidget(w)
         self.dismissed = set()
         self._follow = QtCore.QTimer(self)
@@ -281,8 +352,8 @@ class ErrorCard(QtWidgets.QFrame):
         self.text.setText(html)
         self.footer.setText("WikiTips · κλικ στο μπλε όνομα: σου δείχνει το κουμπί" if "cmd:" in html else "WikiTips")
         self.note.setText("")
-        msg = " ".join(message.split())
-        self.orig.setText("Μήνυμα FreeCAD: %s" % msg[:200] if msg else "")
+        msg = message_html(message)
+        self.orig.setText(wt._box([msg], "#94A3B8", "#1E293B" if self.dark else "#F1F5F9") if msg else "")
         img = rule.get("i")
         path = os.path.join(wt.CONTENT_IMG_DIR, img) if img else ""
         if path and os.path.isfile(path):
@@ -300,6 +371,8 @@ class ErrorCard(QtWidgets.QFrame):
         self.show()
         self.raise_()
         self._follow.start()
+        if key[0] in ("note", "log"):     # no object to fix: go away by itself
+            QtCore.QTimer.singleShot(NOTE_SHOW_MS, lambda k=key: self.key == k and self.dismiss())
 
     def _fit(self):
         inner = CARD_WIDTH - 30
@@ -308,6 +381,12 @@ class ErrorCard(QtWidgets.QFrame):
             lbl.ensurePolished()
             lbl.setFixedWidth(inner)
             h = lbl.heightForWidth(inner) if lbl.text() else 0
+            if lbl in (self.orig, self.text) and h:   # QLabel over-estimates tables and links: measure the document
+                doc = QtGui.QTextDocument()
+                doc.setDefaultFont(lbl.font())
+                doc.setHtml(lbl.text())
+                doc.setTextWidth(inner)
+                h = int(doc.size().height()) + 2
             lbl.setFixedHeight(max(0, h))
             lbl.setVisible(h > 0)
         tw = inner - 30
@@ -321,9 +400,9 @@ class ErrorCard(QtWidgets.QFrame):
         try:
             mw = self.parentWidget()
             area = mw.centralWidget().geometry() if mw.centralWidget() is not None else mw.rect()
-            x = area.right() - self.width() - 16
+            # bottom left of the 3D view: the task panel (26.3 overlay) is on the right
             y = area.bottom() - self.height() - 16
-            self.move(max(area.left(), x), max(area.top(), y))
+            self.move(area.left() + 16, max(area.top(), y))
         except Exception:
             pass
 
@@ -385,6 +464,9 @@ class Explainer(QtCore.QObject):
         self.recomputed = {}        # document -> names of objects recomputed
         self.log_pos = None
         self.log_seen = {}
+        self.note_count = None
+        self.note_wait = 0
+        self.last_box = None
         self.timer = QtCore.QTimer(self)
         self.timer.setInterval(TICK_MS)
         self.timer.timeout.connect(self.tick)
@@ -416,6 +498,7 @@ class Explainer(QtCore.QObject):
                 if self.card is not None and self.card.isVisible():
                     self.card.dismiss()
                 return
+            self.check_notes()
             self.check_log()
             # wait while a task dialog (Pad, sketch...) is open: values change while typing
             if self.pending and not Gui.Control.activeDialog():
@@ -475,8 +558,12 @@ class Explainer(QtCore.QObject):
             if vol is None:
                 continue
             bvol, bsolids = _solid_info(base) if base is not None else (None, 0)
+            if abs(vol) < 1e-9:   # double lines or overlapping shapes in the sketch: no error, no solid
+                r = dict(special("_empty"))
+                r["d"] = r["d"] % obj.Label
+                return (("empty", doc.Name, obj.Name), doc.Name, r, "Στο: <b>%s</b>" % obj.Label, "")
             if bvol is not None and abs(vol - bvol) <= 1e-6 * max(1.0, abs(bvol)):
-                r = dict(special("_nochange"))
+                r = dict(special("_nochange_dressup" if DRESSUP.search(obj.TypeId) else "_nochange"))
                 r["d"] = r["d"] % obj.Label
                 return (("nochange", doc.Name, obj.Name, round(vol, 6)), doc.Name, r,
                         "Στο: <b>%s</b>" % obj.Label, "")
@@ -487,6 +574,60 @@ class Explainer(QtCore.QObject):
                 return (("split", doc.Name, obj.Name, solids), doc.Name, r,
                         "Στο: <b>%s</b>" % obj.Label, "")
         return None
+
+    def check_notes(self):
+        """User warnings ("Wrong selection ...").
+
+        FreeCAD 26.3 counts them on the status bar button 'notificationArea' and
+        shows them for a few seconds in a top-level QLabel 'NotificationBox_label'
+        (verified 2026-10-17); some commands still use a modal message box.
+        Only the text is read; no widget is kept.
+        """
+        box = QtWidgets.QApplication.activeModalWidget()
+        if isinstance(box, QtWidgets.QMessageBox):
+            text = "%s. %s" % (box.windowTitle(), _TAGS.sub(" ", box.text()))
+            if text != self.last_box:
+                self.last_box = text
+                self.note_message(htmllib.unescape(text))
+        else:
+            self.last_box = None
+        btn = Gui.getMainWindow().findChild(QtWidgets.QPushButton, "notificationArea")
+        if btn is None:
+            return
+        try:
+            count = int(btn.text() or 0)
+        except ValueError:
+            return
+        if self.note_count is None or count < self.note_count:
+            self.note_count = count      # start, or the list was cleared
+            return
+        if count == self.note_count:
+            return
+        new = count - self.note_count
+        for w in QtWidgets.QApplication.topLevelWidgets():
+            if w.objectName() == "NotificationBox_label" and w.isVisible() and hasattr(w, "text"):
+                self.note_count, self.note_wait = count, 0
+                for icon, text in _NOTE_ROW.findall(w.text())[:new]:
+                    if "info" in icon.lower() and "critical" not in icon.lower():
+                        continue
+                    if self.note_message(htmllib.unescape(_TAGS.sub(" ", text))):
+                        return
+                return
+        self.note_wait += 1            # the popup may come a moment after the count
+        if self.note_wait > 3:
+            self.note_count, self.note_wait = count, 0
+
+    def note_message(self, text):
+        text = " ".join(text.split())
+        rule = explain(text, src="note")
+        if rule is None:
+            return False
+        now = QtCore.QDateTime.currentMSecsSinceEpoch()
+        if now - self.log_seen.get(text, 0) < 10000:
+            return False
+        self.log_seen[text] = now
+        self.show(("note", "", rule["id"], text), None, rule, "Ειδοποίηση του FreeCAD", text)
+        return True
 
     def check_log(self):
         mw = Gui.getMainWindow()
