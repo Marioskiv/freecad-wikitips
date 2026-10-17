@@ -1,5 +1,31 @@
 # Session log
 
+## 2026-10-17: full audit (code, GIFs, resources) (PR 17)
+- Marios: check the whole project for mistakes, the GIFs too, whether anything can use too many
+  resources or crash his PC (especially knurling), and research more helpful addons.
+- Helper agents could not run (account spend limit), so the audit was done directly.
+- KNURL (the big one): time and memory grow fast with size. Before: D50 x 40 mm, pitch 1 = 29k
+  faces, 2 min, 1.3 GB; D50 pitch 0.6 did not finish in 15 min (would freeze a laptop). Now:
+  tooth tips 2 µm inside the cylinder (no tangent faces: boolean 3-5x faster) and the tool is
+  built as one mesh (shared edges): same case 34 s, 860 MB. Hard limit MAX_FACES = 30000:
+  bigger knurls are refused at once (Greek card + red text in the panel with faces and seconds);
+  the panel shows "N faces, about X seconds" before OK. Angle clamped 5-60°, depth >= 0.01,
+  at most 360 lines each way for the light kind.
+- Knurl light kind put its lines INTO the solid: a Fillet after it failed. Now the solid stays
+  untouched and the lines are drawn by the view provider (pivy). For drawings: TechDraw hatch
+  "Diamond" (FCPAT.pat) is the usual knurl symbol; texts changed accordingly.
+- Error explainer: silent checks only on the 3 newest recomputed features and only shapes with
+  <= 20000 faces (a full recompute of a big model must not cost seconds); patterns that change
+  nothing get their own advice (_nochange_pattern).
+- Idle cost of WikiTips measured in real FreeCAD: +0.09 s CPU per 30 s, +4 MB.
+- GIF audit: automatic checks (frames, blank frames, size, duration) on all 237 + every GIF looked
+  at (3 frames each, with its Greek text). Fixed: CAM_Simulator (legacy) showed the new
+  simulator GIF; chipBreakEnabled (G73) showed full-retract pecking (G83); Adaptive:stepOver
+  showed a zigzag 50% step; Revolution/Groove axis showed the angle GIF (all four images removed,
+  texts kept); Part primitives recorded with non-default sizes (Box 20x14x10, Cylinder R5, Cone
+  6/2...) re-recorded with FreeCAD's real defaults so one click gives what the GIF shows;
+  Part_ProjectionOnSurface caption said "wrapped" (projection is not a wrap).
+
 ## 2026-10-17: CAM put on hold (notes only)
 - Marios: nothing more for CAM now. Next phase: his polar-coordinate converter + easy CAM setup for
   polar and 4th-axis work. Written under "Pending" in memory.md so it is not forgotten.

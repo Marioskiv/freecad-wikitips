@@ -4,8 +4,9 @@
 Select the outer cylindrical face of a solid, press the Knurl button, pick the
 pattern and the pitch. Two kinds:
   - "Πραγματικό": real V-shaped teeth cut into the solid (3D printing, renders);
-  - "Ελαφρύ": only the groove lines on the surface (fast; for drawings, where
-    knurling is drawn as crossed lines anyway).
+  - "Ελαφρύ": the groove lines are only drawn on screen by the view provider; the
+    solid is not changed, so later features never see them. (For a technical
+    drawing, TechDraw's geometric hatch "Diamond" is the usual knurl symbol.)
 Inside a Part Design Body it becomes a normal feature of the Body (it follows
 the Tip like a Pocket); elsewhere a Part feature that cuts the selected solid.
 
@@ -76,7 +77,13 @@ def depth_for(pitch, pattern, angle):
     return 0.5 * pitch * math.cos(math.radians(a))
 
 
+def _angle(angle):
+    """Helix angle kept between 5° and 60°: 0° divides by zero, near 90° gives endless rows."""
+    return min(max(angle, 5.0), 60.0)
+
+
 def _grid(R, L, pitch, angle, straight):
+    angle = _angle(angle)
     n = max(3, int(round(2 * math.pi * R / pitch)))
     if straight:
         return n, 1, L
@@ -85,44 +92,72 @@ def _grid(R, L, pitch, angle, straight):
     return n, rows, L / rows
 
 
+# Real teeth above this many faces take more than ~35 s and ~1 GB (measured in FreeCAD 26.3,
+# D50 x 40 mm, pitch 1 = 28 888 faces: 34 s, 860 MB); bigger ones could freeze a laptop.
+MAX_FACES = 30000
+PEAK_INSET = 0.002   # teeth tips 2 µm inside the cylinder: no tangent faces, boolean 3-5x faster
+
+
+def face_count(R, L, pitch, angle, straight=False):
+    """How many tooth faces a real knurl would have (to refuse ones that are too big)."""
+    if R <= 0 or L <= 0 or pitch <= 0:
+        return 0
+    n, rows, dz = _grid(R, L, pitch, angle, straight)
+    return 2 * n * rows * (1 if straight else 2)
+
+
+def seconds_for(faces):
+    return max(1, int(round(faces * 35.0 / 28888)))
+
+
 def knurl_tool(R, L, pitch, angle, depth, straight=False):
-    """The material a knurling removes from a cylinder of radius R, axis Z, from z=0 to L."""
+    """The material a knurling removes from a cylinder of radius R, axis Z, from z=0 to L.
+
+    Built as one triangle mesh turned into a solid (shared edges: much faster than
+    joining thousands of separate faces).
+    """
     n, rows, dz = _grid(R, L, pitch, angle, straight)
     na = 2 * n
     dth = 2 * math.pi / n
     ro = R / math.cos(dth / 4) + 0.01     # outer prism just outside the cylinder
+    pts, index = [], {}
+
+    def point(kind, a, b):
+        a %= na
+        key = (kind, a, b)
+        if key not in index:
+            if kind == "o":
+                r = ro
+            else:
+                valley = (a % 2 == 0) if straight else ((a + b) % 2 == 0)
+                r = R - depth if valley else R - PEAK_INSET
+            t = a * dth / 2
+            index[key] = len(pts)
+            pts.append(V(r * math.cos(t), r * math.sin(t), b * dz))
+        return index[key]
 
     def node(a, b):
-        a %= na
-        valley = (a % 2 == 0) if straight else ((a + b) % 2 == 0)
-        r = R - depth if valley else R
-        t = a * dth / 2
-        return V(r * math.cos(t), r * math.sin(t), b * dz)
+        return point("n", a, b)
 
     def outer(a, b):
-        t = (a % na) * dth / 2
-        return V(ro * math.cos(t), ro * math.sin(t), b * dz)
+        return point("o", a, b)
 
-    def tri(*p):
-        return Part.Face(Part.makePolygon(list(p) + [p[0]]))
-
-    faces = []
+    tris = []
     for b in range(rows):
         for a in range(na):
             p00, p10, p11, p01 = node(a, b), node(a + 1, b), node(a + 1, b + 1), node(a, b + 1)
-            if straight:
-                faces.append(tri(p00, p10, p11, p01))
-            elif (a + b) % 2 == 0:      # split along the line joining the two valleys
-                faces += [tri(p00, p10, p11), tri(p00, p11, p01)]
+            if straight or (a + b) % 2 == 0:   # split along the line joining the two valleys
+                tris += [(p00, p10, p11), (p00, p11, p01)]
             else:
-                faces += [tri(p00, p10, p01), tri(p10, p11, p01)]
+                tris += [(p00, p10, p01), (p10, p11, p01)]
     for a in range(na):
-        faces.append(tri(outer(a, 0), outer(a + 1, 0), outer(a + 1, rows), outer(a, rows)))
-    for b in (0, rows):
-        inner = Part.makePolygon([node(a, b) for a in range(na + 1)])
-        out = Part.makePolygon([outer(a, b) for a in range(na + 1)])
-        faces.append(Part.makeFace([out, inner], "Part::FaceMakerBullseye"))
-    solid = Part.Solid(Part.Shell(faces))
+        tris += [(outer(a, 0), outer(a, rows), outer(a + 1, rows)), (outer(a, 0), outer(a + 1, rows), outer(a + 1, 0)),
+                 (node(a, 0), outer(a, 0), outer(a + 1, 0)), (node(a, 0), outer(a + 1, 0), node(a + 1, 0)),
+                 (node(a, rows), node(a + 1, rows), outer(a + 1, rows)),
+                 (node(a, rows), outer(a + 1, rows), outer(a, rows))]
+    mesh = Part.Shape()
+    mesh.makeShapeFromMesh((pts, tris), 1e-7)
+    solid = Part.Solid(mesh if mesh.ShapeType == "Shell" else Part.Shell(mesh.Faces))
     if solid.Volume < 0:
         solid.reverse()
     return solid
@@ -132,16 +167,17 @@ def knurl_lines(R, L, pitch, angle, straight=False):
     """Groove lines on the surface (helices or straight lines) for the light kind."""
     n, rows, dz = _grid(R, L, pitch, angle, straight)
     edges = []
+    step = max(1, -(-n // 360))   # at most 360 lines each way: a drawing needs no more
     if straight:
-        for i in range(n):
+        for i in range(0, n, step):
             t = 2 * math.pi * i / n
             p = V(R * math.cos(t), R * math.sin(t), 0)
             edges.append(Part.makeLine(p, p + V(0, 0, L)))
         return Part.makeCompound(edges)
-    lead = 2 * math.pi * R / math.tan(math.radians(angle))   # axial length of one turn
+    lead = 2 * math.pi * R / math.tan(math.radians(_angle(angle)))   # axial length of one turn
     for left in (False, True):
         h = Part.makeHelix(lead, L, R, 0, left)
-        for i in range(n):
+        for i in range(0, n, step):
             c = h.copy()
             c.rotate(V(), V(0, 0, 1), 360.0 * i / n)
             edges += c.Edges
@@ -175,7 +211,7 @@ def _props(obj):
     add = obj.addProperty
     add("App::PropertyEnumeration", "Pattern", "Knurl", "Διαμάντι (σταυρωτό) ή Ίσιο (παράλληλο με τον άξονα)")
     obj.Pattern = PATTERNS
-    add("App::PropertyEnumeration", "Kind", "Knurl", "Πραγματικό: κόβει δόντια. Ελαφρύ: μόνο γραμμές (για σχέδια)")
+    add("App::PropertyEnumeration", "Kind", "Knurl", "Πραγματικό: κόβει δόντια. Ελαφρύ: μόνο γραμμές στην οθόνη, το στερεό μένει ίδιο")
     obj.Kind = KINDS
     add("App::PropertyLength", "Pitch", "Knurl", "Βήμα: απόσταση ανάμεσα στα δόντια γύρω-γύρω")
     add("App::PropertyAngle", "Angle", "Knurl", "Γωνία των ραβδώσεων ως προς τον άξονα (συνήθως 30°)")
@@ -197,6 +233,46 @@ def _base_shape(obj):
     return base.Shape if base is not None and not base.Shape.isNull() else None
 
 
+def layout(obj, base):
+    """(center, axis, radius, start, length) of the knurled band, axis pointing up."""
+    axis = V(obj.AxisDirection).normalize()
+    center = V(obj.AxisCenter)
+    cyl = find_cylinder(base, center, axis, obj.Radius.Value) or (
+        center, axis, obj.Radius.Value, obj.VMin, obj.VMax)
+    center, axis, radius, vmin, vmax = cyl
+    center, axis, vmin, vmax = upwards(center, axis, vmin, vmax)   # margins count from the bottom
+    start = vmin + obj.StartMargin.Value
+    return center, axis, radius, start, (vmax - obj.EndMargin.Value) - start
+
+
+def lines_for(obj):
+    """The groove lines of a light knurl, in the same coordinates as obj.Shape (None if not light)."""
+    if getattr(obj, "Kind", "") != "Ελαφρύ":
+        return None
+    base = _base_shape(obj)
+    if base is None:
+        return None
+    center, axis, radius, start, length = layout(obj, base)
+    if length <= 0 or obj.Pitch.Value <= 0:
+        return None
+    lines = knurl_lines(radius, length, obj.Pitch.Value, obj.Angle.Value, obj.Pattern == "Ίσιο")
+    lines.Placement = placement_for(center, axis, start)
+    return lines
+
+
+def size_report(obj):
+    """(faces of the real teeth, seconds, too big?) for the Greek panel; None if unknown."""
+    try:
+        base = _base_shape(obj)
+        if base is None:
+            return None
+        center, axis, radius, start, length = layout(obj, base)
+        faces = face_count(radius, length, obj.Pitch.Value, obj.Angle.Value, obj.Pattern == "Ίσιο")
+        return faces, seconds_for(faces), faces > MAX_FACES
+    except Exception:
+        return None
+
+
 class Knurl:
     def __init__(self, obj):
         obj.Proxy = self
@@ -212,27 +288,24 @@ class Knurl:
         base = _base_shape(obj)
         if base is None:
             raise RuntimeError("WikiTips Knurl: no base solid")
-        axis = V(obj.AxisDirection).normalize()
-        center = V(obj.AxisCenter)
-        cyl = find_cylinder(base, center, axis, obj.Radius.Value) or (
-            center, axis, obj.Radius.Value, obj.VMin, obj.VMax)
-        center, axis, radius, vmin, vmax = cyl
-        center, axis, vmin, vmax = upwards(center, axis, vmin, vmax)   # margins count from the bottom
-        start = vmin + obj.StartMargin.Value
-        length = (vmax - obj.EndMargin.Value) - start
+        center, axis, radius, start, length = layout(obj, base)
         pitch = obj.Pitch.Value
         if length <= 0 or pitch <= 0:
             raise RuntimeError("WikiTips Knurl: length and pitch must be greater than zero")
         straight = obj.Pattern == "Ίσιο"
         depth = obj.Depth.Value or depth_for(pitch, obj.Pattern, obj.Angle.Value)
-        depth = min(depth, radius * 0.5)
+        depth = min(max(depth, 0.01), radius * 0.5)
         pl = placement_for(center, axis, start)
         if obj.Kind == "Ελαφρύ":
-            lines = knurl_lines(radius, length, pitch, obj.Angle.Value, straight)
-            lines.Placement = pl
-            result = Part.makeCompound([base, lines])
+            # the solid stays as it is: the lines are only drawn by the view provider, so
+            # later features (Pocket, Fillet...) never see them (checked: lines in the shape
+            # made a Fillet after it fail)
+            result = base.copy()
             tool = None
         else:
+            faces = face_count(radius, length, pitch, obj.Angle.Value, straight)
+            if faces > MAX_FACES:
+                raise RuntimeError("WikiTips Knurl: too many teeth (%d faces, max %d)" % (faces, MAX_FACES))
             tool = knurl_tool(radius, length, pitch, obj.Angle.Value, depth, straight)
             tool.Placement = pl
             result = base.cut(tool)
@@ -336,7 +409,7 @@ if App.GuiUp:
             self.start = self._spin(obj.StartMargin.Value, 0, 1000, " mm")
             self.end = self._spin(obj.EndMargin.Value, 0, 1000, " mm")
             rows = [("Μοτίβο", self.pattern, "Διαμάντι: σταυρωτές ραβδώσεις. Ίσιο: παράλληλες με τον άξονα."),
-                    ("Είδος", self.kindbox, "Πραγματικό: για 3D εκτύπωση. Ελαφρύ: για σχέδια (γρήγορο)."),
+                    ("Είδος", self.kindbox, "Πραγματικό: για 3D εκτύπωση. Ελαφρύ: γραμμές μόνο στην οθόνη (γρήγορο). Για τεχνικό σχέδιο: TechDraw, γράμμωση «Diamond»."),
                     ("Βήμα", self.pitch, "Απόσταση ανάμεσα στα δόντια. Μικρό = λεπτό knurling."),
                     ("Γωνία", self.angle, "Γωνία των ραβδώσεων ως προς τον άξονα. Συνήθως 30°."),
                     ("Βάθος", self.depth, "0 = αυτόματο (δόντια 90°)."),
@@ -345,8 +418,11 @@ if App.GuiUp:
             for label, w, tip in rows:
                 w.setToolTip(tip)
                 lay.addRow(label, w)
+            self.size = QtWidgets.QLabel()
+            self.size.setWordWrap(True)
+            lay.addRow(self.size)
             hint = QtWidgets.QLabel("Όσο είναι ανοιχτό το παράθυρο βλέπεις γρήγορη προεπισκόπηση με γραμμές. "
-                                    "Τα πραγματικά δόντια υπολογίζονται με το OK (λίγα δευτερόλεπτα).")
+                                    "Τα πραγματικά δόντια υπολογίζονται με το OK.")
             hint.setWordWrap(True)
             hint.setStyleSheet("color:gray")
             lay.addRow(hint)
@@ -376,15 +452,35 @@ if App.GuiUp:
             o.StartMargin, o.EndMargin = self.start.value(), self.end.value()
             self.angle.setEnabled(o.Pattern != "Ίσιο")
 
+        def show_size(self):
+            """How big the real teeth will be, before anything heavy is computed."""
+            rep = size_report(self.obj)
+            if rep is None:
+                self.size.setText("")
+                return False
+            faces, secs, too_big = rep
+            if too_big:
+                self.size.setStyleSheet("color:#B91C1C")
+                self.size.setText("Πολύ μεγάλο για πραγματικά δόντια (%d επιφάνειες, όριο %d): θα "
+                                  "βάραινε πολύ τον υπολογιστή. Μεγάλωσε το βήμα, μίκρυνε το μήκος, "
+                                  "ή διάλεξε Ελαφρύ." % (faces, MAX_FACES))
+            else:
+                self.size.setStyleSheet("color:gray")
+                self.size.setText("Πραγματικά δόντια: %d επιφάνειες, περίπου %d δευτερόλεπτα." % (faces, secs))
+            return too_big
+
         def preview(self, *args):
             try:
                 self.apply()
+                self.show_size()
                 self.obj.Document.recompute()
             except Exception:
                 pass
 
         def accept(self):
             self.apply()
+            if KINDS[self.kindbox.currentIndex()] == "Πραγματικό" and self.show_size():
+                return False          # too big: the panel stays open, the red text says what to do
             self.obj.Kind = KINDS[self.kindbox.currentIndex()]
             QtWidgets.QApplication.setOverrideCursor(_cursor())
             Gui.getMainWindow().statusBar().showMessage("WikiTips: υπολογίζω το knurling…")
@@ -415,9 +511,43 @@ if App.GuiUp:
 
         def attach(self, vobj):
             self.Object = vobj.Object
+            self.lines = None
             try:   # thousands of small tooth edges: thin grey lines instead of thick black ones
                 vobj.LineWidth = 1.0
                 vobj.LineColor = (0.35, 0.38, 0.42)
+            except Exception:
+                pass
+            try:   # the light kind: groove lines drawn on screen only (not part of the solid)
+                from pivy import coin
+                self.lines = coin.SoSeparator()
+                col = coin.SoBaseColor()
+                col.rgb = (0.12, 0.16, 0.22)
+                style = coin.SoDrawStyle()
+                style.lineWidth = 1.5
+                self.coords = coin.SoCoordinate3()
+                self.lineset = coin.SoLineSet()
+                for n in (col, style, self.coords, self.lineset):
+                    self.lines.addChild(n)
+                vobj.RootNode.addChild(self.lines)
+            except Exception:
+                self.lines = None
+
+        def updateData(self, obj, prop):
+            if prop != "Shape" or getattr(self, "lines", None) is None:
+                return
+            try:
+                pts, counts = [], []
+                shape = lines_for(obj)
+                if shape is not None:
+                    inv = obj.Placement.inverse()
+                    for e in shape.Edges:
+                        ps = [inv.multVec(p) for p in e.discretize(Deflection=0.05)]
+                        pts += [(p.x, p.y, p.z) for p in ps]
+                        counts.append(len(ps))
+                self.coords.point.setValues(0, len(pts), pts)
+                self.coords.point.setNum(len(pts))
+                self.lineset.numVertices.setValues(0, len(counts), counts)
+                self.lineset.numVertices.setNum(len(counts))
             except Exception:
                 pass
 
