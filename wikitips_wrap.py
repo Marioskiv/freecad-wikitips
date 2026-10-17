@@ -21,7 +21,7 @@ import os
 import FreeCAD as App
 import Part
 
-from wikitips_knurl import cylinder_of, find_cylinder, is_outer
+from wikitips_knurl import cylinder_of, find_cylinder, is_outer, upwards
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ICON = os.path.join(HERE, "Resources", "WikiTipsWrap.svg")
@@ -49,10 +49,19 @@ def frame_at(surf, point):
 
 
 def sketch_placement(surf, point):
-    """Placement of a sketch touching the cylinder at `point`: X around, Y along the axis, Z outwards."""
-    u, v, xd, yd, n = frame_at(surf, point)
-    m = App.Matrix(xd.x, yd.x, n.x, 0, xd.y, yd.y, n.y, 0, xd.z, yd.z, n.z, 0, 0, 0, 0, 1)
-    return App.Placement(surf.value(u, v), App.Rotation(m))
+    """Placement of a sketch touching the cylinder at `point`.
+
+    Y goes along the axis, pointing up; Z points out of the cylinder; X = Y x Z,
+    so the sketch is a normal right-handed one (text is never mirrored).
+    """
+    u, v = surf.parameter(point)
+    p = surf.value(u, v)
+    up = upwards(V(surf.Center), V(surf.Axis), 0, 0)[1]
+    radial = p - V(surf.Center)
+    n = (radial - up * radial.dot(up)).normalize()
+    x = up.cross(n)
+    m = App.Matrix(x.x, up.x, n.x, 0, x.y, up.y, n.y, 0, x.z, up.z, n.z, 0, 0, 0, 0, 1)
+    return App.Placement(p, App.Rotation(m))
 
 
 def _wrap_edge(edge, surf, R, u0, v0, sx, sy):
@@ -171,9 +180,8 @@ def make_wrap(face_owner, face, point, doc=None):
     # construction frame = the whole surface unrolled; the solid line is where the sketch touches
     u, v = surf.parameter(point)
     w = 2 * math.pi * radius
-    y0, y1 = vmin - v, vmax - v
-    if surf.tangent(u, v)[1].dot(axis) < 0:
-        y0, y1 = -y1, -y0
+    up = sk.Placement.Rotation.multVec(V(0, 1, 0))
+    y0, y1 = sorted(((vv - v) * axis).dot(up) for vv in (vmin, vmax))
     corners = [V(-w / 2, y0, 0), V(w / 2, y0, 0), V(w / 2, y1, 0), V(-w / 2, y1, 0)]
     for i in range(4):
         sk.addGeometry(Part.LineSegment(corners[i], corners[(i + 1) % 4]), True)
