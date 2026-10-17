@@ -727,8 +727,9 @@ def _ensure_toolbar():
 def _ensure_tool_buttons():
     """WikiTips tools (Knurl ...) on the WikiTips toolbar, also for users who already have it."""
     grp = App.ParamGet("User parameter:BaseApp/Workbench/Global/Toolbar/WikiTips")
-    if not grp.GetString("WikiTips_Knurl", ""):
-        grp.SetString("WikiTips_Knurl", "wikitips")
+    for cmd in ("WikiTips_Knurl", "WikiTips_Wrap"):
+        if not grp.GetString(cmd, ""):
+            grp.SetString(cmd, "wikitips")
 
 
 class ToggleCommand:
@@ -768,8 +769,10 @@ def install():
     _SCAN_TIMER.start()
     QtCore.QTimer.singleShot(500, _scan)
     try:
-        import wikitips_knurl    # tools: knurling on a cylinder
+        import wikitips_knurl    # tools: knurling on a cylinder, drawing on a cylinder
+        import wikitips_wrap
         wikitips_knurl.install()
+        wikitips_wrap.install()
         _ensure_tool_buttons()
     except Exception as e:
         App.Console.PrintWarning("WikiTips: tools off: %s\n" % e)

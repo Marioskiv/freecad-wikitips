@@ -56,7 +56,9 @@
     "not allowed to edit the datum because the sketch contains conflicting constraints": "Δεν αλλάζει η τιμή, γιατί το σκαρίφημα έχει περιορισμούς που συγκρούονται.",
     "early feature must not depend on later feature": "Μια παλιότερη λειτουργία δεν πρέπει να εξαρτάται από μεταγενέστερη.",
     "wikitips knurl: no base solid": "Knurl: δεν υπάρχει στερεό από κάτω.",
-    "wikitips knurl: length and pitch must be greater than zero": "Knurl: το μήκος και το βήμα πρέπει να είναι πάνω από 0."
+    "wikitips knurl: length and pitch must be greater than zero": "Knurl: το μήκος και το βήμα πρέπει να είναι πάνω από 0.",
+    "wikitips wrap: the sketch has no closed shapes": "Σχέδιο σε κύλινδρο: το σκαρίφημα δεν έχει κλειστά σχήματα.",
+    "wikitips wrap: no base solid or no sketch": "Σχέδιο σε κύλινδρο: λείπει το στερεό ή το σκαρίφημα."
   },
   "glossary": {
     "wire": "περίγραμμα (σειρά ενωμένων γραμμών)",
@@ -120,6 +122,16 @@
       "fix": [
         "Άνοιξε το Knurl (διπλό κλικ) και μίκρυνε τις αποστάσεις «Από την αρχή» και «Από το τέλος».",
         "Δες ότι ο κύλινδρος υπάρχει ακόμα πριν από το Knurl στο δέντρο."
+      ]
+    },
+    {
+      "id": "wt_wrap",
+      "re": "wikitips wrap",
+      "t": "Το σχέδιο στον κύλινδρο δεν βγαίνει",
+      "d": "Το σκαρίφημα δεν έχει κλειστά σχήματα. Οι διακεκομμένες γραμμές (το πλαίσιο) δεν μετράνε.",
+      "fix": [
+        "Άνοιξε το WrapSketch (διπλό κλικ) και σχεδίασε κλειστά σχήματα ή γράμματα μέσα στο πλαίσιο.",
+        "Ένωσε τα άκρα με {Sketcher_ConstrainCoincidentUnified}."
       ]
     },
     {

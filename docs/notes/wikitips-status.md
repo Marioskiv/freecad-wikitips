@@ -151,6 +151,14 @@ Text is English (wiki has no Greek translation).
   preview, real teeth valid, Tip, Pocket after it, Part cylinder, save + reopen.
 - Not done: inner (bore) knurling, G-code for a 4th axis, a GIF for the button.
 
+## Drawing on a cylinder (PR 14, 2026-10-17)
+- wikitips_wrap.py, button WikiTips_Wrap. Uses the picked point (Selection PickedPoints) for the
+  tangent sketch (MapMode Deactivated, Placement set; in a Body: body.newObject). Construction frame
+  2πR wide x cylinder length. The Wrap feature (PartDesign::FeaturePython or Part::FeaturePython)
+  reads the sketch Placement on every recompute, so moving the sketch moves the drawing.
+- Only closed shapes count (Bullseye face maker: letters with holes work). Open lines are ignored.
+- Verified in real FreeCAD 26.3 (tests/freecad_wrap_test.py).
+
 ## Ideas / open (plan agreed 2026-10-16, see memory.md)
 - PR 2: field help inside dialogs — CAM task-panel widgets have stable objectNames (see
   freecad-findings.md) → Greek text + animated diagram per field (prototype: CAM heights GIF).
