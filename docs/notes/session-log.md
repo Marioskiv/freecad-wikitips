@@ -1,5 +1,30 @@
 # Session log
 
+## 2026-10-17: Knurl tool + drawing on a cylinder (PR 14)
+- Marios: "make knurling on cylinders simple, without a planar workaround, or an icon that does it
+  automatically" (for 3D printing, CNC 4th axis and drawings). No ready knurl tool exists for
+  FreeCAD (searched: only macros for other programs; FCCamGroover cuts a cam groove).
+- wikitips_knurl.py: button "Knurl (ραβδώσεις)" on the WikiTips toolbar. Select the outer cylindrical
+  face, press it: Greek panel (pattern Διαμάντι/Ίσιο, kind Πραγματικό/Ελαφρύ, pitch, angle, depth,
+  margins). While the panel is open the preview is fast lines; OK computes the real teeth.
+- Real teeth: pyramids on a diamond grid built from planar faces (or straight V grooves) and one
+  boolean cut: D20 x 20 mm, pitch 1: one valid solid in ~6-15 s. Light kind: helix lines only
+  (drawings show knurling as crossed lines).
+- In a Body it is a PartDesign::FeaturePython (follows the Tip; a Pocket after it works); on Part
+  solids a Part::FeaturePython with Base. The cylinder is stored as numbers and found again on
+  recompute, so upstream edits (longer Pad) are followed.
+- FOUND: PartDesign::FeatureAdditivePython / FeatureSubtractivePython crash FreeCAD 26.3 when
+  created with the GUI (even without WikiTips) → use PartDesign::FeaturePython.
+- Test: tests/freecad_knurl_test.py ("knurl" in run_freecad_tests.sh).
+- wikitips_wrap.py: button "Σκαρίφημα σε κύλινδρο". Click the cylinder where the drawing goes, press
+  it: a flat sketch opens touching the cylinder there (X around, Y along the axis, dashed frame =
+  the whole unrolled surface). Text, shapes, circles drawn in it are wrapped EXACTLY (B-spline poles
+  mapped to angle = x/R, height = y) and become Χάραξη / Ανάγλυφο / Μέχρι τον άξονα (double-click
+  the Wrap to change mode and depth). Also works across the cylinder seam. < 0.2 s.
+- Test: tests/freecad_wrap_test.py ("wrap" in the suite): text "CNC" + circle, three modes,
+  save + reopen, upstream Pad edit.
+- Open: G-code for knurling on a 4th axis needs his machine setup (ask); GIFs for the two buttons.
+
 ## 2026-10-17: more errors explained, Greek only (PR 13)
 - Marios keeps FreeCAD in English on purpose (to learn the real terms) but wants the meaning in
   Greek, and "as many problems solved as possible". Not wanted: Greek search.

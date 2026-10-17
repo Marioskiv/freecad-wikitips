@@ -119,7 +119,7 @@ Short, durable facts for the next Claude session. Details live in the other note
   package.xml, data, content, Resources), then
   `FREECAD=<fc>/bin/freecad OUT=<dir> sh tests/run_freecad_tests.sh` → must print ALL PASS.
   The suite includes the error explainer test (tests/freecad_error_test.py, run name "errors").
-  Copy wikitips_errors.py too when installing.
+  Copy wikitips_errors.py, wikitips_knurl.py and wikitips_wrap.py too when installing (suite runs "knurl", "wrap").
 - Offline mock test: `QT_QPA_PLATFORM=offscreen <fc>/bin/python tests/run_popup_test.py tests/shim . <out>`
   (system PySide6 lacks libEGL; FreeCAD's own Python works).
 - GIF prototypes: real FreeCAD scene → `ActiveView.saveImage()` frames → ffmpeg palette GIF (~70 KB),

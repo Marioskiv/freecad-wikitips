@@ -142,6 +142,23 @@ Text is English (wiki has no Greek translation).
 - Not verified: Marios's Windows machine; FreeCAD in Greek UI language (messages are matched in
   English; getStatusString seemed untranslated, to check).
 
+## Knurl tool (PR 14, 2026-10-17)
+- wikitips_knurl.py (geometry without GUI + command/panel/view provider when the GUI is up).
+  WikiTips_Knurl is added to the global WikiTips toolbar (also for existing installs).
+- Default pitch by diameter: ≤8 mm 0.6, ≤16 mm 0.8, ≤32 mm 1.0, else 1.2 (ideas from DIN 82 tables).
+- Depth 0 = automatic (90° teeth: 0.5 x pitch x cos(angle)), capped at half the radius.
+- Verified in real FreeCAD 26.3 (tests/freecad_knurl_test.py): button, wrong selection card, panel,
+  preview, real teeth valid, Tip, Pocket after it, Part cylinder, save + reopen.
+- Not done: inner (bore) knurling, G-code for a 4th axis, a GIF for the button.
+
+## Drawing on a cylinder (PR 14, 2026-10-17)
+- wikitips_wrap.py, button WikiTips_Wrap. Uses the picked point (Selection PickedPoints) for the
+  tangent sketch (MapMode Deactivated, Placement set; in a Body: body.newObject). Construction frame
+  2πR wide x cylinder length. The Wrap feature (PartDesign::FeaturePython or Part::FeaturePython)
+  reads the sketch Placement on every recompute, so moving the sketch moves the drawing.
+- Only closed shapes count (Bullseye face maker: letters with holes work). Open lines are ignored.
+- Verified in real FreeCAD 26.3 (tests/freecad_wrap_test.py).
+
 ## Ideas / open (plan agreed 2026-10-16, see memory.md)
 - PR 2: field help inside dialogs — CAM task-panel widgets have stable objectNames (see
   freecad-findings.md) → Greek text + animated diagram per field (prototype: CAM heights GIF).

@@ -669,6 +669,17 @@ class Explainer(QtCore.QObject):
 _EXPLAINER = None
 
 
+def tell(title, text, steps):
+    """Greek guidance from a WikiTips tool (e.g. "select a cylinder first"), in the same card."""
+    if _EXPLAINER is None:
+        raise RuntimeError("explainer not installed")
+    rule = {"id": "_tell", "t": title, "d": text, "fix": steps}
+    key = ("note", "", "_tell", title + text)
+    card = _EXPLAINER.ensure_card()
+    card.dismissed.discard(key)
+    card.show_problem(key, None, rule, "WikiTips", "")
+
+
 def install():
     global _EXPLAINER
     if _EXPLAINER is not None:
