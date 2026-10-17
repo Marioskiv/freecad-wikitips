@@ -8,4 +8,6 @@ def ParamGet(p): return _P(p)
 class Console:
     @staticmethod
     def PrintMessage(m): print(m, end='')
-    PrintLog = PrintError = PrintMessage
+    PrintLog = PrintError = PrintWarning = PrintMessage
+def addDocumentObserver(obs): pass
+def listDocuments(): return {}

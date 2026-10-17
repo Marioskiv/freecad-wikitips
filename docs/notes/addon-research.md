@@ -67,12 +67,14 @@ New relevant addons:
 
 Ranked ideas for WikiTips (ours to build, no code taken):
 1. "Show me where": outline the real toolbar button of a command for a few seconds (SearchBar idea).
+   DONE 2026-10-17 (PR 12, links in the error card).
 2. Two-stage popup: title + one sentence first, GIF and details after a longer rest (AutoCAD basic/
    extended tooltips; SolidWorks tooltip size setting).
 3. Beginner / expert preference (detail level) + "don't show again for this tool".
 4. Plain-language error explainer: watch the Report view / red tree objects, match common errors
    (Pad/Pocket failed, wire not closed, over-constrained, no tool controller…) → Greek explanation +
    fix checklist (SolidWorks "What's Wrong?"). Biggest beginner gain; nobody does it in FreeCAD.
+   DONE 2026-10-17 (PR 12, wikitips_errors.py + content/errors_el.json).
 5. Greek search over WikiTips content (titles, sentences, synonyms) → run or outline the command.
 6. Selection-aware "what next?" hint (closed sketch selected → Pad / Pocket / Revolution) (addFC idea).
 7. Short checklists: before Pad (closed? constrained?), before CAM post (stock, tool controller,

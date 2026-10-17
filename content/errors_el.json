@@ -1,0 +1,297 @@
+{
+  "_about": "Greek explanations for FreeCAD error messages (WikiTips error explainer). 're' is a case-insensitive regular expression on the English message (getStatusString of the red object, or a Report view line for 'src':'log'). 'type' (optional) must match the object's TypeId. First matching rule wins. In 'fix', {Command_Name} becomes a link that outlines the real toolbar button. Messages verified in FreeCAD 26.3 (see docs/notes/freecad-findings.md).",
+  "rules": [
+    {
+      "id": "open_wire",
+      "re": "wire is not closed|could not create face from sketch|face from sketch failed|failed to obtain profile shape|no valid sketch or face",
+      "t": "Το σκαρίφημα δεν είναι κλειστό",
+      "d": "Για να γίνει όγκος χρειάζεται κλειστό σχήμα. Κάπου δύο γραμμές δεν ενώνονται, ή περισσεύει μία γραμμή.",
+      "fix": [
+        "Άνοιξε το σκαρίφημα (διπλό κλικ).",
+        "Ένωσε τα άκρα που δεν ακουμπάνε με {Sketcher_ConstrainCoincidentUnified}.",
+        "Ή άφησε το {Sketcher_ValidateSketch} να βρει τα ανοιχτά σημεία."
+      ]
+    },
+    {
+      "id": "conflicting",
+      "re": "conflicting constraints|over-constrained",
+      "t": "Περιορισμοί που συγκρούονται",
+      "d": "Δύο περιορισμοί ζητούν διαφορετικά πράγματα, π.χ. 10 mm και 12 mm στην ίδια γραμμή.",
+      "fix": [
+        "Άνοιξε το σκαρίφημα: οι λάθος περιορισμοί είναι κόκκινοι.",
+        "Σβήσε έναν από αυτούς (Delete) ή άλλαξε την τιμή του."
+      ]
+    },
+    {
+      "id": "redundant",
+      "re": "redundant constraint",
+      "t": "Ένας περιορισμός περισσεύει",
+      "d": "Ένας περιορισμός λέει κάτι που ήδη ισχύει, π.χ. δύο φορές «οριζόντια» στην ίδια γραμμή.",
+      "fix": [
+        "Άνοιξε το σκαρίφημα και σβήσε τον περιορισμό με τον αριθμό που λέει το μήνυμα."
+      ]
+    },
+    {
+      "id": "malformed",
+      "re": "malformed constraint|partially redundant",
+      "t": "Χαλασμένος περιορισμός",
+      "d": "Ένας περιορισμός δείχνει σε γραμμή ή σημείο που δεν υπάρχει πια.",
+      "fix": [
+        "Άνοιξε το σκαρίφημα και τρέξε το {Sketcher_ValidateSketch}: διορθώνει τους χαλασμένους."
+      ]
+    },
+    {
+      "id": "attach",
+      "re": "attachengine|subshape not found|attacher|attachment",
+      "t": "Το σκαρίφημα έχασε τη βάση του",
+      "d": "Άλλαξε κάτι πιο πριν και η επιφάνεια ή ακμή που πατούσε δεν υπάρχει πια, ή πήρε άλλον αριθμό.",
+      "fix": [
+        "Διάλεξε ξανά πού πατάει με {Sketcher_MapSketch}.",
+        "Πιο σίγουρο: βάζε τα σκαριφήματα σε επίπεδα (XY, XZ, YZ ή {PartDesign_Plane}), όχι σε επιφάνειες."
+      ]
+    },
+    {
+      "id": "revolve_axis",
+      "re": "revolve axis intersects|axis.*intersect",
+      "t": "Ο άξονας κόβει το σχήμα",
+      "d": "Στην περιστροφή όλο το σχήμα πρέπει να είναι από τη μία μεριά του άξονα.",
+      "fix": [
+        "Μετακίνησε το σχήμα ώστε να μην περνάει από τον άξονα.",
+        "Ή διάλεξε άλλον άξονα στο πεδίο «Άξονας»."
+      ]
+    },
+    {
+      "id": "revolve_angle",
+      "re": "angle of revolution|could not revolve|no revolution geometry",
+      "t": "Η περιστροφή δεν βγαίνει",
+      "d": "Η γωνία είναι 0 ή πάνω από 360°, ή το σχήμα ακουμπάει τον άξονα μόνο σε ένα σημείο.",
+      "fix": [
+        "Δώσε γωνία από 1° έως 360°.",
+        "Δες ότι ο άξονας είναι στο ίδιο επίπεδο με το σκαρίφημα."
+      ]
+    },
+    {
+      "id": "zero_length",
+      "re": "total length of zero|no extrusion geometry|must be greater than zero|too small|height or growth",
+      "t": "Μηδενικό ή πολύ μικρό μέγεθος",
+      "d": "Μια τιμή (μήκος, ύψος, ακτίνα ή βήμα) είναι 0 ή πολύ μικρή, άρα δεν φτιάχνεται όγκος.",
+      "fix": [
+        "Άνοιξε τη λειτουργία (διπλό κλικ) και δώσε τιμή πάνω από 0.",
+        "Με «Μέχρι επιφάνεια»: η επιφάνεια μπορεί να είναι πάνω στο ίδιο το σκαρίφημα."
+      ]
+    },
+    {
+      "id": "hole_axis",
+      "re": "hole error: finding axis|hole error: resulting shape is empty",
+      "t": "Η Τρύπα δεν βρήκε κύκλους",
+      "d": "Η Τρύπα θέλει σκαρίφημα με κύκλους: κάθε κύκλος γίνεται μία τρύπα, στο κέντρο του.",
+      "fix": [
+        "Βάλε κύκλους στο σκαρίφημα με {Sketcher_CreateCircle}.",
+        "Μετά διάλεξε το σκαρίφημα και πάτα {PartDesign_Hole}."
+      ]
+    },
+    {
+      "id": "hole_values",
+      "re": "hole error",
+      "t": "Λάθος τιμή στην Τρύπα",
+      "d": "Μια τιμή της Τρύπας δεν ταιριάζει, π.χ. το κεφάλι πιο βαθύ από την τρύπα ή διάμετρος 0.",
+      "fix": [
+        "Άνοιξε την Τρύπα (διπλό κλικ) και δες βάθος, διάμετρο και κεφάλι."
+      ]
+    },
+    {
+      "id": "nothing_to_cut",
+      "re": "nothing to subtract|without basefeature|without base feature",
+      "t": "Δεν υπάρχει υλικό να κοπεί",
+      "d": "Η Τσέπη, το Groove και η Τρύπα κόβουν από στερεό. Πρώτα χρειάζεται όγκος μέσα στο ίδιο Σώμα.",
+      "fix": [
+        "Φτιάξε πρώτα όγκο με {PartDesign_Pad}.",
+        "Δες ότι το στερεό και η τομή είναι στο ίδιο Σώμα (Body)."
+      ]
+    },
+    {
+      "id": "missing_link",
+      "re": "linked object is not|tool shape is null|link is not set|no .*linked|basefeature has an empty shape|invalid face reference|reference axis is invalid|no edges specified",
+      "t": "Λείπει κάτι που είχες διαλέξει",
+      "d": "Η λειτουργία δείχνει σε αντικείμενο, ακμή ή επιφάνεια που σβήστηκε ή άλλαξε.",
+      "fix": [
+        "Άνοιξέ την (διπλό κλικ) και διάλεξε ξανά.",
+        "Αν το σβήσες κατά λάθος: Ctrl+Z."
+      ]
+    },
+    {
+      "id": "fillet",
+      "re": "fillet|chamfer|brep_api: command not done",
+      "type": "Fillet|Chamfer",
+      "t": "Το στρογγύλεμα δεν χωράει",
+      "d": "Η ακτίνα ή το μέγεθος είναι πιο μεγάλο από όσο χωράει, ή η ακμή ακουμπάει σε δύσκολη γεωμετρία.",
+      "fix": [
+        "Μίκρυνε την ακτίνα ή το μέγεθος, π.χ. στο μισό.",
+        "Διάλεξε λιγότερες ακμές κάθε φορά.",
+        "Βάλε τα {PartDesign_Fillet} στο τέλος του δέντρου."
+      ]
+    },
+    {
+      "id": "multi_solid",
+      "re": "multiple solids",
+      "t": "Το Σώμα έγινε δύο κομμάτια",
+      "d": "Ένα Σώμα πρέπει να είναι ένα ενιαίο στερεό. Το νέο κομμάτι δεν ακουμπάει το προηγούμενο.",
+      "fix": [
+        "Κάνε το σκαρίφημα να μπαίνει λίγο μέσα στο στερεό.",
+        "Για ξεχωριστό κομμάτι φτιάξε νέο {PartDesign_Body}."
+      ]
+    },
+    {
+      "id": "boolean",
+      "re": "boolean|fusion with base feature failed|fused extrusion",
+      "t": "Η ένωση ή η αφαίρεση απέτυχε",
+      "d": "Τα δύο σχήματα ακουμπάνε μόνο σε μια ακμή ή σε επιφάνειες που συμπίπτουν ακριβώς.",
+      "fix": [
+        "Κάνε το νέο κομμάτι να μπαίνει λίγο (π.χ. 0,1 mm) μέσα στο άλλο.",
+        "Απόφυγε επιφάνειες που συμπίπτουν ακριβώς."
+      ]
+    },
+    {
+      "id": "loft_pipe",
+      "re": "loft|pipe|multisections|spine|section",
+      "t": "Το Loft ή το Pipe δεν βγαίνει",
+      "d": "Οι διατομές πρέπει να είναι κλειστές και να μοιάζουν (ίδιος αριθμός τρυπών). Η διαδρομή χωρίς απότομες γωνίες.",
+      "fix": [
+        "Έλεγξε κάθε διατομή με {Sketcher_ValidateSketch}.",
+        "Βάλε την ίδια μορφή σε όλες τις διατομές, π.χ. όλες κύκλους ή όλες ορθογώνια."
+      ]
+    },
+    {
+      "id": "thread",
+      "re": "thread",
+      "t": "Το σπείρωμα δεν βγαίνει",
+      "d": "Το μοντέλο σπειρώματος είναι βαρύ και αποτυγχάνει εύκολα σε κοντές ή πολύ μικρές τρύπες.",
+      "fix": [
+        "Διάλεξε διακοσμητικό σπείρωμα (Cosmetic) αντί για μοντέλο.",
+        "Δες ότι το μέγεθος ταιριάζει με το βάθος της τρύπας."
+      ]
+    },
+    {
+      "id": "pattern",
+      "re": "no features selected to be|only additive and subtractive|transform invalid support|transformation feature",
+      "t": "Το μοτίβο δεν έχει τι να επαναλάβει",
+      "d": "Ένα μοτίβο ή καθρέφτης επαναλαμβάνει λειτουργίες του ίδιου Σώματος (Pad, Τσέπη, Τρύπα...).",
+      "fix": [
+        "Άνοιξε το μοτίβο (διπλό κλικ) και πρόσθεσε τη λειτουργία που θέλεις να επαναληφθεί."
+      ]
+    },
+    {
+      "id": "direction",
+      "re": "orthogonal to sketch|not planar|must be planar|perpendicular to the profile",
+      "t": "Λάθος κατεύθυνση",
+      "d": "Η κατεύθυνση είναι παράλληλη με το σκαρίφημα, ή η επιφάνεια δεν είναι επίπεδη.",
+      "fix": [
+        "Άνοιξε τη λειτουργία και άφησε την κατεύθυνση στο «κάθετα στο σκαρίφημα».",
+        "Για σκαρίφημα διάλεξε επίπεδη επιφάνεια ή {PartDesign_Plane}."
+      ]
+    },
+    {
+      "id": "not_solid",
+      "re": "not a solid|shape is null|shape is empty|non-solid|result is null|failed to create shell",
+      "t": "Το αποτέλεσμα δεν είναι στερεό",
+      "d": "Η εντολή έβγαλε κενό ή σπασμένο σχήμα. Συνήθως φταίει σκαρίφημα με γραμμές που διασταυρώνονται ή διπλές γραμμές.",
+      "fix": [
+        "Τρέξε το {Sketcher_ValidateSketch} στο σκαρίφημα.",
+        "Ψάξε γραμμές που διασταυρώνονται ή πέφτουν η μία πάνω στην άλλη."
+      ]
+    },
+    {
+      "id": "cam_heights",
+      "src": "log",
+      "re": "start depth is above safe height|safe height is above clearance height|final depth is above start depth",
+      "t": "Λάθος σειρά στα ύψη",
+      "d": "Από πάνω προς τα κάτω πρέπει: Clearance ≥ Safe ≥ Start ≥ Final depth.",
+      "i": "cam/safe_height.gif",
+      "fix": [
+        "Άνοιξε την εργασία (διπλό κλικ) και διόρθωσε τα ύψη στις καρτέλες Depths και Heights."
+      ]
+    },
+    {
+      "id": "cam_tool",
+      "src": "log",
+      "re": "no tool controller|tool error|toolcontroller|tool controller",
+      "t": "Δεν υπάρχει εργαλείο",
+      "d": "Κάθε εργασία CAM χρειάζεται κοπτικό (Tool Controller) με διάμετρο, στροφές και ταχύτητες.",
+      "fix": [
+        "Πρόσθεσε κοπτικό με {CAM_ToolBitDock}.",
+        "Μετά άνοιξε την εργασία και διάλεξέ το στο πεδίο Tool Controller."
+      ]
+    },
+    {
+      "id": "cam_depth",
+      "src": "log",
+      "re": "no depth to cut|no passes computed|stepdown must be greater",
+      "t": "Δεν υπάρχει βάθος να κοπεί",
+      "d": "Το Start depth και το Final depth είναι ίδια, ή το Step Down είναι 0.",
+      "i": "cam/final_depth.gif",
+      "fix": [
+        "Άνοιξε την εργασία και βάλε Final depth πιο χαμηλά από το Start depth.",
+        "Δώσε Step Down πάνω από 0."
+      ]
+    },
+    {
+      "id": "cam_geometry",
+      "src": "log",
+      "re": "no valid faces or edges|no base geometry|do not form a single connected wire|could not determine centerline|not horizontal circle",
+      "t": "Λάθος επιλογή γεωμετρίας",
+      "d": "Η εργασία δεν βρήκε επιφάνειες ή ακμές που μπορεί να κόψει.",
+      "fix": [
+        "Άνοιξε την εργασία, καρτέλα Base Geometry, και διάλεξε ξανά επιφάνειες ή ακμές.",
+        "Για περίγραμμα ακμών: διάλεξε μία ακμή και πάτα {CAM_SelectLoop}."
+      ]
+    },
+    {
+      "id": "cam_job",
+      "src": "log",
+      "re": "no job|has no base|doesn't have a base|no parent job",
+      "t": "Λείπει το Job",
+      "d": "Οι εργασίες CAM ζουν μέσα σε ένα Job, που ξέρει το μοντέλο και το υλικό (stock).",
+      "fix": [
+        "Διάλεξε το μοντέλο σου και φτιάξε {CAM_Job}."
+      ]
+    },
+    {
+      "id": "cam_offset",
+      "src": "log",
+      "re": "negative radius",
+      "t": "Πολύ μεγάλο offset",
+      "d": "Το offset (ή το υλικό που μένει) είναι μεγαλύτερο από τη μισή διάμετρο του κοπτικού ή του σχήματος.",
+      "fix": [
+        "Μίκρυνε το Offset ή το Stock to leave στην εργασία."
+      ]
+    },
+    {
+      "id": "_nochange",
+      "t": "Η εντολή δεν άλλαξε τίποτα",
+      "d": "Το «%s» υπολογίστηκε χωρίς λάθος, αλλά το στερεό έμεινε ίδιο. Συνήθως το σκαρίφημα είναι έξω από το στερεό ή η φορά είναι ανάποδη.",
+      "fix": [
+        "Άνοιξέ το (διπλό κλικ) και δοκίμασε «Αντίστροφα» (Reversed).",
+        "Δες ότι το σκαρίφημα πέφτει πάνω στο στερεό."
+      ]
+    },
+    {
+      "id": "_split",
+      "t": "Το Σώμα χωρίστηκε σε %d κομμάτια",
+      "d": "Μετά το «%s» το Σώμα δεν είναι πια ένα ενιαίο στερεό. Αυτό συνήθως είναι λάθος.",
+      "fix": [
+        "Κάνε το νέο κομμάτι να ακουμπάει ή να μπαίνει λίγο στο στερεό.",
+        "Για ξεχωριστό κομμάτι φτιάξε νέο {PartDesign_Body}."
+      ]
+    },
+    {
+      "id": "_generic",
+      "t": "Κάτι απέτυχε",
+      "d": "Η λειτουργία δεν υπολογίστηκε. Δεν έχω ακόμα εξήγηση για αυτό το μήνυμα.",
+      "fix": [
+        "Πάτα Ctrl+Z για να γυρίσεις πίσω.",
+        "Δες ποια λειτουργία έγινε κόκκινη πρώτη στο δέντρο: εκεί είναι η αιτία.",
+        "Άνοιξέ την (διπλό κλικ) και δες τις τιμές της."
+      ]
+    }
+  ]
+}
