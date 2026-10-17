@@ -31,9 +31,15 @@ Short, durable facts for the next Claude session. Details live in the other note
   Addon Manager offers the update. Marios made the repo PUBLIC on 2026-10-17. Verified the same day
   in FreeCAD 26.3 (clean user folder): AddonInstaller with url + branch main downloads it into
   Mod/WikiTips, and after a restart the WikiTips toolbar, Knurl and Wrap load.
-- **CAM tool library (asked 2026-10-17):** waiting for Marios's list of real cutters (type,
-  diameter, flutes, cutting length) to build a .fctl library + .fctb bits for him (config, no code).
-  Belongs to the separate CAM addon/phase, but the library file can be given earlier.
+- **CAM tool library (2026-10-17):** Marios will buy YG-1 ALU-POWER carbide end mills (aluminium,
+  heavy DIY machine, 1 and 2 flutes). Built from his catalog PDF (YG-1 "YE-AP25 EUROPE") and sent as
+  a zip (not in this repo): 26 bits, E5E47 1F Ø2-12, E5E48 2F short Ø3-12, E5522 2F long Ø3-12,
+  E5910 2F ball Ø6-12; Tools/Library/YG1_AluPower.fctl + Tools/Bit/*.fctb, loaded and checked in
+  FreeCAD 26.3; Greek guide with the catalog's cutting data (aluminium, VDI 21-22) and DIY advice.
+  Open: his spindle max RPM (feeds then = RPM x fz x flutes); trim the library to what he buys.
+  26.3 facts: libraries import .fctl (bits from the sibling Bit folder), .fctb, YAML, Camotics
+  JSON; LinuxCNC .tbl export only; NO Fusion 360 import (Better Tool Library addon did it,
+  deprecated after 1.0.1). Feeds/speeds live in the Tool Controller, not in the bit.
 - **NEXT PHASE: CAM (Marios, 2026-10-17: "not now, in another phase"; do NOT start before he says).**
   DECISION (2026-10-17): this will be a SEPARATE addon, not part of WikiTips ("I don't want
   everything in one addon"). New repo/addon, its own notes; WikiTips stays help + error
