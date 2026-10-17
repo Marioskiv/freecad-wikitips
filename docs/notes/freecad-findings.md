@@ -94,3 +94,16 @@
 - Under xvfb (no window manager) `mw.mapFromGlobal(btn.mapToGlobal(...))` is off by ~16 px; use
   `btn.mapTo(mw, ...)` for widgets inside the main window.
 - PartDesign has Sketcher_ValidateSketch / MapSketch in its "Part Design Helper Features" toolbar.
+- More probed messages (26.3): 'SketchBased: No face selected' (Up to face without face),
+  'Sections need to have the same amount of wires or vertices as the base section' (Loft),
+  'No spine linked' (Pipe), 'Part::FaceMaker: result shape is null.' (Part Extrude of open wire,
+  Solid=True), 'Boolean operation failed\nSketch is not a solid' (Part Cut with a sketch),
+  'Angle of revolution too small', 'BRep_API: command not done' (fillet/chamfer too big),
+  Draft with a too big angle: Invalid with an EMPTY message.
+- Silent: a sketch with double lines or two overlapping rectangles gives a valid Pad with volume 0.
+- User warnings ("Wrong selection. Wrong number of selected objects!") are notifications in 26.3:
+  not in the Report view; shown in a top-level QLabel objectName 'NotificationBox_label' (HTML table,
+  newest row first, icon ':/icons/Warning.svg'), counted on QPushButton 'notificationArea' (its text).
+- PartDesign commands without a Body open a modal QDialog "Active Body Required" (not QMessageBox).
+- Marios uses FreeCAD in English on purpose.
+

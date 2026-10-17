@@ -1,8 +1,25 @@
 # Session log
 
+## 2026-10-17: more errors explained, Greek only (PR 13)
+- Marios keeps FreeCAD in English on purpose (to learn the real terms) but wants the meaning in
+  Greek, and "as many problems solved as possible". Not wanted: Greek search.
+- Marios then asked: error cards ONLY in Greek. The card shows FreeCAD's message translated
+  ("Το FreeCAD λέει: ..."), no English; pref ShowEnglish brings the English + glossary back.
+- Translation data: Greek translation (content/errors_el.json
+  "translations", sentence by sentence) and the key words ("glossary", e.g. wire = περίγραμμα).
+- 55 rules (was 26): wrong-selection notifications of Sketcher / Part Design / Part (FreeCAD 26.3
+  shows them in a short popup 'NotificationBox_label', read once per new notification; modal
+  message boxes too), Up to face without face, Loft sections that do not match, Pipe without spine,
+  Part boolean with a sketch, Draft with empty message, Part fillet too big (log).
+- New silent checks found by probing: double lines / overlapping shapes give an EMPTY Pad (volume 0)
+  without any error; dressups (Thickness...) that change nothing get their own advice.
+- Card moved to the bottom LEFT of the 3D view: in 26.3 the task panel sits on the right.
+- Next (asked by Marios): knurling on cylinders made easy, and sketches/text/holes on cylinders
+  (he wants it for 3D printing, CNC 4th axis and drawings).
+
 ## 2026-10-17: error explainer + "show me where" (PR 12)
 - Marios liked ideas 1 and 4 of addon-research.md → implemented in wikitips_errors.py.
-- Error explainer: when a feature turns red after a recompute, a Greek card (bottom right of the
+- Error explainer: when a feature turns red after a recompute, a Greek card (bottom of the
   3D view) says what went wrong + numbered steps; also CAM errors in the Report view. Rules in
   content/errors_el.json (26 rules, regex on the English message), messages probed in real FreeCAD.
   Also catches two silent mistakes: feature that changed nothing, Body split in two solids.

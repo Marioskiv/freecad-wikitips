@@ -1,9 +1,118 @@
 {
   "_about": "Greek explanations for FreeCAD error messages (WikiTips error explainer). 're' is a case-insensitive regular expression on the English message (getStatusString of the red object, or a Report view line for 'src':'log'). 'type' (optional) must match the object's TypeId. First matching rule wins. In 'fix', {Command_Name} becomes a link that outlines the real toolbar button. Messages verified in FreeCAD 26.3 (see docs/notes/freecad-findings.md).",
+  "translations": {
+    "wire is not closed": "Το περίγραμμα δεν είναι κλειστό.",
+    "sketch with conflicting constraints": "Σκαρίφημα με περιορισμούς που συγκρούονται.",
+    "remove at least one of the following conflicting constraints": "Σβήσε τουλάχιστον έναν από τους παρακάτω περιορισμούς που συγκρούονται.",
+    "sketch with redundant constraints": "Σκαρίφημα με περιττούς περιορισμούς.",
+    "remove the following redundant constraint": "Σβήσε τον παρακάτω περιττό περιορισμό.",
+    "revolve axis intersects the sketch": "Ο άξονας περιστροφής κόβει το σκαρίφημα.",
+    "cannot create a pad with a total length of zero": "Δεν γίνεται Εξώθηση (Pad) με συνολικό μήκος μηδέν.",
+    "cannot create a pocket with a total length of zero": "Δεν γίνεται Τσέπη με συνολικό μήκος μηδέν.",
+    "hole error: finding axis failed": "Λάθος Τρύπας: δεν βρέθηκε άξονας (κέντρο κύκλου).",
+    "linked object is not a part object": "Το συνδεδεμένο αντικείμενο δεν είναι σχήμα.",
+    "subshape not found": "Δεν βρέθηκε το υπο-σχήμα (η επιφάνεια ή η ακμή που πατούσε).",
+    "result has multiple solids: enable 'allow compound' in the active body": "Το αποτέλεσμα έχει πολλά στερεά: ενεργοποίησε το «Allow Compound» στο ενεργό Σώμα.",
+    "resulting shape is not a solid": "Το σχήμα που βγήκε δεν είναι στερεό.",
+    "there is nothing to subtract": "Δεν υπάρχει τίποτα για να αφαιρεθεί.",
+    "failed to create chamfer": "Η λοξότμηση απέτυχε.",
+    "command not done": "Η εντολή δεν ολοκληρώθηκε (ο γεωμετρικός πυρήνας απέτυχε).",
+    "no face selected": "Δεν έχει επιλεγεί επιφάνεια.",
+    "sections need to have the same amount of wires or vertices as the base section": "Οι διατομές πρέπει να έχουν ίδιο αριθμό περιγραμμάτων ή κορυφών με την πρώτη διατομή.",
+    "no spine linked": "Δεν έχει συνδεθεί διαδρομή.",
+    "part::facemaker: result shape is null": "Ο δημιουργός επιφάνειας: το σχήμα που βγήκε είναι κενό.",
+    "there are no suitable edges for chamfer or fillet": "Δεν υπάρχουν κατάλληλες ακμές για λοξότμηση ή στρογγύλεμα.",
+    "boolean operation failed": "Η πράξη ένωσης/αφαίρεσης απέτυχε.",
+    "sketch is not a solid": "Το σκαρίφημα δεν είναι στερεό.",
+    "angle of revolution too small": "Η γωνία περιστροφής είναι πολύ μικρή.",
+    "angle of revolution too large": "Η γωνία περιστροφής είναι πολύ μεγάλη.",
+    "start depth is above safe height": "Το βάθος αρχής είναι πάνω από το ασφαλές ύψος.",
+    "safe height is above clearance height": "Το ασφαλές ύψος είναι πάνω από το ύψος διέλευσης.",
+    "final depth is above start depth": "Το τελικό βάθος είναι πάνω από το βάθος αρχής.",
+    "no tool controller selected": "Δεν έχει επιλεγεί κοπτικό.",
+    "no depth to cut for": "Δεν υπάρχει βάθος να κοπεί για",
+    "no valid faces or edges found in base geometry": "Δεν βρέθηκαν σωστές επιφάνειες ή ακμές στη βασική γεωμετρία.",
+    "wrong selection": "Λάθος επιλογή.",
+    "wrong number of selected objects": "Λάθος αριθμός επιλεγμένων αντικειμένων.",
+    "parallel lines": "Παράλληλες γραμμές.",
+    "an angle constraint cannot be set for two parallel lines": "Δεν μπαίνει περιορισμός γωνίας σε δύο παράλληλες γραμμές.",
+    "impossible constraint": "Αδύνατος περιορισμός.",
+    "the selected items cannot be constrained horizontally or vertically": "Τα επιλεγμένα δεν μπορούν να γίνουν οριζόντια ή κατακόρυφα.",
+    "double constraint": "Διπλός περιορισμός.",
+    "the selected edge already has a horizontal constraint": "Η επιλεγμένη ακμή έχει ήδη περιορισμό οριζόντιας.",
+    "the selected edge already has a vertical constraint": "Η επιλεγμένη ακμή έχει ήδη περιορισμό κατακόρυφης.",
+    "the selected points are already coincident": "Τα επιλεγμένα σημεία ήδη συμπίπτουν.",
+    "no active body": "Δεν υπάρχει ενεργό Σώμα.",
+    "active body required": "Χρειάζεται ενεργό Σώμα.",
+    "select a face as support for a sketch": "Διάλεξε μια επιφάνεια για να πατήσει το σκαρίφημα.",
+    "need a planar face as support for a sketch": "Το σκαρίφημα χρειάζεται επίπεδη επιφάνεια για να πατήσει.",
+    "performing difference on non-solids is not possible": "Η αφαίρεση σε μη στερεά δεν γίνεται.",
+    "performing union on non-solids is not possible": "Η ένωση σε μη στερεά δεν γίνεται.",
+    "performing intersection on non-solids is not possible": "Η τομή σε μη στερεά δεν γίνεται.",
+    "select 2 shapes": "Διάλεξε 2 σχήματα.",
+    "cannot add a length constraint on an axis": "Δεν μπαίνει περιορισμός μήκους σε άξονα.",
+    "cannot add a constraint between two external geometries": "Δεν μπαίνει περιορισμός ανάμεσα σε δύο εξωτερικές γεωμετρίες.",
+    "cannot add a tangency constraint at an unconnected point": "Δεν μπαίνει εφαπτομένη σε σημείο που δεν είναι ενωμένο.",
+    "not allowed to edit the datum because the sketch contains conflicting constraints": "Δεν αλλάζει η τιμή, γιατί το σκαρίφημα έχει περιορισμούς που συγκρούονται.",
+    "early feature must not depend on later feature": "Μια παλιότερη λειτουργία δεν πρέπει να εξαρτάται από μεταγενέστερη."
+  },
+  "glossary": {
+    "wire": "περίγραμμα (σειρά ενωμένων γραμμών)",
+    "closed": "κλειστό",
+    "sketch": "σκαρίφημα",
+    "constraint": "περιορισμός",
+    "conflicting": "που συγκρούονται",
+    "redundant": "περιττός",
+    "malformed": "χαλασμένος",
+    "solid": "στερεό",
+    "shape": "σχήμα",
+    "face": "επιφάνεια",
+    "edge": "ακμή",
+    "vertex": "κορυφή (σημείο)",
+    "vertices": "κορυφές",
+    "shell": "κέλυφος (κλειστή επιφάνεια)",
+    "axis": "άξονας",
+    "profile": "προφίλ (το σχήμα που προεκτείνεται)",
+    "section": "διατομή",
+    "spine": "διαδρομή",
+    "support": "βάση (πού πατάει)",
+    "attach": "προσάρτηση",
+    "subshape": "υπο-σχήμα (επιφάνεια/ακμή)",
+    "body": "Σώμα",
+    "feature": "λειτουργία (στο δέντρο)",
+    "base feature": "η προηγούμενη λειτουργία (βάση)",
+    "tip": "η τελευταία ενεργή λειτουργία",
+    "boolean": "ένωση/αφαίρεση/τομή",
+    "fillet": "στρογγύλεμα",
+    "chamfer": "λοξότμηση",
+    "pad": "εξώθηση",
+    "pocket": "τσέπη",
+    "revolve": "περιστροφή",
+    "revolution": "περιστροφή",
+    "null": "κενό",
+    "empty": "άδειο",
+    "invalid": "άκυρο",
+    "failed": "απέτυχε",
+    "selection": "επιλογή",
+    "selected": "επιλεγμένο",
+    "external geometry": "εξωτερική γεωμετρία (από το 3D)",
+    "coincident": "σύμπτωση (ίδιο σημείο)",
+    "tangent": "εφαπτομένη",
+    "parallel": "παράλληλες",
+    "datum": "βοηθητικό στοιχείο / τιμή διάστασης",
+    "depth": "βάθος",
+    "height": "ύψος",
+    "clearance height": "ύψος διέλευσης",
+    "safe height": "ασφαλές ύψος",
+    "step down": "βήμα σε βάθος",
+    "tool controller": "κοπτικό με στροφές και ταχύτητες",
+    "offset": "μετατόπιση",
+    "stock": "ακατέργαστο υλικό"
+  },
   "rules": [
     {
       "id": "open_wire",
-      "re": "wire is not closed|could not create face from sketch|face from sketch failed|failed to obtain profile shape|no valid sketch or face",
+      "re": "wire is not closed|could not create face from sketch|face from sketch failed|failed to obtain profile shape|no valid sketch or face|facemaker",
       "t": "Το σκαρίφημα δεν είναι κλειστό",
       "d": "Για να γίνει όγκος χρειάζεται κλειστό σχήμα. Κάπου δύο γραμμές δεν ενώνονται, ή περισσεύει μία γραμμή.",
       "fix": [
@@ -41,6 +150,16 @@
       ]
     },
     {
+      "id": "upto_face",
+      "re": "no face selected|up to face|could not get face",
+      "t": "Δεν έχεις διαλέξει επιφάνεια",
+      "d": "Με «Μέχρι επιφάνεια» (Up to face) πρέπει να δείξεις την επιφάνεια όπου σταματάει η λειτουργία.",
+      "fix": [
+        "Άνοιξε τη λειτουργία (διπλό κλικ), πάτα «Επιφάνεια» και κάνε κλικ στην επιφάνεια στο 3D.",
+        "Ή άλλαξε τον τύπο σε «Διάσταση» (Dimension) και δώσε μήκος."
+      ]
+    },
+    {
       "id": "attach",
       "re": "attachengine|subshape not found|attacher|attachment",
       "t": "Το σκαρίφημα έχασε τη βάση του",
@@ -72,7 +191,7 @@
     },
     {
       "id": "zero_length",
-      "re": "total length of zero|no extrusion geometry|must be greater than zero|too small|height or growth",
+      "re": "total length of zero|no extrusion geometry|must be greater than zero|too small|height or growth|zero-length|is zero",
       "t": "Μηδενικό ή πολύ μικρό μέγεθος",
       "d": "Μια τιμή (μήκος, ύψος, ακτίνα ή βήμα) είναι 0 ή πολύ μικρή, άρα δεν φτιάχνεται όγκος.",
       "fix": [
@@ -101,12 +220,22 @@
     },
     {
       "id": "nothing_to_cut",
-      "re": "nothing to subtract|without basefeature|without base feature",
+      "re": "nothing to subtract|without (a )?base ?feature",
       "t": "Δεν υπάρχει υλικό να κοπεί",
       "d": "Η Τσέπη, το Groove και η Τρύπα κόβουν από στερεό. Πρώτα χρειάζεται όγκος μέσα στο ίδιο Σώμα.",
       "fix": [
         "Φτιάξε πρώτα όγκο με {PartDesign_Pad}.",
         "Δες ότι το στερεό και η τομή είναι στο ίδιο Σώμα (Body)."
+      ]
+    },
+    {
+      "id": "pipe_spine",
+      "re": "spine",
+      "t": "Λείπει η διαδρομή του Pipe",
+      "d": "Το Pipe σέρνει το σχήμα πάνω σε μια διαδρομή (spine), π.χ. ένα δεύτερο σκαρίφημα με γραμμή.",
+      "fix": [
+        "Φτιάξε τη διαδρομή σε δικό της σκαρίφημα, κάθετο στο σχήμα.",
+        "Άνοιξε το Pipe και διάλεξε τη διαδρομή στο πεδίο «Path to sweep along»."
       ]
     },
     {
@@ -142,6 +271,17 @@
       ]
     },
     {
+      "id": "bool_not_solid",
+      "re": "not a solid|non-solids",
+      "type": "^Part::(Cut|Fuse|Common|MultiFuse|MultiCommon|Boolean)",
+      "t": "Ένα από τα δύο δεν είναι στερεό",
+      "d": "Η ένωση και η αφαίρεση θέλουν στερεά. Ένα σκαρίφημα ή μια επιφάνεια δεν έχει όγκο.",
+      "fix": [
+        "Κάνε πρώτα όγκο από το σκαρίφημα (π.χ. Extrude με «Create solid»).",
+        "Μετά κάνε την ένωση ή την αφαίρεση με τα στερεά."
+      ]
+    },
+    {
       "id": "boolean",
       "re": "boolean|fusion with base feature failed|fused extrusion",
       "t": "Η ένωση ή η αφαίρεση απέτυχε",
@@ -149,6 +289,16 @@
       "fix": [
         "Κάνε το νέο κομμάτι να μπαίνει λίγο (π.χ. 0,1 mm) μέσα στο άλλο.",
         "Απόφυγε επιφάνειες που συμπίπτουν ακριβώς."
+      ]
+    },
+    {
+      "id": "loft_wires",
+      "re": "same amount of (inner )?wires|same amount of wires or vertices",
+      "t": "Οι διατομές δεν ταιριάζουν",
+      "d": "Όλες οι διατομές του Loft πρέπει να έχουν ίδιο αριθμό κλειστών σχημάτων: αν η μία έχει τρύπα, να έχουν όλες.",
+      "fix": [
+        "Βάλε την ίδια τρύπα σε όλες τις διατομές, ή βγάλ' την από όλες.",
+        "Κάνε την τρύπα μετά, με Τσέπη (Pocket)."
       ]
     },
     {
@@ -198,6 +348,27 @@
       "fix": [
         "Τρέξε το {Sketcher_ValidateSketch} στο σκαρίφημα.",
         "Ψάξε γραμμές που διασταυρώνονται ή πέφτουν η μία πάνω στην άλλη."
+      ]
+    },
+    {
+      "id": "draft",
+      "type": "^PartDesign::Draft$",
+      "t": "Η κλίση (Draft) δεν βγαίνει",
+      "d": "Η γωνία είναι πολύ μεγάλη για το ύψος, ή το ουδέτερο επίπεδο δεν είναι σωστό.",
+      "fix": [
+        "Δοκίμασε μικρότερη γωνία (π.χ. 1° έως 5°).",
+        "Διάλεξε ουδέτερο επίπεδο κάθετο στις επιφάνειες που γέρνουν."
+      ]
+    },
+    {
+      "id": "part_fillet_edges",
+      "src": "log",
+      "re": "no suitable edges for chamfer or fillet",
+      "t": "Το στρογγύλεμα δεν χωράει",
+      "d": "Καμία από τις ακμές δεν δέχεται τόση ακτίνα ή μέγεθος.",
+      "fix": [
+        "Μίκρυνε την ακτίνα, π.χ. στο μισό του πιο λεπτού τοιχώματος.",
+        "Διάλεξε λιγότερες ακμές."
       ]
     },
     {
@@ -266,12 +437,218 @@
       ]
     },
     {
+      "id": "n_no_body",
+      "src": "note",
+      "re": "active body|no active body|needs to belong to a body|belong to a part object",
+      "t": "Δεν υπάρχει ενεργό Σώμα",
+      "d": "Οι εντολές του Part Design δουλεύουν μέσα σε ένα ενεργό Σώμα (Body).",
+      "fix": [
+        "Διπλό κλικ στο Body στο δέντρο για να γίνει ενεργό (γίνεται έντονο).",
+        "Ή φτιάξε νέο {PartDesign_Body}."
+      ]
+    },
+    {
+      "id": "n_sketch_support",
+      "src": "note",
+      "re": "planar face as support|face as support for a sketch|create a plane first|base or datum plane as the\\s*sketch plane",
+      "t": "Το σκαρίφημα θέλει επίπεδο",
+      "d": "Ένα σκαρίφημα πατάει σε επίπεδη επιφάνεια ή σε επίπεδο (XY, XZ, YZ). Οι καμπύλες επιφάνειες δεν κάνουν.",
+      "fix": [
+        "Διάλεξε μία επίπεδη επιφάνεια και μετά πάτα {PartDesign_NewSketch}.",
+        "Για κύλινδρο: φτιάξε {PartDesign_Plane} εφαπτόμενο στον κύλινδρο."
+      ]
+    },
+    {
+      "id": "n_single_body",
+      "src": "note",
+      "re": "single body|same body|from the active body|from an active body|single source body|already belongs to a body",
+      "t": "Επιλογή από άλλο Σώμα",
+      "d": "Η εντολή δουλεύει μόνο με στοιχεία του ενεργού Σώματος.",
+      "fix": [
+        "Διάλεξε ακμές ή επιφάνειες μόνο από το ενεργό Σώμα.",
+        "Για κάτι από άλλο Σώμα χρησιμοποίησε {PartDesign_SubShapeBinder}."
+      ]
+    },
+    {
+      "id": "n_order",
+      "src": "note",
+      "re": "early feature must not depend on later|dependenc",
+      "t": "Λάθος σειρά στο δέντρο",
+      "d": "Μια λειτουργία δεν μπορεί να χρησιμοποιεί κάτι που φτιάχνεται μετά από αυτήν.",
+      "fix": [
+        "Μετακίνησε τη λειτουργία πιο κάτω στο δέντρο, ή διάλεξε κάτι πιο παλιό."
+      ]
+    },
+    {
+      "id": "n_non_solid",
+      "src": "note",
+      "re": "non-solids|is not a solid|selected shape is not a solid",
+      "t": "Χρειάζονται στερεά",
+      "d": "Η ένωση, η αφαίρεση και η τομή θέλουν στερεά. Ένα σκαρίφημα ή μια επιφάνεια δεν έχει όγκο.",
+      "fix": [
+        "Κάνε πρώτα όγκο από το σκαρίφημα (π.χ. {Part_Extrude} με «Create solid»)."
+      ]
+    },
+    {
+      "id": "n_two_shapes",
+      "src": "note",
+      "re": "select 2 shapes|at least 2 shapes|same shape|select two shapes",
+      "t": "Διάλεξε δύο σχήματα",
+      "d": "Η ένωση, η αφαίρεση και η τομή θέλουν δύο σχήματα επιλεγμένα πριν πατήσεις το κουμπί.",
+      "fix": [
+        "Κλικ στο πρώτο, Ctrl+κλικ στο δεύτερο, μετά το κουμπί.",
+        "Στην αφαίρεση ({Part_Cut}) πρώτα αυτό που μένει, μετά αυτό που κόβει."
+      ]
+    },
+    {
+      "id": "n_parallel_angle",
+      "src": "note",
+      "re": "angle constraint cannot be set for two parallel",
+      "t": "Παράλληλες γραμμές δεν έχουν γωνία",
+      "d": "Δύο παράλληλες γραμμές δεν σχηματίζουν γωνία, άρα δεν παίρνουν περιορισμό γωνίας.",
+      "fix": [
+        "Για απόσταση ανάμεσά τους: {Sketcher_ConstrainDistance}.",
+        "Για να μείνουν παράλληλες: {Sketcher_ConstrainParallel}."
+      ]
+    },
+    {
+      "id": "n_double",
+      "src": "note",
+      "re": "already has a (horizontal|vertical|block) constraint|already coincident|double constraint",
+      "t": "Ο περιορισμός υπάρχει ήδη",
+      "d": "Αυτό το στοιχείο έχει ήδη αυτόν τον περιορισμό. Δεύτερος ίδιος θα περίσσευε.",
+      "fix": [
+        "Δεν χρειάζεται τίποτα. Αν θέλεις άλλον περιορισμό, διάλεξε άλλο στοιχείο."
+      ]
+    },
+    {
+      "id": "n_horvert",
+      "src": "note",
+      "re": "cannot be constrained horizontally or vertically",
+      "t": "Δεν γίνεται οριζόντιο ή κατακόρυφο",
+      "d": "Οριζόντιο ή κατακόρυφο μπαίνει σε ευθεία γραμμή ή σε δύο σημεία, όχι σε κύκλο ή τόξο.",
+      "fix": [
+        "Διάλεξε μία ευθεία γραμμή, ή δύο σημεία με Ctrl+κλικ."
+      ]
+    },
+    {
+      "id": "n_axis",
+      "src": "note",
+      "re": "on an axis|on the origin point|sketch axes cannot|origin point",
+      "t": "Οι άξονες δεν αλλάζουν",
+      "d": "Οι άξονες και η αρχή (0,0) του σκαριφήματος είναι σταθεροί. Δεν παίρνουν μήκος ή γωνία.",
+      "fix": [
+        "Βάλε τον περιορισμό στη δική σου γραμμή, π.χ. απόσταση από τον άξονα."
+      ]
+    },
+    {
+      "id": "n_external",
+      "src": "note",
+      "re": "external geometr|two fixed geometries",
+      "t": "Η εξωτερική γεωμετρία είναι κλειδωμένη",
+      "d": "Οι γραμμές που ήρθαν από το 3D (ροζ ή μωβ) δεν κινούνται. Δύο κλειδωμένα στοιχεία δεν παίρνουν περιορισμό μεταξύ τους.",
+      "fix": [
+        "Βάλε τον περιορισμό από μια δική σου γραμμή προς την εξωτερική."
+      ]
+    },
+    {
+      "id": "n_coincident",
+      "src": "note",
+      "re": "coincident constraint because it would|collapse geometry to zero",
+      "t": "Η σύμπτωση θα χαλούσε το σκαρίφημα",
+      "d": "Αν ενωθούν αυτά τα σημεία, κάποιος άλλος περιορισμός δεν θα ισχύει ή μια γραμμή θα γίνει μηδενική.",
+      "fix": [
+        "Σβήσε πρώτα τον περιορισμό που εμποδίζει (π.χ. μια διάσταση) και ξαναδοκίμασε."
+      ]
+    },
+    {
+      "id": "n_unconnected",
+      "src": "note",
+      "re": "at an unconnected point|two end points, or coincident point",
+      "t": "Τα σημεία δεν ενώνονται",
+      "d": "Η εφαπτομένη ή η καθετότητα σε σημείο θέλει τα δύο άκρα να είναι ήδη ενωμένα.",
+      "fix": [
+        "Ένωσε πρώτα τα άκρα με {Sketcher_ConstrainCoincidentUnified}.",
+        "Ή διάλεξε τις δύο γραμμές (όχι το σημείο)."
+      ]
+    },
+    {
+      "id": "n_conflict_edit",
+      "src": "note",
+      "re": "contains conflicting constraints|sketch is unsolved",
+      "t": "Πρώτα διόρθωσε τους κόκκινους περιορισμούς",
+      "d": "Όσο το σκαρίφημα έχει περιορισμούς που συγκρούονται, δεν αλλάζουν τιμές.",
+      "fix": [
+        "Σβήσε έναν από τους κόκκινους περιορισμούς και μετά άλλαξε την τιμή."
+      ]
+    },
+    {
+      "id": "n_symmetry",
+      "src": "note",
+      "re": "symmetry constraint|symmetry line|symmetry point",
+      "t": "Λάθος επιλογή για συμμετρία",
+      "d": "Η συμμετρία θέλει δύο σημεία (ή μία γραμμή) και μετά τη γραμμή ή το σημείο συμμετρίας.",
+      "fix": [
+        "Ctrl+κλικ στα δύο άκρα, Ctrl+κλικ στον άξονα, μετά {Sketcher_ConstrainSymmetric}."
+      ]
+    },
+    {
+      "id": "n_bspline",
+      "src": "note",
+      "re": "b-spline",
+      "t": "Δεν γίνεται σε B-spline",
+      "d": "Αυτός ο περιορισμός ή η εντολή δεν δουλεύει σε ελεύθερες καμπύλες (B-spline).",
+      "fix": [
+        "Αν γίνεται, σχεδίασε με τόξα και γραμμές αντί για B-spline."
+      ]
+    },
+    {
+      "id": "n_font",
+      "src": "note",
+      "re": "font .*not found",
+      "t": "Η γραμματοσειρά δεν βρέθηκε",
+      "d": "Το σχέδιο είχε γραμματοσειρά που δεν υπάρχει στον υπολογιστή σου. Το FreeCAD έβαλε άλλη.",
+      "fix": [
+        "Διάλεξε μια γραμματοσειρά που έχεις, στο κείμενο του σκαριφήματος."
+      ]
+    },
+    {
+      "id": "n_select",
+      "src": "note",
+      "re": "wrong selection|wrong number of selected|select exactly|select two|select one|select at least|select either|select only|select an?\\b|with 3 objects|nothing is selected|no geometries selected|too many objects selected|number of selected objects|incompatible geometry|no edge selected|no shape selected|selection is empty|invalid selection",
+      "t": "Λάθος επιλογή πριν από την εντολή",
+      "d": "Η εντολή θέλει συγκεκριμένα στοιχεία επιλεγμένα πριν πατήσεις το κουμπί (π.χ. δύο σημεία ή μία γραμμή).",
+      "fix": [
+        "Πάτα Esc για να αδειάσει η επιλογή.",
+        "Κράτα το ποντίκι πάνω στο κουμπί: το GIF δείχνει τι να διαλέξεις.",
+        "Διάλεξε με κλικ (Ctrl+κλικ για το δεύτερο) και μετά πάτα το κουμπί."
+      ]
+    },
+    {
       "id": "_nochange",
       "t": "Η εντολή δεν άλλαξε τίποτα",
       "d": "Το «%s» υπολογίστηκε χωρίς λάθος, αλλά το στερεό έμεινε ίδιο. Συνήθως το σκαρίφημα είναι έξω από το στερεό ή η φορά είναι ανάποδη.",
       "fix": [
         "Άνοιξέ το (διπλό κλικ) και δοκίμασε «Αντίστροφα» (Reversed).",
         "Δες ότι το σκαρίφημα πέφτει πάνω στο στερεό."
+      ]
+    },
+    {
+      "id": "_empty",
+      "t": "Το αποτέλεσμα είναι άδειο",
+      "d": "Το «%s» δεν έβγαλε όγκο. Συνήθως το σκαρίφημα έχει διπλές γραμμές ή σχήματα που επικαλύπτονται.",
+      "fix": [
+        "Άνοιξε το σκαρίφημα και τρέξε το {Sketcher_ValidateSketch}.",
+        "Σβήσε τις διπλές γραμμές. Δύο σχήματα που επικαλύπτονται: ένωσέ τα σε ένα περίγραμμα με {Sketcher_Trimming}."
+      ]
+    },
+    {
+      "id": "_nochange_dressup",
+      "t": "Η εντολή δεν άλλαξε τίποτα",
+      "d": "Το «%s» υπολογίστηκε χωρίς λάθος, αλλά το στερεό έμεινε ίδιο. Η τιμή είναι 0 ή πολύ μεγάλη για αυτό το κομμάτι.",
+      "fix": [
+        "Άνοιξέ το (διπλό κλικ) και δοκίμασε μικρότερη τιμή.",
+        "Δες ότι έχεις διαλέξει τις σωστές ακμές ή επιφάνειες."
       ]
     },
     {

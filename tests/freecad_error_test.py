@@ -51,7 +51,39 @@ MESSAGES = [
     ("No features selected to be patterned.", "PartDesign::LinearPattern", "pattern"),
     ("Creation failed because direction is orthogonal to sketch's normal vector", "PartDesign::Pad", "direction"),
     ("Error: pitch too small!", "PartDesign::AdditiveHelix", "zero_length"),
+    ("SketchBased: No face selected", "PartDesign::Pad", "upto_face"),
+    ("Sections need to have the same amount of wires or vertices as the base section",
+     "PartDesign::AdditiveLoft", "loft_wires"),
+    ("No spine linked", "PartDesign::AdditivePipe", "pipe_spine"),
+    ("Part::FaceMaker: result shape is null.", "Part::Extrusion", "open_wire"),
+    ("Boolean operation failed\nSketch is not a solid", "Part::Cut", "bool_not_solid"),
+    ("Angle of revolution too small", "PartDesign::Revolution", "revolve_angle"),
+    ("", "PartDesign::Draft", "draft"),
     ("Something nobody has seen", "PartDesign::Pad", "_generic"),
+]
+NOTES = [   # notification popup / message box texts seen in 26.3 or taken from its source
+    ("Wrong selection. Wrong number of selected objects!", "n_select"),
+    ("Parallel lines. An angle constraint cannot be set for two parallel lines.", "n_parallel_angle"),
+    ("Impossible constraint. The selected items cannot be constrained horizontally or vertically!", "n_horvert"),
+    ("Double constraint. The selected edge already has a horizontal constraint!", "n_double"),
+    ("Wrong selection. Cannot add a length constraint on an axis!", "n_axis"),
+    ("Wrong selection. Cannot add a constraint between two external geometries.", "n_external"),
+    ("Wrong selection. Cannot add a tangency constraint at an unconnected point!", "n_unconnected"),
+    ("Active Body Required. To create a new Part Design object, an active body is required in the document.",
+     "n_no_body"),
+    ("Wrong selection. Need a planar face as support for a sketch!", "n_sketch_support"),
+    ("Non-solids selected. Performing difference on non-solids is not possible", "n_non_solid"),
+    ("Wrong selection. Select 2 shapes", "n_two_shapes"),
+    ("Some informative message nobody explains", None),
+]
+TRANSLATE = [   # English message -> a word that must be in the Greek line, a glossary word
+    ("Wire is not closed.", "περίγραμμα", "wire"),
+    ("Pad: Wire is not closed.", "περίγραμμα", "wire"),
+    ("Sketch with conflicting constraints\nRemove at least one of the following conflicting constraints:1\n, 2\n",
+     "συγκρούονται", "constraint"),
+    ("Wrong selection. Wrong number of selected objects!", "Λάθος επιλογή", "selection"),
+    ("AttachEngine3D: subshape not found Pad.Face99", "υπο-σχήμα", "subshape"),
+    ("Something with a solid face nobody translated", None, "solid"),
 ]
 LOG_LINES = [
     ("Profile: Start depth is above safe height", "cam_heights"),
@@ -139,6 +171,13 @@ def run():
     for line, want in LOG_LINES:
         r = we.explain(line, src="log")
         check((r["id"] if r else None) == want, "log rule %s <- %r" % (want, line))
+    for text, want in NOTES:
+        r = we.explain(text, src="note")
+        check((r["id"] if r else None) == want, "note rule %s <- %r (got %s)" % (want, text[:50], r and r["id"]))
+    for msg, greek, word in TRANSLATE:
+        g, words = we.translate(msg)
+        ok = (greek is None and not g or greek is not None and greek in " ".join(g)) and word in [w for w, _ in words]
+        check(ok, "translate %r -> %r %r" % (msg[:40], g, words))
     check(we.constraint_numbers(MESSAGES[1][0]) == ["1", "2"], "constraint numbers 1, 2")
     import re
     for r in we.rules():   # every command link in the steps must exist
@@ -229,6 +268,63 @@ def run():
     shown("χωρίστηκε σε 2", "body split in two", "split")
     App.closeDocument(doc.Name)
     pump(800)
+
+    # 6b) double lines in the sketch: FreeCAD makes an empty Pad without any error
+    doc = App.newDocument("DoubleLines")
+    b = body(doc)
+    pad(b, sketch(b, rect(0, 0, 10, 10) + rect(0, 0, 10, 10)))
+    doc.recompute()
+    pump(1600)
+    shown("άδειο", "empty result (double lines)", "empty")
+    App.closeDocument(doc.Name)
+
+    # 6c) Thickness too thick: no error, nothing changes -> the dressup text
+    doc = App.newDocument("Thick")
+    b = body(doc)
+    p = pad(b, sketch(b, rect(0, 0, 10, 10)))
+    doc.recompute()
+    pump(1200)
+    t = b.newObject("PartDesign::Thickness", "Thickness")
+    t.Base = (p, ["Face6"])
+    t.Value = 6
+    doc.recompute()
+    pump(1600)
+    if shown("δεν άλλαξε τίποτα", "thickness that does nothing", "nochange_dressup"):
+        check("μικρότερη τιμή" in card().text.text(), "dressup advice (smaller value)")
+    App.closeDocument(doc.Name)
+
+    # 6d) Up to face without a face: English message + Greek meaning on the card
+    doc = App.newDocument("UpToFace")
+    b = body(doc)
+    p = pad(b, sketch(b, rect(0, 0, 10, 10)))
+    p.Type = "UpToFace"
+    doc.recompute()
+    pump(1600)
+    if shown("επιφάνεια", "up to face without a face", "upto_face"):
+        o = card().orig.text()
+        check("Δεν έχει επιλεγεί" in o and "No face" not in o,
+              "card shows FreeCAD's message in Greek only (%r)" % o[:120])
+    App.closeDocument(doc.Name)
+
+    # 6e) a real "wrong selection" notification inside a sketch
+    doc = App.newDocument("Notes")
+    s = doc.addObject("Sketcher::SketchObject", "Sketch")
+    s.addGeometry(Part.LineSegment(V(0, 0, 0), V(10, 0, 0)))
+    s.addGeometry(Part.LineSegment(V(0, 5, 0), V(10, 5, 0)))
+    doc.recompute()
+    Gui.ActiveDocument.setEdit(s)
+    pump(1500)
+    Gui.Selection.clearSelection()
+    Gui.Selection.addSelection(doc.Name, "Sketch", "Edge1")
+    Gui.Selection.addSelection(doc.Name, "Sketch", "Edge2")
+    Gui.runCommand("Sketcher_ConstrainAngle")
+    pump(2500)
+    shown("Παράλληλες", "notification: angle between parallel lines", "note_parallel")
+    Gui.Selection.clearSelection()
+    Gui.ActiveDocument.resetEdit()
+    pump(800)
+    App.closeDocument(doc.Name)
+    pump(500)
 
     # 7) CAM error in the Report view
     App.Console.PrintError("Profile: Start depth is above safe height\n")
