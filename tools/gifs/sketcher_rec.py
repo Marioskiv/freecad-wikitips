@@ -18,11 +18,15 @@ import FreeCAD as App
 import FreeCADGui as Gui
 import Part
 import Sketcher
-from PySide import QtCore, QtWidgets
+from PySide import QtCore, QtGui, QtWidgets
 
 OUT = os.environ.get("WT_OUT", "/tmp/sketcher_rec")
 ONLY = {x for x in os.environ.get("WT_ONLY", "").split(",") if x}
 V = App.Vector
+# Sharp 3x GIFs (2026-10-17): record with QT_SCALE_FACTOR=1.5 (FreeCAD then draws fonts, markers
+# and lines like on a 150 % screen and the view is 1248 x 750 pixels). WT_REC_SCALE renders the key
+# frames even bigger than the view; sketcher_gifs.py works out the scale from the pictures.
+REC_SCALE = float(os.environ.get("WT_REC_SCALE", "1"))
 
 THEME = {   # modern light look; keys are FreeCAD View preferences (26.3)
     "BackgroundColor": "#F4F6FA", "SketchEdgeColor": "#1E293B", "SketchVertexColor": "#1E293B",
@@ -53,6 +57,8 @@ def set_theme():
                   ("BSplinePoleWeightVisible", False), ("BSplineKnotMultiplicityVisible", False),
                   ("BSplineControlPolygonVisible", True)):
         g.SetBool(k, on)        # no curvature comb: it hides the curve in a small GIF
+    # recorded at QT_SCALE_FACTOR=1.5: keep the grid as sparse as on a 100 % screen
+    g.SetInt("GridSizePixelThreshold", int(round(15 * float(os.environ.get("QT_SCALE_FACTOR", "1")))))
 
 
 class Rec:
@@ -72,12 +78,31 @@ class Rec:
 
     def save_icon(self):
         """The command's own toolbar icon, shown in the GIF as the button to press."""
+        self.icon = None
         try:
             act = Gui.Command.get(self.name).getAction()[0]
-            act.icon().pixmap(64, 64).save(os.path.join(self.dir, "icon.png"))
-            self.icon = "icon.png"
+            if act.icon().pixmap(64, 64).save(os.path.join(self.dir, "icon.png")):
+                self.icon = "icon.png"
         except Exception:
-            self.icon = None
+            pass
+        if self.icon is None:     # commands inside a drop-down group have no action of their own
+            icons = []
+            try:
+                pix = Gui.Command.get(self.name).getInfo()["pixmap"]
+                if pix:
+                    icons.append(Gui.getIcon(pix))
+            except Exception:
+                pass
+            try:                  # Grid, Snap...: the icon is set on the toolbar button at run time
+                QAction = getattr(QtGui, "QAction", None) or QtWidgets.QAction
+                icons += [a.icon() for a in Gui.getMainWindow().findChildren(QAction)
+                          if a.objectName() == self.name]
+            except Exception:
+                pass
+            for ic in icons:
+                if ic is not None and not ic.isNull() and ic.pixmap(64, 64).save(os.path.join(self.dir, "icon.png")):
+                    self.icon = "icon.png"
+                    break
 
     # -- setup ---------------------------------------------------------------
     def edit(self):
@@ -130,7 +155,7 @@ class Rec:
         pump(150)
         f = "k%03d.png" % self.n
         self.n += 1
-        self.v.saveImage(os.path.join(self.dir, f), self.W, self.H, THEME["BackgroundColor"])
+        self.v.saveImage(os.path.join(self.dir, f), int(round(self.W * REC_SCALE)), int(round(self.H * REC_SCALE)), THEME["BackgroundColor"])
         return f
 
     def img(self, blend=False):
@@ -170,7 +195,7 @@ class Rec:
         self.hold(ms)
 
     def save(self, tool_px=None):
-        meta = {"name": self.name, "size": [self.W, self.H], "icon": self.icon, "events": self.events}
+        meta = {"name": self.name, "size": [self.W, self.H], "scale": REC_SCALE, "icon": self.icon, "events": self.events}
         with open(os.path.join(self.dir, "events.json"), "w", encoding="utf-8") as f:
             json.dump(meta, f, ensure_ascii=False, indent=1)
         Gui.ActiveDocument.resetEdit()

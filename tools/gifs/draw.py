@@ -2,25 +2,27 @@
 """Small drawing kit for the WikiTips teaching animations (build time only).
 
 Needs Pillow and the DejaVu fonts (Greek). Not used by the addon at runtime.
-Everything is drawn at 2x and scaled down for smooth lines.
+Everything is drawn at 6x and saved at 3x (OUT): the addon shows the 3x picture at the
+logical size W x H with the screen's real pixels, so it stays sharp on 125-200 % displays.
 """
 import math
 import os
 
 from PIL import Image, ImageDraw, ImageFont
 
-W, H = 416, 250          # final size; fits the popup without scaling
-SS = 2                   # supersampling
+W, H = 416, 250          # size on screen (logical pixels); fits the popup without scaling
+OUT = 3                  # saved at 3x (Marios 2026-10-17: the 1x GIFs were blurry; "more, do not skimp")
+SS = 6                   # drawn at 6x, scaled down to OUT for smooth lines
 CAP_H = 34               # caption bar height
 
 FONT_DIRS = ["/usr/share/fonts/truetype/dejavu", "/usr/share/fonts/dejavu"]
 
 
-def _font(name, size):
+def _font(name, size, scale=SS):
     for d in FONT_DIRS:
         p = os.path.join(d, name)
         if os.path.exists(p):
-            return ImageFont.truetype(p, size * SS)
+            return ImageFont.truetype(p, size * scale)
     raise RuntimeError("DejaVu font %s not found" % name)
 
 
@@ -28,6 +30,9 @@ F_SMALL = _font("DejaVuSans.ttf", 11)
 F_LABEL = _font("DejaVuSans-Bold.ttf", 11)
 F_CAP = _font("DejaVuSans-Bold.ttf", 12)
 F_BIG = _font("DejaVuSans-Bold.ttf", 14)
+# the same, for pictures composed at 2x (recordings from FreeCAD, see sketcher_gifs.py)
+F_LABEL2 = _font("DejaVuSans-Bold.ttf", 11, 2)
+F_CAP2 = _font("DejaVuSans-Bold.ttf", 12, 2)
 
 # palette (kept in one place so every animation looks the same)
 # v4 (2026-10-16): Marios found the wood-brown stock old-fashioned. Modern CAM look: a light
@@ -204,7 +209,7 @@ class Frame:
                    ey + 2 * math.sin(tang), color, 2, 6)
 
     def image(self):
-        return self.im.resize((W, H), Image.LANCZOS)
+        return self.im.resize((W * OUT, H * OUT), Image.LANCZOS)
 
 
 SLOWER = 1.3   # Marios (2026-10-17): "a bit slower, but not too slow" — all animations
@@ -217,10 +222,11 @@ def save_gif(frames, path):
     # one shared palette (from a sample of all frames) keeps colours stable and the file small
     sample = ims[::max(1, len(ims) // 12)]
     sample += [im for im, ms in zip(ims, durs) if ms >= 1000][:8]   # the held frames carry the labels
-    sheet = Image.new("RGB", (W, H * len(sample)))
+    w, h = ims[0].size
+    sheet = Image.new("RGB", (w, h * len(sample)))
     for i, im in enumerate(sample):
-        sheet.paste(im, (0, H * i))
-    pal = sheet.quantize(colors=128, method=Image.Quantize.MEDIANCUT)
+        sheet.paste(im, (0, h * i))
+    pal = sheet.quantize(colors=256, method=Image.Quantize.MEDIANCUT)
     q = [im.quantize(palette=pal, dither=Image.Dither.NONE) for im in ims]
     os.makedirs(os.path.dirname(path), exist_ok=True)
     q[0].save(path, save_all=True, append_images=q[1:], duration=durs, loop=0,

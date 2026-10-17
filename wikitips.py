@@ -53,7 +53,8 @@ SMOOTH = _enum(Qt, "SmoothTransformation", "TransformationMode")
 KEEP_AR = _enum(Qt, "KeepAspectRatio", "AspectRatioMode")
 ALIGN_CENTER = _enum(Qt, "AlignCenter", "AlignmentFlag")
 
-POPUP_WIDTH = 440
+POPUP_WIDTH = 440        # small screens (laptops); POPUP_WIDTH_BIG on screens of 1500 x 950 and up
+POPUP_WIDTH_BIG = 560
 
 
 def params():
@@ -321,11 +322,13 @@ class TipPopup(QtWidgets.QFrame):
         super().__init__(None, WIN_FLAGS)
         self.setAttribute(WA_NOACTIVATE, True)
         self.setObjectName("WikiTipsPopup")
-        self.setFixedWidth(POPUP_WIDTH)
+        self._pw = POPUP_WIDTH
+        self.setFixedWidth(self._pw)
         self._owner = None
         self._rect = None
         self._movie = None
-        self._max_image_h = 260
+        self._hidpi = False
+        self._max_image_h = 250
 
         pal = QtWidgets.QApplication.palette()
         bg = pal.color(_enum(QtGui.QPalette, "Base", "ColorRole")).name()
@@ -417,23 +420,19 @@ class TipPopup(QtWidgets.QFrame):
         if el and img and not os.path.isfile(path):
             # Greek text without our own animation: keep the wiki picture
             path = os.path.join(IMG_DIR, img)
+        self._hidpi = path.startswith(CONTENT_IMG_DIR)
         if img and os.path.exists(path):
             if img.lower().endswith(".gif"):
+                # our GIFs are stored at 2x: each frame is scaled smoothly to the screen's real
+                # pixels (Windows 125 %/150 % scaling included), never stretched up (blurry)
                 self._movie = QtGui.QMovie(path)
+                self._movie.setCacheMode(_enum(QtGui.QMovie, "CacheAll", "CacheMode"))
+                self._movie.frameChanged.connect(self._show_frame)
                 self._movie.jumpToFrame(0)
-                sz = self._movie.currentImage().size()
-                maxw, maxh = POPUP_WIDTH - 24, self._max_image_h
-                if sz.width() > 0 and (sz.width() > maxw or sz.height() > maxh):
-                    sz.scale(maxw, maxh, KEEP_AR)
-                    self._movie.setScaledSize(sz)
-                self.image.setMovie(self._movie)
+                self._show_frame()
                 self._movie.start()
             else:
-                pm = QtGui.QPixmap(path)
-                maxw, maxh = POPUP_WIDTH - 24, self._max_image_h
-                if pm.width() > maxw or pm.height() > maxh:
-                    pm = pm.scaled(maxw, maxh, KEEP_AR, SMOOTH)
-                self.image.setPixmap(pm)
+                self.image.setPixmap(self._sharp(QtGui.QPixmap(path)))
             self.image.show()
         else:
             self.image.clear()
@@ -459,7 +458,7 @@ class TipPopup(QtWidgets.QFrame):
             html += "<p><b>Πώς χρησιμοποιείται:</b></p><ol style='margin-left:-20px'>%s</ol>" % "".join(
                 "<li>%s</li>" % s for s in steps)
         self.text.setText(html)
-        inner = POPUP_WIDTH - 24
+        inner = self._pw - 24
         self.ensurePolished()   # style sheet fonts (bigger title) must apply before measuring
         for lbl in (self.title, self.meta, self.text, self.footer):
             lbl.ensurePolished()
@@ -478,8 +477,36 @@ class TipPopup(QtWidgets.QFrame):
     def _stop_movie(self):
         if self._movie is not None:
             self._movie.stop()
-            self.image.setMovie(None)
+            try:
+                self._movie.frameChanged.disconnect(self._show_frame)
+            except Exception:
+                pass
             self._movie = None
+
+    def _sharp(self, pm):
+        """The picture at most popup width - 24 x _max_image_h on screen, drawn with the screen's
+        real pixels: our 3x pictures stay sharp on 100-300 % displays."""
+        if pm.isNull():
+            return pm
+        dpr = max(1.0, self.devicePixelRatioF() if hasattr(self, "devicePixelRatioF") else 1.0)
+        w, h = pm.width(), pm.height()
+        big = 1.0
+        if self._hidpi and w > 416:               # ours: 2x or 3x of 416 x 250, may be shown bigger
+            h, w = h * 416.0 / w, 416.0
+            big = 1.35                            # shown up to 562 px wide: still sharp from 1248 px
+        k = min(big, (self._pw - 24) / w, self._max_image_h / h)
+        size = QtCore.QSize(int(round(w * k * dpr)), int(round(h * k * dpr)))
+        if size != pm.size():
+            pm = pm.scaled(size, KEEP_AR, SMOOTH)
+        pm.setDevicePixelRatio(dpr)
+        return pm
+
+    def _show_frame(self, *args):
+        try:
+            if self._movie is not None:
+                self.image.setPixmap(self._sharp(self._movie.currentPixmap()))
+        except Exception:
+            pass
 
     # -- show / hide -------------------------------------------------------
     def show_for(self, owner, key, entry, action, gpos, rect=None):
@@ -491,11 +518,18 @@ class TipPopup(QtWidgets.QFrame):
         if screen is None:
             screen = QtGui.QGuiApplication.primaryScreen()
         geo = screen.availableGeometry()
-        # small screens (laptops): smaller picture so the popup always fits
-        self._max_image_h = 260 if geo.height() >= 900 else 170
+        # bigger popup and picture on big screens; on a small screen first drop the examples and
+        # the tip, and only if it still does not fit make the picture smaller
+        big = geo.width() >= 1500 and geo.height() >= 950
+        self._pw = POPUP_WIDTH_BIG if big else POPUP_WIDTH
+        self.setFixedWidth(self._pw)
+        self._max_image_h = 322 if big else 250
         self.fill(key, entry, action)
         if self.height() > geo.height() - 30 and entry.get("_el"):
-            self.fill(key, entry, action, compact=True)   # small screen: drop examples and tip
+            self.fill(key, entry, action, compact=True)
+        if self.height() > geo.height() - 30:
+            self._max_image_h = 170
+            self.fill(key, entry, action, compact=bool(entry.get("_el")))
         x, y = gpos.x() + 16, gpos.y() + 22
         w, h = self.width(), self.height()
         if x + w > geo.right():

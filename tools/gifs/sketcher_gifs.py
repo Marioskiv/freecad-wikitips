@@ -15,7 +15,7 @@ import sys
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from draw import F_CAP, F_LABEL, W, H, save_gif, ease  # noqa: E402
+from draw import F_CAP2 as F_CAP, F_LABEL2 as F_LABEL, W, H, OUT, save_gif, ease  # noqa: E402
 
 ACCENT = (245, 158, 11)       # amber: click ring + step number
 PILL = (15, 23, 42)           # caption pill (slate 900)
@@ -61,18 +61,19 @@ def draw_caption(d, n, text, size):
     d.text((tx, y0 + h / 2), text, font=font, fill=(255, 255, 255), anchor="lm")
 
 
+LAYOUT_W = 832
 BTN = (22, 22, 92)    # x, y, size of the toolbar button drawn top-left (2x pixels)
 
 
-def draw_button(base_rgba, icon, pressed):
+def draw_button(base_rgba, icon, pressed, k=1.0):
     """The command's real icon as a toolbar button; amber frame once it is pressed."""
-    d = ImageDraw.Draw(base_rgba)
+    d = ScaledDraw(ImageDraw.Draw(base_rgba), k)
     x, y, s = BTN
     d.rounded_rectangle([x + 3, y + 4, x + s + 3, y + s + 4], 16, fill=(0, 0, 0, 40))
     d.rounded_rectangle([x, y, x + s, y + s], 16, fill=(255, 247, 230) if pressed else (255, 255, 255),
                         outline=ACCENT if pressed else (203, 213, 225), width=5 if pressed else 2)
     if icon is not None:
-        base_rgba.alpha_composite(icon, (int(x + (s - icon.width) / 2), int(y + (s - icon.height) / 2)))
+        base_rgba.alpha_composite(icon, (int((x + s / 2) * k - icon.width / 2), int((y + s / 2) * k - icon.height / 2)))
 
 
 F_MONO = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf", 25)
@@ -138,22 +139,70 @@ def draw_legend(d, items, size):
         x += d.textlength(t, font=F_PTXT) + 64
 
 
-def load(path):
-    """Key frame with thicker lines: FreeCAD draws 1 px lines and the GIF is half size."""
+class ScaledDraw:
+    """ImageDraw in layout pixels (the 3D view's own pixels, ~832 x 500) on a picture that
+    is `k` times bigger (recordings saved at WT_REC_SCALE): the cards, cursor and captions keep
+    their layout and get k times more pixels."""
+
+    _fonts = {}
+
+    def __init__(self, d, k):
+        self.d, self.k = d, k
+
+    def _f(self, font):
+        if self.k == 1 or font is None:
+            return font
+        key = (font.path, font.size, self.k)
+        if key not in self._fonts:
+            self._fonts[key] = ImageFont.truetype(font.path, int(round(font.size * self.k)))
+        return self._fonts[key]
+
+    def _xy(self, v):
+        return [c * self.k for c in v] if not isinstance(v[0], (tuple, list)) else \
+            [(x * self.k, y * self.k) for x, y in v]
+
+    def _kw(self, kw):
+        if "width" in kw:
+            kw["width"] = max(1, int(round(kw["width"] * self.k)))
+        if "font" in kw:
+            kw["font"] = self._f(kw["font"])
+        return kw
+
+    def textlength(self, text, font=None):
+        return self.d.textlength(text, font=self._f(font)) / self.k
+
+    def text(self, xy, text, **kw):
+        self.d.text(tuple(self._xy(xy)), text, **self._kw(kw))
+
+    def rounded_rectangle(self, box, radius, **kw):
+        self.d.rounded_rectangle(self._xy(box), radius * self.k, **self._kw(kw))
+
+    def __getattr__(self, name):          # ellipse, rectangle, polygon, line
+        f = getattr(self.d, name)
+        return lambda xy, **kw: f(self._xy(xy), **self._kw(kw))
+
+
+def load(path, k=1.0):
+    """Key frame with thicker lines: FreeCAD draws 1 px lines and the GIF is shown smaller."""
     return Image.open(path).convert("RGB").filter(ImageFilter.MinFilter(3))
 
 
 def render(rec_dir, out_path):
     meta = json.load(open(os.path.join(rec_dir, "events.json"), encoding="utf-8"))
-    size = tuple(meta["size"])
-    frames = []
+    # layout: 832 pixels wide, as the cards and captions were designed (the 3D view at 100 %);
+    # events are in the view's pixels (1248 wide when recorded at QT_SCALE_FACTOR=1.5)
+    cf = LAYOUT_W / float(meta["size"][0])
+    size = (LAYOUT_W, int(round(meta["size"][1] * cf)))
     first = next(e for e in meta["events"] if e["t"] == "img")   # scene before the first click
-    base = load(os.path.join(rec_dir, first["f"]))
+    ks = Image.open(os.path.join(rec_dir, first["f"])).width / float(LAYOUT_W)   # picture / layout
+    frames = []
+    base = load(os.path.join(rec_dir, first["f"]), ks)
     cur = [size[0] * 0.82, size[1] * 0.2]
     cap = (0, "")
     icon = None
     if meta.get("icon"):
-        icon = Image.open(os.path.join(rec_dir, meta["icon"])).convert("RGBA").resize((64, 64), Image.LANCZOS)
+        n = int(round(64 * ks))
+        icon = Image.open(os.path.join(rec_dir, meta["icon"])).convert("RGBA").resize((n, n), Image.LANCZOS)
     pressed = [False]
     panel = [None]
     legend = [None]
@@ -162,9 +211,9 @@ def render(rec_dir, out_path):
     def emit(ms, ring=None, img=None):
         im = (img or base).convert("RGBA")
         if icon is not None:
-            draw_button(im, icon, pressed[0])
-        ov = Image.new("RGBA", size, (0, 0, 0, 0))
-        d = ImageDraw.Draw(ov)
+            draw_button(im, icon, pressed[0], ks)
+        ov = Image.new("RGBA", im.size, (0, 0, 0, 0))
+        d = ScaledDraw(ImageDraw.Draw(ov), ks)
         if ring is not None:
             draw_ring(d, cur[0], cur[1], ring)
         for mx, my in marks:
@@ -175,12 +224,14 @@ def render(rec_dir, out_path):
             draw_cursor(d, cur[0], cur[1])
         draw_caption(d, cap[0], cap[1], size)
         im = Image.alpha_composite(im, ov).convert("RGB")
-        frames.append((im.resize((W, H), Image.LANCZOS), ms))
+        if im.size != (W * OUT, H * OUT):
+            im = im.resize((W * OUT, H * OUT), Image.LANCZOS)
+        frames.append((im, ms))
 
     for ev in meta["events"]:
         t = ev["t"]
         if t == "img":
-            new = load(os.path.join(rec_dir, ev["f"]))
+            new = load(os.path.join(rec_dir, ev["f"]), ks)
             if ev.get("blend"):
                 marks.clear()
             if ev.get("blend") and base is not None:
@@ -191,7 +242,7 @@ def render(rec_dir, out_path):
             cap = (ev["n"], ev["text"])
         elif t == "move":
             x0, y0 = cur
-            x1, y1 = ev["to"]
+            x1, y1 = ev["to"][0] * cf, ev["to"][1] * cf
             n = max(2, int(ev["ms"] / FRAME_MS))
             if math.hypot(x1 - x0, y1 - y0) < 3:
                 n = 1

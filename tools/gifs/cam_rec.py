@@ -29,6 +29,10 @@ except ImportError:
 OUT = os.environ.get("WT_OUT", "/tmp/cam_rec")
 ONLY = {x for x in os.environ.get("WT_ONLY", "").split(",") if x}
 V = App.Vector
+# Sharp 3x GIFs (2026-10-17): record with QT_SCALE_FACTOR=1.5 (FreeCAD then draws fonts, markers
+# and lines like on a 150 % screen and the view is 1248 x 750 pixels). WT_REC_SCALE renders the key
+# frames even bigger than the view; sketcher_gifs.py works out the scale from the pictures.
+REC_SCALE = float(os.environ.get("WT_REC_SCALE", "1"))
 
 BG = "#F4F6FA"
 MODEL = (0.62, 0.68, 0.77)     # part: light slate
@@ -124,10 +128,17 @@ class Rec:
         self.icon = None
         try:
             act = Gui.Command.get(name).getAction()[0]
-            act.icon().pixmap(64, 64).save(os.path.join(self.dir, "icon.png"))
-            self.icon = "icon.png"
+            if act.icon().pixmap(64, 64).save(os.path.join(self.dir, "icon.png")):
+                self.icon = "icon.png"
         except Exception:
             pass
+        if self.icon is None:     # commands inside a drop-down group: the icon by its pixmap name
+            try:
+                ic = Gui.getIcon(Gui.Command.get(name).getInfo()["pixmap"])
+                if ic is not None and not ic.isNull() and ic.pixmap(64, 64).save(os.path.join(self.dir, "icon.png")):
+                    self.icon = "icon.png"
+            except Exception:
+                pass
         self.part = self.doc.addObject("Part::Feature", "Part")
         self.part.Shape = shape if shape is not None else plate()
         self.doc.recompute()
@@ -275,7 +286,7 @@ class Rec:
         pump(150)
         f = "k%03d.png" % self.n
         self.n += 1
-        self.v.saveImage(os.path.join(self.dir, f), self.W, self.H, BG)
+        self.v.saveImage(os.path.join(self.dir, f), int(round(self.W * REC_SCALE)), int(round(self.H * REC_SCALE)), BG)
         return f
 
     def img(self, blend=False):
@@ -417,7 +428,7 @@ class Rec:
                 for o in self.doc.Objects:
                     f.write("%s %s vis=%s cmds=%s\n" % (o.Name, o.TypeId, getattr(o.ViewObject, "Visibility", None),
                             len(o.Path.Commands) if hasattr(o, "Path") else "-"))
-        meta = {"name": self.name, "size": [self.W, self.H], "icon": self.icon, "events": self.events}
+        meta = {"name": self.name, "size": [self.W, self.H], "scale": REC_SCALE, "icon": self.icon, "events": self.events}
         with open(os.path.join(self.dir, "events.json"), "w", encoding="utf-8") as f:
             json.dump(meta, f, ensure_ascii=False, indent=1)
 
