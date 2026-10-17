@@ -55,6 +55,21 @@ def is_outer(face):
     return radial.dot(n) > 0
 
 
+def upwards(center, axis, vmin, vmax):
+    """The same cylinder with its axis pointing "up" (world Z, else Y, else X).
+
+    FreeCAD often gives the side of a Pad an axis pointing down (v from -L to 0);
+    people mean "from the bottom" and want text the right way up.
+    """
+    for ref in (V(0, 0, 1), V(0, 1, 0), V(1, 0, 0)):
+        d = axis.dot(ref)
+        if abs(d) > 1e-9:
+            if d < 0:
+                return center, -axis, -vmax, -vmin
+            break
+    return center, axis, vmin, vmax
+
+
 def depth_for(pitch, pattern, angle):
     """Depth of 90° teeth: half the groove spacing measured across the groove."""
     a = 0.0 if pattern == "Ίσιο" else angle
@@ -202,6 +217,7 @@ class Knurl:
         cyl = find_cylinder(base, center, axis, obj.Radius.Value) or (
             center, axis, obj.Radius.Value, obj.VMin, obj.VMax)
         center, axis, radius, vmin, vmax = cyl
+        center, axis, vmin, vmax = upwards(center, axis, vmin, vmax)   # margins count from the bottom
         start = vmin + obj.StartMargin.Value
         length = (vmax - obj.EndMargin.Value) - start
         pitch = obj.Pitch.Value

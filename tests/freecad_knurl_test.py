@@ -106,7 +106,7 @@ def run():
     shot("preview")
     panel = wk._PANEL
     panel.start.setValue(5)
-    panel.end.setValue(5)
+    panel.end.setValue(3)
     pump(500)
     t = time.time()
     panel.accept()
@@ -119,6 +119,9 @@ def run():
     removed = pad.Shape.Volume - sh.Volume
     check(200 < removed < 600, "material removed %.1f mm³" % removed)
     check(b.Tip == k, "Knurl is the Tip of the Body")
+    cut = pad.Shape.cut(sh).BoundBox
+    check(abs(cut.ZMin - 5) < 0.3 and abs(cut.ZMax - 27) < 0.3,
+          "margins count from the bottom: teeth from z %.2f to %.2f (want 5 to 27)" % (cut.ZMin, cut.ZMax))
     Gui.Selection.clearSelection()
     shot("real")
     for o in (pad,):

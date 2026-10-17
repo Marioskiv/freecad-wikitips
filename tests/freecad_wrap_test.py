@@ -110,6 +110,11 @@ def run():
     check(abs(math.hypot(o.x, o.y) - 12) < 1e-6 and abs(o.z - 15) < 1e-6 and
           abs(math.degrees(math.atan2(o.y, o.x)) - 45) < 1e-6, "sketch touches the cylinder where clicked (%s)" % o)
     check(len(sk.Geometry) == 4 and all(sk.getConstruction(i) for i in range(4)), "construction frame of the unrolled surface")
+    rot = sk.Placement.Rotation
+    xs, ys, zs = (rot.multVec(V(*a)) for a in ((1, 0, 0), (0, 1, 0), (0, 0, 1)))
+    out = V(o.x, o.y, 0).normalize()
+    check(ys.z > 0.999 and zs.dot(out) > 0.999 and abs(xs.cross(ys).dot(zs) - 1) < 1e-9,
+          "sketch Y points up, Z out of the cylinder, not mirrored")
     shot("sketch_open", fit=False)
 
     # draw: text "CNC" and a circle, as the user would
@@ -141,6 +146,32 @@ def run():
     check(w.Shape.isValid() and w.Shape.Volume < base - 50, "down to the axis")
     w.Mode = "Χάραξη"
     doc.recompute()
+
+    # where does a drawing land? a 2x2 square at sketch (8, 5) must be cut 5 mm higher and
+    # 8 mm along the surface towards sketch +X (catches upside-down or mirrored wraps)
+    d3 = App.newDocument("Where")
+    b3 = d3.addObject("PartDesign::Body", "Body")
+    s3 = b3.newObject("Sketcher::SketchObject", "Sketch")
+    s3.AttachmentSupport = [(b3.Origin.OriginFeatures[3], "")]
+    s3.MapMode = "FlatFace"
+    s3.addGeometry(Part.Circle(V(0, 0, 0), V(0, 0, 1), 12))
+    p3 = b3.newObject("PartDesign::Pad", "Pad")
+    p3.Profile = s3
+    p3.Length = 30
+    d3.recompute()
+    f3 = next(f for f in p3.Shape.Faces if wk.cylinder_of(f))
+    w3, k3 = ww.make_wrap(p3, f3, V(12, 0, 15))
+    sq = [V(7, 4, 0), V(9, 4, 0), V(9, 6, 0), V(7, 6, 0)]
+    for i in range(4):
+        k3.addGeometry(Part.LineSegment(sq[i], sq[(i + 1) % 4]))
+    d3.recompute()
+    com = p3.Shape.cut(w3.Shape).Solids[0].CenterOfMass
+    xs = k3.Placement.Rotation.multVec(V(1, 0, 0))
+    ang = math.degrees(math.atan2(com.y, com.x))
+    want = math.degrees(8 / 12.0) * (1 if xs.y > 0 else -1)
+    check(abs(com.z - 20) < 0.2 and abs(ang - want) < 1.0,
+          "drawing lands where drawn (z %.2f want 20, angle %.1f want %.1f)" % (com.z, ang, want))
+    App.closeDocument(d3.Name)
 
     path = os.path.join(OUT, "wrap.FCStd")
     doc.saveAs(path)

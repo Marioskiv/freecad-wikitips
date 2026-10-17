@@ -1,5 +1,13 @@
 # Session log
 
+## 2026-10-17: fix, text on a cylinder was upside down (PR 15)
+- Found on the demo picture (the tests only measured volumes): FreeCAD gives the side of a Pad an
+  axis pointing DOWN (v from -L to 0); the sketch took that as its Y, so text came out upside down
+  and mirrored (left-handed frame). Fix: the sketch is always right-handed with Y up (world Z, else
+  Y, else X) and Z out of the cylinder; Knurl margins also count from the bottom (upwards()).
+- Tests now check where a drawing lands (a square at sketch (8, 5) must be cut 5 mm higher and
+  8 mm along the surface) and that the Knurl margins start at the bottom.
+
 ## 2026-10-17: Knurl tool + drawing on a cylinder (PR 14)
 - Marios: "make knurling on cylinders simple, without a planar workaround, or an icon that does it
   automatically" (for 3D printing, CNC 4th axis and drawings). No ready knurl tool exists for

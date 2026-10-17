@@ -113,4 +113,7 @@
   to a B-spline and scaling its poles (Geom2d BSplineCurve2d, then toShape(surface)); build one face per
   wire with Part.Face(surface, wire) (reverse the wire if the area is huge), cut the hole faces, then
   face.makeOffsetShape(h, 1e-6, fill=True) gives the emboss/engrave solid. Exact (area preserved).
+- The side face of a Pad has a cylinder surface whose Axis may point opposite to the Pad direction
+  (seen: XY sketch padded +Z gives Axis (0,0,-1), v from -L to 0). Never take the surface's axis as
+  "up" for something the user reads.
 
