@@ -75,6 +75,13 @@ Short, durable facts for the next Claude session. Details live in the other note
 - Marios: "a bit slower, but not too slow" → `draw.SLOWER = 1.3` multiplies every frame duration
   (all generators use draw.save_gif). Change only that number if he asks again.
 
+## Recording lessons (all GIFs)
+- Click marks: sketcher_gifs.py draws an amber dot at every click until the next result (blend).
+  Set "marks": false in events.json to disable; "cursor": false hides the mouse (pd_rec settings).
+- Sketcher B-splines: turn off the curvature comb (Mod/Sketcher/General BSplineCombVisible) or the
+  curve disappears under green hatching.
+- Part Design settings: real recordings, one property change per frame (tools/gifs/pd_rec.py).
+
 ## CAM recording lessons (2026-10-16, PR 7)
 - Marios: "if 26.3 blocks you, use the stable 1.1". Not needed so far: everything worked in 26.3.
   Stay on 26.3 (his version) unless something really cannot be done there.

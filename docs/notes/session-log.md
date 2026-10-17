@@ -1,5 +1,23 @@
 # Session log
 
+## 2026-10-17: Part Design dialog fields (PR 10) + addon survey
+- Marios: "yes, do ALL functions; search for helper addons and take ideas, make it professional".
+- 124 Part Design panel fields with Greek help (Pad, Pocket, Revolution, Groove, Hole, Fillet,
+  Chamfer, Draft, Thickness, Helix, Loft, Pipe, Linear/Polar Pattern, Mirrored). Field names from
+  the 26.3 .ui files (FreeCAD git tag 26.3rc1), meanings from the 26.3 wiki; Hole type mapping read
+  in TaskHoleParameters.cpp (Clearance / Tap drill / Threaded = model or cosmetic thread).
+- 15 setting animations recorded in real FreeCAD (tools/gifs/pd_rec.py → content/img/pd): sides,
+  type, pocket type, taper, reversed, revolution angle, hole type, hole head, fillet, chamfer,
+  thickness, draft, helix, linear and polar pattern. No mouse in these (setting changes only).
+- Test suite opens 10 Part Design dialogs (Pad, Pocket, Revolution, Hole, Fillet, Chamfer,
+  Thickness, Helix, Linear/Polar pattern) and hovers every field.
+- Addon survey (see addon-research.md, second survey): ranked ideas list for next PRs.
+- 55 more Sketcher animations (tools/gifs/sketcher_more.py, same recorder): every Sketcher toolbar
+  button now has its own GIF except the 3D/UI ones (Leave/View/Section/Edit/Map/Validate/New sketch,
+  Projection, Intersection, Text) → next PR. B-spline curvature comb hidden in recordings
+  (Sketcher/General BSplineCombVisible etc.); composer draws an amber dot at each click until the
+  result appears. Test found a missing field (Revolution sidesMode) → added.
+
 ## 2026-10-17: CAM dressups (PR 8)
 - Marios: "more explanation for CAM, e.g. dressups, or better GIFs … check if you left something".
 - Dressup command GIFs re-recorded: before (light indigo) vs after (rose) with a legend, quieter

@@ -33,5 +33,10 @@ for op in CAM_Profile: CAM_Pocket_Shape:Face6 CAM_MillFacing:Face6 CAM_Adaptive:
           CAM_DressupDragKnife: CAM_DressupAxisMap:; do
     run "${op%%:*}" WT_SKIP_WB=1 WT_CAM_OPS="$op"
 done
+for op in PartDesign_Pad PartDesign_Pocket PartDesign_Revolution PartDesign_Hole PartDesign_Fillet \
+          PartDesign_Chamfer PartDesign_Thickness PartDesign_AdditiveHelix PartDesign_LinearPattern \
+          PartDesign_PolarPattern; do
+    run "$op" WT_SKIP_WB=1 WT_CAM_OPS= WT_PD_OPS="$op"
+done
 [ $status -eq 0 ] && echo "ALL PASS" || echo "SOME FAILED (see $OUT)"
 exit $status

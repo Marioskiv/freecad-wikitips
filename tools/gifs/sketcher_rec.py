@@ -48,6 +48,11 @@ def set_theme():
     pv.SetBool("ShowNaviCube", False)
     pv.SetBool("CornerCoordSystem", False)
     App.ParamGet("User parameter:BaseApp/Preferences/Mod/Sketcher/View").SetInt("MarkerSize", 9)
+    g = App.ParamGet("User parameter:BaseApp/Preferences/Mod/Sketcher/General")
+    for k, on in (("BSplineCombVisible", False), ("BSplineDegreeVisible", False),
+                  ("BSplinePoleWeightVisible", False), ("BSplineKnotMultiplicityVisible", False),
+                  ("BSplineControlPolygonVisible", True)):
+        g.SetBool(k, on)        # no curvature comb: it hides the curve in a small GIF
 
 
 class Rec:
@@ -524,4 +529,5 @@ def run():
 
 
 os.makedirs(OUT, exist_ok=True)
-QtCore.QTimer.singleShot(3500, run)
+if not os.environ.get("WT_NO_AUTORUN"):     # sketcher_more.py imports this module and adds scenes
+    QtCore.QTimer.singleShot(3500, run)

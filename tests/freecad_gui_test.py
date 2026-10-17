@@ -192,6 +192,58 @@ def cam_fields(wikitips):
     return failures
 
 
+PD_OPS = [x for x in os.environ.get("WT_PD_OPS", "").split(",") if x]
+
+
+def pd_fields(wikitips):
+    """Open Part Design feature dialogs (one per FreeCAD start) and hover every field with help."""
+    import Part
+    failures = 0
+    V = App.Vector
+    Gui.activateWorkbench("PartDesignWorkbench")
+    doc = App.newDocument("WikiTipsPD")
+    body = doc.addObject("PartDesign::Body", "Body")
+    Gui.ActiveDocument.ActiveView.setActiveObject("pdbody", body)
+
+    def sketch(geo, z=0.0):
+        sk = body.newObject("Sketcher::SketchObject", "Sketch")
+        sk.AttachmentSupport = [(body.Origin.OriginFeatures[3], "")]
+        sk.MapMode = "FlatFace"
+        sk.AttachmentOffset = App.Placement(V(0, 0, z), App.Rotation())
+        for g in geo:
+            sk.addGeometry(g)
+        doc.recompute()
+        return sk
+
+    p = [V(-20, -15, 0), V(20, -15, 0), V(20, 15, 0), V(-20, 15, 0)]
+    base = sketch([Part.LineSegment(p[i], p[(i + 1) % 4]) for i in range(4)])
+    pad = body.newObject("PartDesign::Pad", "Pad")
+    pad.Profile = base
+    pad.Length = 10
+    doc.recompute()
+    prof = sketch([Part.Circle(V(25, 0, 0), V(0, 0, 1), 3)], z=10)
+    mw = Gui.getMainWindow()
+    top = [i + 1 for i, f in enumerate(pad.Shape.Faces) if abs(f.BoundBox.ZMin - 10) < 1e-6
+           and abs(f.BoundBox.ZMax - 10) < 1e-6][0]
+    for cmd in PD_OPS:
+        Gui.Selection.clearSelection()
+        if cmd in ("PartDesign_Fillet", "PartDesign_Chamfer"):
+            Gui.Selection.addSelection(doc.Name, pad.Name, "Edge1")
+        elif cmd in ("PartDesign_Thickness", "PartDesign_Draft"):
+            Gui.Selection.addSelection(doc.Name, pad.Name, "Face%d" % top)
+        elif cmd in ("PartDesign_LinearPattern", "PartDesign_PolarPattern", "PartDesign_Mirrored"):
+            Gui.Selection.addSelection(doc.Name, pad.Name)
+        else:
+            Gui.Selection.addSelection(doc.Name, prof.Name)
+        Gui.runCommand(cmd)
+        pump(2800)
+        failures += hover_fields(wikitips, mw, cmd)
+        pump(300)
+        close_dialog()
+        pump(1500)
+    return failures
+
+
 def run():
     failures = 0
     try:
@@ -241,6 +293,8 @@ def run():
                 Gui.ActiveDocument.resetEdit()
         if CAM_OPS:
             failures += cam_fields(wikitips)
+        if PD_OPS:
+            failures += pd_fields(wikitips)
         P("RESULT:", "PASS" if failures == 0 else "%d FAILURES" % failures)
     except Exception:
         P("EXCEPTION", traceback.format_exc())
