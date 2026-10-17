@@ -19,6 +19,16 @@ Short, durable facts for the next Claude session. Details live in the other note
   (tests/freecad_error_test.py lists them). He does NOT want a Greek search.
 
 ## Pending (do later, he asked to wait)
+- **NEXT PHASE: CAM (Marios, 2026-10-17: "not now, in another phase"; do NOT start before he says).**
+  Do nothing more for CAM until then. Plan he described:
+  1. Try to bring his polar-coordinate converter (his separate repo `Marioskiv/polar-cnc-converter`)
+     into the FreeCAD CAM workflow (e.g. as a post-processing step or a WikiTips tool).
+  2. Make the CAM setup easy for polar work and for a 4th (rotary) axis.
+  3. Ideas already waiting for that phase: G-code for knurling on a 4th axis (same parameters as
+     the Knurl tool); helical grooves / wrapped engraving on a rotary axis.
+  Ask him first: does he already have the 4th axis, is it parallel to X, where is Z zero (axis
+  centre or part surface), which controller/post (linuxcnc today).
+  Keep the two repos separate: link or call the converter, don't copy its code here without asking.
 - CAM animations: **more colour contrast** (he likes the v4 look, but the stock/tool/paths need
   stronger contrast). Ideas: darker stock edge + darker tool, stronger path colour, darker labels.
 - Repo: `Marioskiv/freecad-wikitips` (private). Created by Marios by hand on github.com because

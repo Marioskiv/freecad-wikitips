@@ -1,5 +1,9 @@
 # Session log
 
+## 2026-10-17: CAM put on hold (notes only)
+- Marios: nothing more for CAM now. Next phase: his polar-coordinate converter + easy CAM setup for
+  polar and 4th-axis work. Written under "Pending" in memory.md so it is not forgotten.
+
 ## 2026-10-17: fix, text on a cylinder was upside down (PR 15)
 - Found on the demo picture (the tests only measured volumes): FreeCAD gives the side of a Pad an
   axis pointing DOWN (v from -L to 0); the sketch took that as its Y, so text came out upside down

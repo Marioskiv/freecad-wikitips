@@ -160,6 +160,7 @@ Text is English (wiki has no Greek translation).
 - Verified in real FreeCAD 26.3 (tests/freecad_wrap_test.py).
 
 ## Ideas / open (plan agreed 2026-10-16, see memory.md)
+- NEXT PHASE (on hold until Marios says): CAM with his polar converter + 4th axis (memory.md, Pending).
 - PR 2: field help inside dialogs — CAM task-panel widgets have stable objectNames (see
   freecad-findings.md) → Greek text + animated diagram per field (prototype: CAM heights GIF).
 - PR 3: GIFs for unusual buttons (Binders, Boolean, Clone, Datums, Compound, Section...).
