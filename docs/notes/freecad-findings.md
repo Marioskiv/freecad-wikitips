@@ -106,4 +106,11 @@
   newest row first, icon ':/icons/Warning.svg'), counted on QPushButton 'notificationArea' (its text).
 - PartDesign commands without a Body open a modal QDialog "Active Body Required" (not QMessageBox).
 - Marios uses FreeCAD in English on purpose.
+- 26.3 CRASH (segfault) when creating PartDesign::FeatureAdditivePython, FeatureSubtractivePython or
+  FeatureAddSubPython with the GUI up, even in an empty document (checked 2026-10-17). FreeCADCmd is
+  fine. PartDesign::FeaturePython and Part::FeaturePython work. (Gears-type addons would crash too.)
+- Wrapping onto a cylinder: map sketch (x, y) to the cylinder's (u = x/R, v = y) by converting each edge
+  to a B-spline and scaling its poles (Geom2d BSplineCurve2d, then toShape(surface)); build one face per
+  wire with Part.Face(surface, wire) (reverse the wire if the area is huge), cut the hole faces, then
+  face.makeOffsetShape(h, 1e-6, fill=True) gives the emboss/engrave solid. Exact (area preserved).
 
