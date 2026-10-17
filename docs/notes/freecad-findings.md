@@ -75,3 +75,22 @@
   "Make independent copy" into an existing body gives a feature that is not the body's base,
   so Pocket says "no solid to subtract from".
 - If Create Body refuses (not a solid): Part → Compound → Explode compound, use the solid.
+
+## Error messages (probed in real FreeCAD 26.3, 2026-10-17)
+- A failed feature has 'Invalid' in `obj.State`; `obj.getStatusString()` gives the English message
+  (e.g. 'Wire is not closed.', 'Revolve axis intersects the sketch', 'Cannot create a pad with a
+  total length of zero.', 'Hole error: Finding axis failed', 'Linked object is not a Part object',
+  'AttachEngine3D: subshape not found Pad.Face99', 'Sketch with conflicting constraints\nRemove at
+  least one of the following conflicting constraints:1\n, 2\n', 'Sketch with redundant constraints...').
+  Full list of PartDesign messages: grep QT_TRANSLATE_NOOP("Exception" in src/Mod/PartDesign/App.
+- Silent in 26.3 (NO error): a Pocket that misses the solid (volume unchanged), a second Pad that
+  does not touch the first (Body becomes 2 solids, no 'multiple solids' error any more), a too thick
+  Thickness, a pattern that goes off the part. WikiTips checks these itself (volume / solid count
+  against BaseFeature).
+- Python document observer: `App.addDocumentObserver(obj)`; slots used and verified:
+  slotRecomputedObject(obj), slotRecomputedDocument(doc), slotDeletedDocument(doc).
+- Report view widget: `mw.findChild(QTextEdit, "Report view")`; lines start with "hh:mm:ss  ".
+  Text written by a running script appears there only after the event loop runs.
+- Under xvfb (no window manager) `mw.mapFromGlobal(btn.mapToGlobal(...))` is off by ~16 px; use
+  `btn.mapTo(mw, ...)` for widgets inside the main window.
+- PartDesign has Sketcher_ValidateSketch / MapSketch in its "Part Design Helper Features" toolbar.

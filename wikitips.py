@@ -760,4 +760,9 @@ def install():
     _SCAN_TIMER.timeout.connect(_scan)
     _SCAN_TIMER.start()
     QtCore.QTimer.singleShot(500, _scan)
+    try:
+        import wikitips_errors   # Greek explanation of red features, "show me where"
+        wikitips_errors.install()
+    except Exception as e:
+        App.Console.PrintWarning("WikiTips: error explainer off: %s\n" % e)
     App.Console.PrintLog("WikiTips: %d commands loaded\n" % len(data()))

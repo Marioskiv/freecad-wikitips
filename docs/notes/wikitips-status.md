@@ -121,6 +121,23 @@ Text is English (wiki has no Greek translation).
   whose defaultAction is FreeCAD's QAction.
 - Menus: no popup on menu items (only toolbar buttons).
 
+## Error explainer + "show me where" (PR 12, 2026-10-17)
+- wikitips_errors.py, started from wikitips.install() (failure only prints a warning).
+- Document observer marks recomputed documents/objects; a 700 ms timer (only when no task dialog is
+  open) finds red objects, picks the first one whose dependencies are fine, matches its status
+  string against content/errors_el.json and shows ErrorCard (child widget of the main window,
+  bottom right of the central area). Unknown message → generic card with the original text.
+- Silent checks on recomputed Part Design features: same volume as BaseFeature → "_nochange";
+  more solids than before → "_split".
+- Report view: new lines are matched only against rules with "src": "log" (CAM messages).
+- Links {Command} in the steps → show_me(): finds the visible toolbar button (also inside dropdowns)
+  and draws a pulsing Outline; if hidden, a hint where it is (sketch mode / workbench).
+- Verified: tests/freecad_error_test.py in real FreeCAD 26.3 (rules for 20 real messages, cards for
+  open sketch, conflicting constraints, missed Pocket, split Body, CAM heights; outline on the Pad
+  button; card hides when fixed; closed card stays closed; preference off).
+- Not verified: Marios's Windows machine; FreeCAD in Greek UI language (messages are matched in
+  English; getStatusString seemed untranslated, to check).
+
 ## Ideas / open (plan agreed 2026-10-16, see memory.md)
 - PR 2: field help inside dialogs — CAM task-panel widgets have stable objectNames (see
   freecad-findings.md) → Greek text + animated diagram per field (prototype: CAM heights GIF).

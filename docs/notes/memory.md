@@ -112,6 +112,8 @@ Short, durable facts for the next Claude session. Details live in the other note
 - Install the addon in `$HOME/.local/share/FreeCAD/v26-3/Mod/WikiTips` (copy wikitips.py, InitGui.py,
   package.xml, data, content, Resources), then
   `FREECAD=<fc>/bin/freecad OUT=<dir> sh tests/run_freecad_tests.sh` → must print ALL PASS.
+  The suite includes the error explainer test (tests/freecad_error_test.py, run name "errors").
+  Copy wikitips_errors.py too when installing.
 - Offline mock test: `QT_QPA_PLATFORM=offscreen <fc>/bin/python tests/run_popup_test.py tests/shim . <out>`
   (system PySide6 lacks libEGL; FreeCAD's own Python works).
 - GIF prototypes: real FreeCAD scene → `ActiveView.saveImage()` frames → ffmpeg palette GIF (~70 KB),

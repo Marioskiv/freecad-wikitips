@@ -1,5 +1,17 @@
 # Session log
 
+## 2026-10-17: error explainer + "show me where" (PR 12)
+- Marios liked ideas 1 and 4 of addon-research.md → implemented in wikitips_errors.py.
+- Error explainer: when a feature turns red after a recompute, a Greek card (bottom right of the
+  3D view) says what went wrong + numbered steps; also CAM errors in the Report view. Rules in
+  content/errors_el.json (26 rules, regex on the English message), messages probed in real FreeCAD.
+  Also catches two silent mistakes: feature that changed nothing, Body split in two solids.
+  Waits while a task dialog is open; a closed card does not come back for the same error.
+  Preference Mod/WikiTips ExplainErrors (default on).
+- "Show me where": command names in the steps are blue links; a click outlines the real toolbar
+  button (amber, pulsing ~3 s) or says which workbench / sketch mode shows it.
+- New real-FreeCAD test tests/freecad_error_test.py (in run_freecad_tests.sh as "errors").
+
 ## 2026-10-17: a GIF for every toolbar button (PR 11)
 - 72 new 3D scenes in tools/gifs/part_more.py (Part Design features, additive/subtractive
   primitives, dressups, Body, datums, binders, sketch 3D commands, Part ops and primitives)
