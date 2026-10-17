@@ -13,7 +13,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from draw import (ACTIVE, BG, CAP_H, CUT, DIM, F_BIG, F_LABEL, F_SMALL, FEED, H, LEFT, PART,  # noqa: E402
                   PART_EDGE, PATH, RAPID, SHANK, STOCK, STOCK_EDGE, TOOL, W, Frame,
-                  ease, lerp, save_gif)
+                  SS, ease, lerp, save_gif)
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else "content/img/cam"
 GIFS = {}
@@ -451,10 +451,10 @@ def pattern_angle():
                     (cx + ox + math.cos(a) * L, cy + oy + math.sin(a) * L)], PATH, 1.5)
             k += 1
         # mask everything outside the face, then frame it again
-        f.d.rectangle([0, 0, TX0 * 2 - 1, H * 2], fill=BG)
-        f.d.rectangle([TX1 * 2 + 1, 0, W * 2, H * 2], fill=BG)
-        f.d.rectangle([0, 0, W * 2, TY0 * 2 - 1], fill=BG)
-        f.d.rectangle([0, TY1 * 2 + 1, W * 2, H * 2], fill=BG)
+        f.d.rectangle([0, 0, TX0 * SS - 1, H * SS], fill=BG)
+        f.d.rectangle([TX1 * SS + 1, 0, W * SS, H * SS], fill=BG)
+        f.d.rectangle([0, 0, W * SS, TY0 * SS - 1], fill=BG)
+        f.d.rectangle([0, TY1 * SS + 1, W * SS, H * SS], fill=BG)
         f.rect(TX0, TY0, TX1, TY1, outline=STOCK_EDGE)
         # angle gauge
         gx, gy = TX1 + 52, TY0 + 52

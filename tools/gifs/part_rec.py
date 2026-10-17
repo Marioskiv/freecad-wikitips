@@ -27,6 +27,10 @@ except ImportError:
 OUT = os.environ.get("WT_OUT", "/tmp/part_rec")
 ONLY = {x for x in os.environ.get("WT_ONLY", "").split(",") if x}
 V = App.Vector
+# Sharp 3x GIFs (2026-10-17): record with QT_SCALE_FACTOR=1.5 (FreeCAD then draws fonts, markers
+# and lines like on a 150 % screen and the view is 1248 x 750 pixels). WT_REC_SCALE renders the key
+# frames even bigger than the view; sketcher_gifs.py works out the scale from the pictures.
+REC_SCALE = float(os.environ.get("WT_REC_SCALE", "1"))
 
 BG = "#F4F6FA"
 BASE = (0.58, 0.64, 0.74)      # main solid: slate blue
@@ -132,7 +136,7 @@ class Rec:
         pump(200)
         f = "k%03d.png" % self.n
         self.n += 1
-        self.v.saveImage(os.path.join(self.dir, f), self.W, self.H, BG)
+        self.v.saveImage(os.path.join(self.dir, f), int(round(self.W * REC_SCALE)), int(round(self.H * REC_SCALE)), BG)
         return f
 
     def img(self, blend=False):
@@ -166,7 +170,7 @@ class Rec:
         self.hold(ms)
 
     def save(self):
-        meta = {"name": self.name, "size": [self.W, self.H], "icon": self.icon, "events": self.events}
+        meta = {"name": self.name, "size": [self.W, self.H], "scale": REC_SCALE, "icon": self.icon, "events": self.events}
         with open(os.path.join(self.dir, "events.json"), "w", encoding="utf-8") as f:
             json.dump(meta, f, ensure_ascii=False, indent=1)
         App.closeDocument(self.doc.Name)

@@ -13,7 +13,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from draw import (ACTIVE, F_LABEL, PATH, SHANK, STOCK, STOCK_EDGE, TOOL, TOOL_HI,  # noqa: E402
-                  Frame, ease, lerp, save_gif)
+                  SS, Frame, ease, lerp, save_gif)
 
 OUT = sys.argv[1] if len(sys.argv) > 1 else "content/img/camcmd"
 GIFS = {}
@@ -59,7 +59,7 @@ def axis_map():
 
     def cyl(f, rot, upto=99):
         f.rect(CX - 70, CY - RY, CX + 70, CY + RY, fill=STOCK, outline=STOCK_EDGE)
-        f.d.ellipse([(CX + 70 - 14) * 2, (CY - RY) * 2, (CX + 70 + 14) * 2, (CY + RY) * 2],
+        f.d.ellipse([(CX + 70 - 14) * SS, (CY - RY) * SS, (CX + 70 + 14) * SS, (CY + RY) * SS],
                     fill=(190, 201, 218), outline=STOCK_EDGE, width=2)
         for i in range(len(lines)):
             if i >= upto:
