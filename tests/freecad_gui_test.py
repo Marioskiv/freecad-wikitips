@@ -111,6 +111,10 @@ def hover_fields(wikitips, mw, cmd):
             if not w.isVisible() or w.width() < 4:
                 continue
             pop = rest_on(wikitips, w)
+            if pop is None:   # the 150 ms poll can miss under load: move away and rest again once
+                QtGui.QCursor.setPos(10, 10)
+                pump(400)
+                pop = rest_on(wikitips, w)
             if pop is None:
                 failures += 1
                 P("  FAIL %s %s: no popup" % (cmd, n))

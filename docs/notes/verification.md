@@ -142,3 +142,15 @@ checked in a real FreeCAD by tests/run_freecad_tests.sh (each dressup panel, eve
 | Boundary shape, extents (negative values to cut part of a path), Create Box sets only the size, "Constrained to inside" | wiki CAM_DressupPathBoundary; DressupPathBoundary.ui |
 | Axis map radius / mapping / reverse; Z correct probe file (LinuxCNC G38; CAM Probe makes a G38.2 grid) | AxisMap.py, ZCorrect.py, Op/Probe.py |
 | Dressup animations (dogbone_style, tag_shape, lead_style, dragknife, boundary_inside) | geometry from the statements above; our own drawings |
+
+# Greek for the remaining Sketcher / Part Design / Part toolbar commands (2026-10-17)
+
+128 entries (every visible toolbar button of the four workbenches now has Greek help).
+Source of every row: the FreeCAD 26.3 wiki page of the command (Description + Usage + Notes), read
+from the Reqrefusion mirror. "⚠" lines are only written when the wiki states the point, e.g.:
+Split / Extend take no pre-selection; Translate / Rotate / Scale / Offset / Symmetry select first;
+ValidateSketch not in edit mode; CarbonCopy keeps dimensions linked; ConstrainGroup ignores member
+constraints; CheckGeometry: select the whole object; Part Scale is relative to the global origin;
+Part Compound with touching pieces is invalid for booleans; Cone: one radius 0 for a full cone;
+Fillet/Chamfer: a face or the feature selects all its edges; Body with a selected solid → Base Feature.
+Entries without our own animation keep the wiki picture; the footer then credits it (CC-BY 3.0).

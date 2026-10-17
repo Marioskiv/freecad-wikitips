@@ -9,7 +9,9 @@
   dressup panels (Dogbone opened with setEdit, the command itself does not open it): ALL PASS.
 - Marios: "a bit slower, not too slow" → all GIFs regenerated 1.3× slower (draw.SLOWER).
 - Audit: 128 toolbar commands of Sketcher / Part Design / Part still showed only the English
-  wiki → next PR adds Greek for all of them.
+  wiki → PR 9 adds Greek for all of them. Found while testing: a Greek entry without our own GIF
+  dropped the wiki picture → fixed (picture kept, credited). Field-hover test made robust
+  against a missed 150 ms poll (one retry; it failed once, passed on reruns).
 
 ## CAM toolbar commands (PR 7, 2026-10-16)
 - Marios asked: "I want more for CAM: Inspect, SelectLoop, Helix, Adaptive, Slot, Engrave, Deburr,
