@@ -154,3 +154,20 @@ constraints; CheckGeometry: select the whole object; Part Scale is relative to t
 Part Compound with touching pieces is invalid for booleans; Cone: one radius 0 for a full cone;
 Fillet/Chamfer: a face or the feature selects all its edges; Body with a selected solid → Base Feature.
 Entries without our own animation keep the wiki picture; the footer then credits it (CC-BY 3.0).
+
+# Part Design dialog fields (content/fields_el.json, 2026-10-17)
+
+Field names: FreeCAD source tag 26.3rc1, `src/Mod/PartDesign/Gui/*.ui` and
+`src/Mod/Part/Gui/PatternParametersWidget.ui`; combo items from TaskPadParameters.cpp,
+TaskPocketParameters.cpp, TaskRevolutionParameters.cpp, TaskExtrudeParameters.cpp (One sided /
+Two sided / Symmetric). Meanings: the 26.3 wiki pages (Options sections) of Pad, Pocket, Revolution,
+Groove, Hole, Fillet, Chamfer, Draft, Thickness, AdditiveHelix, Loft, Pipe, LinearPattern,
+PolarPattern, Mirrored. Checked statements include: length can't be negative (use Reversed);
+To first / To last need a support; taper: inner structures get the opposite angle; Revolution angle
+≤ 360°, no negatives; Hole type → Threaded/ModelThread/CosmeticThread (TaskHoleParameters.cpp);
+Model Thread is heavy, avoid Through all with it; Head depth meaning per type; Tapered < 90° = smaller
+at the end; fillet/chamfer cannot consume a whole adjacent face; Draft fails on tangent-connected
+faces (draft before fillet); Thickness inward must be thinner than the body; "Intersection" option
+not recommended by the wiki; Extent = (n−1)·Spacing; Polar 360° spreads evenly.
+Numbers in the animations: M5 clearance ≈ 5.5 mm (ISO 273 medium), M5 tap drill 4.2 mm (common
+practice, matches FreeCAD's value in the recording).

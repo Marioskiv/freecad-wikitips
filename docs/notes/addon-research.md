@@ -50,3 +50,33 @@ GitHub search API and repo creation are NOT available from Claude's cloud enviro
 - MeshToFeatures / Detessellate: STL → editable PartDesign (prismatic parts).
 - DFM (draft/thickness/undercut analysis), LiveSectionAnalyzer, PieMenu, Launcher/Runner (command
   search; may be merged into FreeCAD via PR #25833).
+
+## Second survey (2026-10-17): ideas for a more professional WikiTips
+Catalog `FreeCAD/Addons` Data/Index.json (182 entries), READMEs/licences of the relevant ones read
+(shallow clones, nothing executed); other programs from public documentation only (ideas, no copying).
+
+New relevant addons:
+- **SearchBar** (APEbbers/SearchBar, LGPL-2.1, 2026-10-01): search tools/objects/preferences ("S"
+  key at the mouse); hovering a result outlines the real toolbar button; extensible result providers.
+- **addFC** (GS90/addFC, LGPL-2.1, 2026-10-10): selection-aware "smart HUD" offering only the tools
+  that fit the current selection; built-in examples and quick-start.
+- **DesignProof** (Unai-Pz-de-A/FreeCAD-DesignProof, LGPL-2.1, 2026-04): flexes parameters and rates
+  model robustness (EXCELLENT…CRITICAL).
+- offline-documentation (wiki as Markdown; wiki text is CC-BY 3.0).
+- Nothing found for: tutorials/lessons, "did you know" tips, constraint advice, error explanations.
+
+Ranked ideas for WikiTips (ours to build, no code taken):
+1. "Show me where": outline the real toolbar button of a command for a few seconds (SearchBar idea).
+2. Two-stage popup: title + one sentence first, GIF and details after a longer rest (AutoCAD basic/
+   extended tooltips; SolidWorks tooltip size setting).
+3. Beginner / expert preference (detail level) + "don't show again for this tool".
+4. Plain-language error explainer: watch the Report view / red tree objects, match common errors
+   (Pad/Pocket failed, wire not closed, over-constrained, no tool controller…) → Greek explanation +
+   fix checklist (SolidWorks "What's Wrong?"). Biggest beginner gain; nobody does it in FreeCAD.
+5. Greek search over WikiTips content (titles, sentences, synonyms) → run or outline the command.
+6. Selection-aware "what next?" hint (closed sketch selected → Pad / Pocket / Revolution) (addFC idea).
+7. Short checklists: before Pad (closed? constrained?), before CAM post (stock, tool controller,
+   feeds, simulate) (Carbide Create guide, DesignProof).
+8. "Did you know" tip on workbench change.
+Recording only: show key presses in the GIFs (Blender Screencast Keys idea).
+Not verified: Fusion official docs on animated tooltips, Onshape hover videos, KiCad/Kiri:Moto help.

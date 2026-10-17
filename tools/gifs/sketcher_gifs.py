@@ -157,6 +157,7 @@ def render(rec_dir, out_path):
     pressed = [False]
     panel = [None]
     legend = [None]
+    marks = []          # where the mouse clicked, until the result appears
 
     def emit(ms, ring=None, img=None):
         im = (img or base).convert("RGBA")
@@ -166,9 +167,12 @@ def render(rec_dir, out_path):
         d = ImageDraw.Draw(ov)
         if ring is not None:
             draw_ring(d, cur[0], cur[1], ring)
+        for mx, my in marks:
+            d.ellipse([mx - 7, my - 7, mx + 7, my + 7], fill=ACCENT + (255,), outline=(255, 255, 255), width=3)
         draw_panel(d, panel[0], size)
         draw_legend(d, legend[0], size)
-        draw_cursor(d, cur[0], cur[1])
+        if meta.get("cursor", True):      # setting animations (pd_rec.py) have no mouse
+            draw_cursor(d, cur[0], cur[1])
         draw_caption(d, cap[0], cap[1], size)
         im = Image.alpha_composite(im, ov).convert("RGB")
         frames.append((im.resize((W, H), Image.LANCZOS), ms))
@@ -177,6 +181,8 @@ def render(rec_dir, out_path):
         t = ev["t"]
         if t == "img":
             new = load(os.path.join(rec_dir, ev["f"]))
+            if ev.get("blend"):
+                marks.clear()
             if ev.get("blend") and base is not None:
                 for k in range(1, 6):
                     emit(70, img=Image.blend(base, new, k / 5))
@@ -196,6 +202,8 @@ def render(rec_dir, out_path):
         elif t == "click":
             for k in range(5):
                 emit(60, ring=k / 4)
+            if meta.get("marks", True):
+                marks.append(tuple(cur))
         elif t == "press" and icon is not None:
             x0, y0 = cur
             x1, y1 = BTN[0] + BTN[2] * 0.55, BTN[1] + BTN[2] * 0.6

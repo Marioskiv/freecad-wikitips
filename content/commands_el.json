@@ -656,85 +656,103 @@
     "uses": [
       "Κέντρα τρυπών",
       "Σημεία αναφοράς"
-    ]
+    ],
+    "i": "sketcher/Sketcher_CreatePoint.gif"
   },
   "Sketcher_CreateLine": {
     "t": "Γραμμή",
     "d": "Φτιάχνει ευθεία γραμμή με δύο κλικ.",
-    "selw": "Με το M αλλάζεις τρόπο: δύο σημεία ή σημείο + μήκος/γωνία."
+    "selw": "Με το M αλλάζεις τρόπο: δύο σημεία ή σημείο + μήκος/γωνία.",
+    "i": "sketcher/Sketcher_CreateLine.gif"
   },
   "Sketcher_Create3PointArc": {
     "t": "Τόξο από 3 σημεία",
-    "d": "Τόξο από τα δύο άκρα του και ένα σημείο πάνω του."
+    "d": "Τόξο από τα δύο άκρα του και ένα σημείο πάνω του.",
+    "i": "sketcher/Sketcher_Create3PointArc.gif"
   },
   "Sketcher_CreateArcOfEllipse": {
     "t": "Τόξο έλλειψης",
-    "d": "Φτιάχνει τόξο από έλλειψη: κέντρο, άξονες, αρχή και τέλος."
+    "d": "Φτιάχνει τόξο από έλλειψη: κέντρο, άξονες, αρχή και τέλος.",
+    "i": "sketcher/Sketcher_CreateArcOfEllipse.gif"
   },
   "Sketcher_CreateArcOfHyperbola": {
     "t": "Τόξο υπερβολής",
-    "d": "Φτιάχνει τόξο υπερβολής."
+    "d": "Φτιάχνει τόξο υπερβολής.",
+    "i": "sketcher/Sketcher_CreateArcOfHyperbola.gif"
   },
   "Sketcher_CreateArcOfParabola": {
     "t": "Τόξο παραβολής",
-    "d": "Φτιάχνει τόξο παραβολής: εστία, κορυφή, αρχή και τέλος."
+    "d": "Φτιάχνει τόξο παραβολής: εστία, κορυφή, αρχή και τέλος.",
+    "i": "sketcher/Sketcher_CreateArcOfParabola.gif"
   },
   "Sketcher_Create3PointCircle": {
     "t": "Κύκλος από 3 σημεία",
     "d": "Κύκλος που περνά από τρία σημεία.",
     "uses": [
       "Κύκλος που ακουμπά τρία υπάρχοντα σημεία"
-    ]
+    ],
+    "i": "sketcher/Sketcher_Create3PointCircle.gif"
   },
   "Sketcher_CreateEllipseByCenter": {
     "t": "Έλλειψη από κέντρο",
-    "d": "Έλλειψη από κέντρο, άκρο άξονα και ένα σημείο πάνω της."
+    "d": "Έλλειψη από κέντρο, άκρο άξονα και ένα σημείο πάνω της.",
+    "i": "sketcher/Sketcher_CreateEllipseByCenter.gif"
   },
   "Sketcher_CreateEllipseBy3Points": {
     "t": "Έλλειψη από 3 σημεία",
-    "d": "Έλλειψη από τα δύο άκρα ενός άξονα και ένα σημείο πάνω της."
+    "d": "Έλλειψη από τα δύο άκρα ενός άξονα και ένα σημείο πάνω της.",
+    "i": "sketcher/Sketcher_CreateEllipseBy3Points.gif"
   },
   "Sketcher_CreateRectangle_Center": {
     "t": "Ορθογώνιο από κέντρο",
     "d": "Ορθογώνιο που ξεκινά από το κέντρο του.",
     "uses": [
       "Κεντραρισμένες πλάκες"
-    ]
+    ],
+    "i": "sketcher/Sketcher_CreateRectangle_Center.gif"
   },
   "Sketcher_CreateOblong": {
     "t": "Στρογγυλεμένο ορθογώνιο",
-    "d": "Ορθογώνιο με στρογγυλές γωνίες."
+    "d": "Ορθογώνιο με στρογγυλές γωνίες.",
+    "i": "sketcher/Sketcher_CreateOblong.gif"
   },
   "Sketcher_CreateTriangle": {
     "t": "Τρίγωνο",
-    "d": "Ισόπλευρο τρίγωνο."
+    "d": "Ισόπλευρο τρίγωνο.",
+    "i": "sketcher/Sketcher_CreateTriangle.gif"
   },
   "Sketcher_CreateSquare": {
     "t": "Τετράγωνο",
-    "d": "Τετράγωνο (κανονικό πολύγωνο 4 πλευρών)."
+    "d": "Τετράγωνο (κανονικό πολύγωνο 4 πλευρών).",
+    "i": "sketcher/Sketcher_CreateSquare.gif"
   },
   "Sketcher_CreatePentagon": {
     "t": "Πεντάγωνο",
-    "d": "Κανονικό πεντάγωνο."
+    "d": "Κανονικό πεντάγωνο.",
+    "i": "sketcher/Sketcher_CreatePentagon.gif"
   },
   "Sketcher_CreateHexagon": {
     "t": "Εξάγωνο",
     "d": "Κανονικό εξάγωνο.",
     "uses": [
       "Παξιμάδια, εξάγωνα κλειδιά"
-    ]
+    ],
+    "i": "sketcher/Sketcher_CreateHexagon.gif"
   },
   "Sketcher_CreateHeptagon": {
     "t": "Επτάγωνο",
-    "d": "Κανονικό επτάγωνο."
+    "d": "Κανονικό επτάγωνο.",
+    "i": "sketcher/Sketcher_CreateHeptagon.gif"
   },
   "Sketcher_CreateOctagon": {
     "t": "Οκτάγωνο",
-    "d": "Κανονικό οκτάγωνο."
+    "d": "Κανονικό οκτάγωνο.",
+    "i": "sketcher/Sketcher_CreateOctagon.gif"
   },
   "Sketcher_CreateRegularPolygon": {
     "t": "Κανονικό πολύγωνο",
-    "d": "Πολύγωνο με όσες πλευρές θέλεις· τις γράφεις στο παράθυρο που ανοίγει."
+    "d": "Πολύγωνο με όσες πλευρές θέλεις· τις γράφεις στο παράθυρο που ανοίγει.",
+    "i": "sketcher/Sketcher_CreateRegularPolygon.gif"
   },
   "Sketcher_CreateSlot": {
     "t": "Αυλάκι (Slot)",
@@ -742,31 +760,37 @@
     "uses": [
       "Οβάλ τρύπες ρύθμισης",
       "Αυλάκια για βίδες"
-    ]
+    ],
+    "i": "sketcher/Sketcher_CreateSlot.gif"
   },
   "Sketcher_CreateArcSlot": {
     "t": "Καμπύλο αυλάκι",
     "d": "Αυλάκι πάνω σε τόξο, με στρογγυλά ή ίσια άκρα.",
     "uses": [
       "Αυλάκια ρύθμισης γωνίας"
-    ]
+    ],
+    "i": "sketcher/Sketcher_CreateArcSlot.gif"
   },
   "Sketcher_CreateBSpline": {
     "t": "B-spline",
     "d": "Ελεύθερη καμπύλη από σημεία ελέγχου.",
-    "selw": "Με το M αλλάζεις: σημεία ελέγχου ή σημεία που η καμπύλη περνά από πάνω τους."
+    "selw": "Με το M αλλάζεις: σημεία ελέγχου ή σημεία που η καμπύλη περνά από πάνω τους.",
+    "i": "sketcher/Sketcher_CreateBSpline.gif"
   },
   "Sketcher_CreatePeriodicBSpline": {
     "t": "Κλειστή B-spline",
-    "d": "Κλειστή ελεύθερη καμπύλη από σημεία ελέγχου."
+    "d": "Κλειστή ελεύθερη καμπύλη από σημεία ελέγχου.",
+    "i": "sketcher/Sketcher_CreatePeriodicBSpline.gif"
   },
   "Sketcher_CreateBSplineByInterpolation": {
     "t": "B-spline από σημεία",
-    "d": "Ελεύθερη καμπύλη που περνά ακριβώς από τα σημεία που βάζεις."
+    "d": "Ελεύθερη καμπύλη που περνά ακριβώς από τα σημεία που βάζεις.",
+    "i": "sketcher/Sketcher_CreateBSplineByInterpolation.gif"
   },
   "Sketcher_CreatePeriodicBSplineByInterpolation": {
     "t": "Κλειστή B-spline από σημεία",
-    "d": "Κλειστή καμπύλη που περνά ακριβώς από τα σημεία που βάζεις."
+    "d": "Κλειστή καμπύλη που περνά ακριβώς από τα σημεία που βάζεις.",
+    "i": "sketcher/Sketcher_CreatePeriodicBSplineByInterpolation.gif"
   },
   "Sketcher_CreateText": {
     "t": "Κείμενο",
@@ -778,56 +802,66 @@
   "Sketcher_ConstrainDistanceX": {
     "t": "Οριζόντια απόσταση",
     "d": "Κλειδώνει την οριζόντια απόσταση δύο σημείων ή το οριζόντιο μήκος γραμμής.",
-    "selw": "Ένα μόνο σημείο = απόσταση από την αρχή (0,0)."
+    "selw": "Ένα μόνο σημείο = απόσταση από την αρχή (0,0).",
+    "i": "sketcher/Sketcher_ConstrainDistanceX.gif"
   },
   "Sketcher_ConstrainDistanceY": {
     "t": "Κάθετη απόσταση",
     "d": "Κλειδώνει την κάθετη απόσταση δύο σημείων ή το κάθετο μήκος γραμμής.",
-    "selw": "Ένα μόνο σημείο = απόσταση από την αρχή (0,0)."
+    "selw": "Ένα μόνο σημείο = απόσταση από την αρχή (0,0).",
+    "i": "sketcher/Sketcher_ConstrainDistanceY.gif"
   },
   "Sketcher_ConstrainDistance": {
     "t": "Απόσταση / μήκος",
-    "d": "Κλειδώνει μήκος γραμμής, απόσταση σημείων, σημείου-γραμμής ή κύκλων."
+    "d": "Κλειδώνει μήκος γραμμής, απόσταση σημείων, σημείου-γραμμής ή κύκλων.",
+    "i": "sketcher/Sketcher_ConstrainDistance.gif"
   },
   "Sketcher_ConstrainRadiam": {
     "t": "Ακτίνα ή διάμετρος",
     "d": "Ακτίνα για τόξα, διάμετρο για κύκλους: διαλέγει μόνο του.",
     "uses": [
       "Τρύπες σε σωστό μέγεθος"
-    ]
+    ],
+    "i": "sketcher/Sketcher_ConstrainRadiam.gif"
   },
   "Sketcher_ConstrainRadius": {
     "t": "Ακτίνα",
-    "d": "Κλειδώνει την ακτίνα κύκλων και τόξων."
+    "d": "Κλειδώνει την ακτίνα κύκλων και τόξων.",
+    "i": "sketcher/Sketcher_ConstrainRadius.gif"
   },
   "Sketcher_ConstrainDiameter": {
     "t": "Διάμετρος",
     "d": "Κλειδώνει τη διάμετρο κύκλων και τόξων.",
     "uses": [
       "Τρύπες με τη διάμετρο του σχεδίου"
-    ]
+    ],
+    "i": "sketcher/Sketcher_ConstrainDiameter.gif"
   },
   "Sketcher_ConstrainHorizontal": {
     "t": "Οριζόντιο",
     "d": "Κάνει γραμμή ή δύο σημεία οριζόντια.",
-    "selw": "Συνήθως αρκεί το κουμπί «Οριζόντιο/Κάθετο»."
+    "selw": "Συνήθως αρκεί το κουμπί «Οριζόντιο/Κάθετο».",
+    "i": "sketcher/Sketcher_ConstrainHorizontal.gif"
   },
   "Sketcher_ConstrainVertical": {
     "t": "Κάθετο",
     "d": "Κάνει γραμμή ή δύο σημεία κάθετα.",
-    "selw": "Συνήθως αρκεί το κουμπί «Οριζόντιο/Κάθετο»."
+    "selw": "Συνήθως αρκεί το κουμπί «Οριζόντιο/Κάθετο».",
+    "i": "sketcher/Sketcher_ConstrainVertical.gif"
   },
   "Sketcher_ConstrainBlock": {
     "t": "Κλείδωμα ακμής (Block)",
     "d": "Κλειδώνει μια ακμή στη θέση της με έναν περιορισμό.",
     "uses": [
       "Κυρίως για B-spline"
-    ]
+    ],
+    "i": "sketcher/Sketcher_ConstrainBlock.gif"
   },
   "Sketcher_ConstrainGroup": {
     "t": "Ομάδα",
     "d": "Κάνει τα επιλεγμένα να κινούνται σαν ένα κομμάτι· θέση και μέγεθος από μια βοηθητική γραμμή.",
-    "selw": "Όσο υπάρχει η ομάδα, οι περιορισμοί πάνω στα μέλη της αγνοούνται."
+    "selw": "Όσο υπάρχει η ομάδα, οι περιορισμοί πάνω στα μέλη της αγνοούνται.",
+    "i": "sketcher/Sketcher_ConstrainGroup.gif"
   },
   "Sketcher_ToggleDrivingConstraint": {
     "t": "Οδηγός / αναφορά",
@@ -835,29 +869,34 @@
     "selw": "Χωρίς επιλογή αλλάζει τον τρόπο των νέων διαστάσεων.",
     "uses": [
       "Διάσταση μόνο για να βλέπεις την τιμή"
-    ]
+    ],
+    "i": "sketcher/Sketcher_ToggleDrivingConstraint.gif"
   },
   "Sketcher_ToggleActiveConstraint": {
     "t": "Ενεργός / ανενεργός περιορισμός",
     "d": "Απενεργοποιεί περιορισμούς (γκρι) χωρίς να τους σβήσεις.",
     "uses": [
       "Δοκιμή άλλης διάταξης"
-    ]
+    ],
+    "i": "sketcher/Sketcher_ToggleActiveConstraint.gif"
   },
   "Sketcher_CreateChamfer": {
     "t": "Φάλτσο γωνίας",
     "d": "Φάλτσο ανάμεσα σε δύο μη παράλληλες ακμές.",
-    "selw": "Ίδιο εργαλείο με το Fillet: το M αλλάζει τρόπο."
+    "selw": "Ίδιο εργαλείο με το Fillet: το M αλλάζει τρόπο.",
+    "i": "sketcher/Sketcher_CreateChamfer.gif"
   },
   "Sketcher_Split": {
     "t": "Κόψιμο ακμής",
     "d": "Κόβει μια ακμή στο σημείο που κάνεις κλικ· κύκλος γίνεται τόξο.",
-    "selw": "Δεν δέχεται προεπιλογή: πρώτα το κουμπί, μετά κλικ."
+    "selw": "Δεν δέχεται προεπιλογή: πρώτα το κουμπί, μετά κλικ.",
+    "i": "sketcher/Sketcher_Split.gif"
   },
   "Sketcher_Extend": {
     "t": "Επέκταση",
     "d": "Μακραίνει ή κονταίνει γραμμή ή τόξο ως ένα σημείο ή ως άλλη ακμή.",
-    "selw": "Δεν δέχεται προεπιλογή: πρώτα το κουμπί, μετά κλικ στη γραμμή."
+    "selw": "Δεν δέχεται προεπιλογή: πρώτα το κουμπί, μετά κλικ στη γραμμή.",
+    "i": "sketcher/Sketcher_Extend.gif"
   },
   "Sketcher_Projection": {
     "t": "Προβολή εξωτερικής γεωμετρίας",
@@ -873,7 +912,8 @@
   "Sketcher_CarbonCopy": {
     "t": "Αντιγραφή σκαριφήματος",
     "d": "Αντιγράφει γεωμετρία και περιορισμούς άλλου σκαριφήματος στο ανοιχτό.",
-    "selw": "Κλικ σε ακμή του ΑΛΛΟΥ σκαριφήματος· οι διαστάσεις μένουν συνδεδεμένες."
+    "selw": "Κλικ σε ακμή του ΑΛΛΟΥ σκαριφήματος· οι διαστάσεις μένουν συνδεδεμένες.",
+    "i": "sketcher/Sketcher_CarbonCopy.gif"
   },
   "Sketcher_Translate": {
     "t": "Μετακίνηση / αντίγραφα",
@@ -881,7 +921,8 @@
     "selw": "Πρώτα επιλέγεις, μετά το κουμπί.",
     "uses": [
       "Σειρές από τρύπες"
-    ]
+    ],
+    "i": "sketcher/Sketcher_Translate.gif"
   },
   "Sketcher_Rotate": {
     "t": "Περιστροφή / κυκλικά αντίγραφα",
@@ -889,12 +930,14 @@
     "selw": "Πρώτα επιλέγεις, μετά το κουμπί.",
     "uses": [
       "Τρύπες σε κύκλο"
-    ]
+    ],
+    "i": "sketcher/Sketcher_Rotate.gif"
   },
   "Sketcher_Scale": {
     "t": "Κλίμακα",
     "d": "Μεγαλώνει ή μικραίνει τα επιλεγμένα, ή φτιάχνει κλιμακωμένα αντίγραφα.",
-    "selw": "Πρώτα επιλέγεις, μετά το κουμπί."
+    "selw": "Πρώτα επιλέγεις, μετά το κουμπί.",
+    "i": "sketcher/Sketcher_Scale.gif"
   },
   "Sketcher_Offset": {
     "t": "Παράλληλο περίγραμμα (Offset)",
@@ -902,63 +945,75 @@
     "selw": "Πρώτα επιλέγεις γραμμές/τόξα, μετά το κουμπί.",
     "uses": [
       "Τοιχώματα σταθερού πάχους"
-    ]
+    ],
+    "i": "sketcher/Sketcher_Offset.gif"
   },
   "Sketcher_Symmetry": {
     "t": "Κατοπτρικό αντίγραφο",
     "d": "Φτιάχνει καθρέφτη των επιλεγμένων γύρω από γραμμή ή σημείο.",
-    "selw": "Πρώτα επιλέγεις, μετά το κουμπί."
+    "selw": "Πρώτα επιλέγεις, μετά το κουμπί.",
+    "i": "sketcher/Sketcher_Symmetry.gif"
   },
   "Sketcher_RemoveAxesAlignment": {
     "t": "Αφαίρεση ευθυγράμμισης αξόνων",
     "d": "Αλλάζει τα οριζόντια/κάθετα σε παράλληλα/κάθετα μεταξύ τους, ώστε το σχήμα να μπορεί να γυρίσει.",
     "uses": [
       "Περιστροφή ορθογωνίου χωρίς να χαλάσει"
-    ]
+    ],
+    "i": "sketcher/Sketcher_RemoveAxesAlignment.gif"
   },
   "Sketcher_BSplineConvertToNURBS": {
     "t": "Μετατροπή σε B-spline",
     "d": "Κάνει τις επιλεγμένες ακμές B-spline.",
-    "selw": "Ευθείες που έγιναν B-spline θέλουν μεγαλύτερο βαθμό για να λυγίσουν."
+    "selw": "Ευθείες που έγιναν B-spline θέλουν μεγαλύτερο βαθμό για να λυγίσουν.",
+    "i": "sketcher/Sketcher_BSplineConvertToNURBS.gif"
   },
   "Sketcher_BSplineIncreaseDegree": {
     "t": "Αύξηση βαθμού B-spline",
-    "d": "Ανεβάζει τον βαθμό της B-spline (πιο ευέλικτη καμπύλη)."
+    "d": "Ανεβάζει τον βαθμό της B-spline (πιο ευέλικτη καμπύλη).",
+    "i": "sketcher/Sketcher_BSplineIncreaseDegree.gif"
   },
   "Sketcher_BSplineDecreaseDegree": {
     "t": "Μείωση βαθμού B-spline",
-    "d": "Κατεβάζει τον βαθμό της B-spline."
+    "d": "Κατεβάζει τον βαθμό της B-spline.",
+    "i": "sketcher/Sketcher_BSplineDecreaseDegree.gif"
   },
   "Sketcher_BSplineIncreaseKnotMultiplicity": {
     "t": "Αύξηση πολλαπλότητας κόμβου",
-    "d": "Ο κόμβος γίνεται πιο «σκληρός» (λιγότερο ομαλή ένωση)."
+    "d": "Ο κόμβος γίνεται πιο «σκληρός» (λιγότερο ομαλή ένωση).",
+    "i": "sketcher/Sketcher_BSplineIncreaseKnotMultiplicity.gif"
   },
   "Sketcher_BSplineDecreaseKnotMultiplicity": {
     "t": "Μείωση πολλαπλότητας κόμβου",
-    "d": "Ο κόμβος γίνεται πιο ομαλός· στο μηδέν εξαφανίζεται."
+    "d": "Ο κόμβος γίνεται πιο ομαλός· στο μηδέν εξαφανίζεται.",
+    "i": "sketcher/Sketcher_BSplineDecreaseKnotMultiplicity.gif"
   },
   "Sketcher_BSplineInsertKnot": {
     "t": "Νέος κόμβος B-spline",
-    "d": "Βάζει κόμβο στη B-spline εκεί που κάνεις κλικ."
+    "d": "Βάζει κόμβο στη B-spline εκεί που κάνεις κλικ.",
+    "i": "sketcher/Sketcher_BSplineInsertKnot.gif"
   },
   "Sketcher_JoinCurves": {
     "t": "Ένωση καμπυλών",
     "d": "Ενώνει δύο ακμές σε μία B-spline.",
-    "selw": "Επιλέγεις τα άκρα (ή το κοινό σημείο) πριν το κουμπί."
+    "selw": "Επιλέγεις τα άκρα (ή το κοινό σημείο) πριν το κουμπί.",
+    "i": "sketcher/Sketcher_JoinCurves.gif"
   },
   "Sketcher_SelectConstraints": {
     "t": "Επιλογή περιορισμών στοιχείου",
     "d": "Επιλέγει τους περιορισμούς των επιλεγμένων γραμμών.",
     "uses": [
       "Βρίσκεις τι κρατάει μια γραμμή"
-    ]
+    ],
+    "i": "sketcher/Sketcher_SelectConstraints.gif"
   },
   "Sketcher_SelectElementsAssociatedWithConstraints": {
     "t": "Επιλογή στοιχείων περιορισμού",
     "d": "Επιλέγει τις γραμμές/σημεία ενός περιορισμού.",
     "uses": [
       "Βρίσκεις πού είναι ένας περιορισμός"
-    ]
+    ],
+    "i": "sketcher/Sketcher_SelectElementsAssociatedWithConstraints.gif"
   },
   "PartDesign_Body": {
     "t": "Σώμα (Body)",
