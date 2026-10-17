@@ -102,7 +102,12 @@ def run():
     if k is None or wk._PANEL is None:
         return
     check(abs(k.Pitch.Value - 1.0) < 1e-9, "default pitch for D20 = 1.0 mm (got %s)" % k.Pitch)
-    check(k.Kind == "Ελαφρύ" and len(k.Shape.Edges) > 100, "fast preview with lines while editing")
+    lineset = getattr(k.ViewObject.Proxy, "lineset", None)
+    check(k.Kind == "Ελαφρύ" and lineset is not None and lineset.numVertices.getNum() > 100,
+          "fast preview with lines (drawn on screen) while editing")
+    check(len(k.Shape.Solids) == 1 and abs(k.Shape.Volume - pad.Shape.Volume) < 1e-6,
+          "light kind leaves the solid untouched")
+    check("επιφάνειες" in wk._PANEL.size.text(), "panel shows the size of the real teeth (%r)" % wk._PANEL.size.text())
     shot("preview")
     panel = wk._PANEL
     panel.start.setValue(5)
@@ -138,6 +143,36 @@ def run():
     doc.recompute()
     check("Invalid" not in q.State and q.Shape.isValid(), "Pocket after the Knurl")
     shot("pocket_after")
+
+    # a knurl that is far too big: refused at once with a Greek card, FreeCAD does not freeze
+    dbig = App.newDocument("Big")
+    bb = dbig.addObject("PartDesign::Body", "Body")
+    big = bb.newObject("Sketcher::SketchObject", "SketchBig")
+    big.AttachmentSupport = [(bb.Origin.OriginFeatures[3], "")]
+    big.MapMode = "FlatFace"
+    big.addGeometry(Part.Circle(V(0, 0, 0), V(0, 0, 1), 40))
+    padbig = bb.newObject("PartDesign::Pad", "PadBig")
+    padbig.Profile = big
+    padbig.Length = 80
+    dbig.recompute()
+    fbig = next(f for f in padbig.Shape.Faces if wk.cylinder_of(f) and abs(wk.cylinder_of(f)[2] - 40) < 1e-6)
+    kb = wk.make_knurl(padbig, fbig)
+    kb.Pitch = 0.4
+    t = time.time()
+    dbig.recompute()
+    took = time.time() - t
+    check("Invalid" in kb.State and "too many teeth" in kb.getStatusString() and took < 10,
+          "too big knurl refused in %.1f s (%s)" % (took, kb.getStatusString()))
+    pump(1600)
+    c = we._EXPLAINER.card
+    check(c is not None and c.isVisible() and "πολύ μεγάλο" in c.title.text(), "Greek card for the too big knurl")
+    kb.Kind = "Ελαφρύ"
+    t = time.time()
+    dbig.recompute()
+    check("Invalid" not in kb.State and time.time() - t < 15, "the light kind still works for it (%.1f s)" % (time.time() - t))
+    App.closeDocument(dbig.Name)
+    App.setActiveDocument(doc.Name)
+    pump(500)
 
     # Part workbench cylinder, lying along X
     cyl = doc.addObject("Part::Cylinder", "Cylinder")

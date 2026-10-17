@@ -116,4 +116,12 @@
 - The side face of a Pad has a cylinder surface whose Axis may point opposite to the Pad direction
   (seen: XY sketch padded +Z gives Axis (0,0,-1), v from -L to 0). Never take the surface's axis as
   "up" for something the user reads.
+- Booleans with many faces TANGENT to the cut surface are slow: a knurl tool whose tooth tips touch
+  the cylinder exactly took 3-5x longer than one with tips 2 µm inside. Part.Shape.makeShapeFromMesh
+  + Part.Solid builds a 30k-face tool in ~6 s; Part.Shell of 15k separate faces alone took 6 s.
+- Defaults in 26.3: Part::Box 10x10x10, Cylinder R2 H10, Sphere R5, Cone R1 2 (bottom) R2 4 (top)
+  H10, Torus 10/2, Part_Tube (Python) R5/R2 H10.
+- TechDraw hatch patterns (share/examples/FCPAT.pat) include Diamond, Diamond2, Diamond4.
+- A compound "solid + edges" as a PartDesign feature shape breaks later dressups (Fillet "not
+  possible on selected shapes"): never put helper lines into a Body feature's Shape.
 

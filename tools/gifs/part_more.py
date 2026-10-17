@@ -696,12 +696,13 @@ def s_check():
 # ---------------------------------------------------------------------------
 # Part workbench
 # ---------------------------------------------------------------------------
-PART_PRIMS = {"Part_Box": ("Part::Box", {"Length": 20, "Width": 14, "Height": 10}, "Κουτί 10 mm στο (0,0,0)"),
-              "Part_Cylinder": ("Part::Cylinder", {"Radius": 5, "Height": 10}, "Κύλινδρος R5 στο (0,0,0)"),
-              "Part_Sphere": ("Part::Sphere", {"Radius": 5}, "Σφαίρα R5 με κέντρο το (0,0,0)"),
-              "Part_Cone": ("Part::Cone", {"Radius1": 6, "Radius2": 2, "Height": 10}, "Κώνος (κομμένος στην κορυφή)"),
-              "Part_Torus": ("Part::Torus", {"Radius1": 8, "Radius2": 2}, "Τόρος"),
-              "Part_Tube": ("Part::Tube", {"OuterRadius": 8, "InnerRadius": 5, "Height": 12}, "Σωλήνας: εξωτ. και εσωτ. ακτίνα")}
+# FreeCAD 26.3 defaults (checked 2026-10-17): what you see is exactly what one click makes
+PART_PRIMS = {"Part_Box": ("Part::Box", {}, "Κουτί 10×10×10 mm στο (0,0,0)"),
+              "Part_Cylinder": ("Part::Cylinder", {}, "Κύλινδρος R2, ύψος 10, στο (0,0,0)"),
+              "Part_Sphere": ("Part::Sphere", {}, "Σφαίρα R5 με κέντρο το (0,0,0)"),
+              "Part_Cone": ("Part::Cone", {}, "Κώνος R2 κάτω, R4 πάνω, ύψος 10"),
+              "Part_Torus": ("Part::Torus", {}, "Τόρος R10, πάχος r2"),
+              "Part_Tube": ("Part::Tube", {}, "Σωλήνας R5 έξω, R2 μέσα, ύψος 10")}
 
 
 def part_prim(name):
@@ -711,8 +712,8 @@ def part_prim(name):
     def _s():
         r = Rec(name, tool_first=True)
         guide = r.doc.addObject("Part::Box", "Guide")      # gives the camera a size before the shape exists
-        guide.Length, guide.Width, guide.Height = 24, 18, 14
-        guide.Placement.Base = V(-6, -6, -1)
+        guide.Length, guide.Width, guide.Height = 26, 26, 14
+        guide.Placement.Base = V(-13, -13, -2)
         r.doc.recompute()
         guide.ViewObject.Visibility = False
         r.view(1.6)
@@ -721,7 +722,7 @@ def part_prim(name):
             if typ == "Part::Tube":
                 import BasicShapes.Shapes as BS
                 o = r.doc.addObject("Part::Feature", "Tube")
-                o.Shape = BS.makeTube(8, 5, 12)
+                o.Shape = BS.makeTube(5, 2, 10)      # Part_Tube defaults
             else:
                 o = r.doc.addObject(typ, name[5:])
                 for k, v in props.items():
@@ -1154,7 +1155,7 @@ def s_proj():
         o.ViewObject.LineColor = (0.88, 0.11, 0.28)
         o.ViewObject.LineWidth = 5
         hide(star)
-    r.apply(go, 3, "Το σχήμα «τυλίχτηκε» πάνω στην καμπύλη έδρα")
+    r.apply(go, 3, "Το σχήμα προβλήθηκε πάνω στην καμπύλη έδρα")
     r.save()
 
 

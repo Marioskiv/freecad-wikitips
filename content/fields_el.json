@@ -83,8 +83,7 @@
   "Adaptive:stepOver": {
     "t": "Πλάγιο βήμα στο Adaptive (Step Over)",
     "d": "Στο Adaptive: λίγο πλάγια (<b>10–20%</b>) αλλά βαθιά. Η φρέζα δουλεύει με όλο της το μήκος.",
-    "f": "Optimal load",
-    "i": "cam/step_over.gif"
+    "f": "Optimal load"
   },
   "stepOverDistance": {
     "t": "Πλάγιο βήμα σε mm (Step over distance)",
@@ -326,8 +325,7 @@
   "chipBreakEnabled": {
     "t": "Σπάσιμο ρινίσματος (Chip break, G73)",
     "d": "Μικρό ανέβασμα για να σπάσει το ρίνισμα (G73), αντί να βγαίνει τελείως.",
-    "f": "Cycle type: Chip breaking – partial retract",
-    "i": "cam/peck.gif"
+    "f": "Cycle type: Chip breaking – partial retract"
   },
   "dwellEnabled": {
     "t": "Παύση στον πάτο (Dwell, G82)",
@@ -742,8 +740,7 @@
   "Revolution:axis": {
     "t": "Άξονας (Axis)",
     "d": "Γύρω από ποιον άξονα γυρίζει: κάθετος/οριζόντιος του σκαριφήματος, βοηθητική γραμμή, X/Y/Z του Body ή ακμή.",
-    "w": "Το σκαρίφημα δεν πρέπει να περνά πάνω από τον άξονα.",
-    "i": "pd/revolution_angle.gif"
+    "w": "Το σκαρίφημα δεν πρέπει να περνά πάνω από τον άξονα."
   },
   "Revolution:changeMode": {
     "t": "Τύπος (Type)",
@@ -774,8 +771,7 @@
   "Groove:axis": {
     "t": "Άξονας (Axis)",
     "d": "Γύρω από ποιον άξονα κόβει γυρίζοντας: κάθετος/οριζόντιος του σκαριφήματος, βοηθητική γραμμή, X/Y/Z του Body ή ακμή.",
-    "w": "Το σκαρίφημα δεν πρέπει να περνά πάνω από τον άξονα.",
-    "i": "pd/revolution_angle.gif"
+    "w": "Το σκαρίφημα δεν πρέπει να περνά πάνω από τον άξονα."
   },
   "Groove:changeMode": {
     "t": "Τύπος (Type)",

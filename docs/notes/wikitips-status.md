@@ -145,6 +145,8 @@ Text is English (wiki has no Greek translation).
 ## Knurl tool (PR 14, 2026-10-17)
 - wikitips_knurl.py (geometry without GUI + command/panel/view provider when the GUI is up).
   WikiTips_Knurl is added to the global WikiTips toolbar (also for existing installs).
+- Size limit: MAX_FACES 30000 real tooth faces (~35 s, ~0.9 GB); bigger is refused with a Greek
+  card. Light kind: lines drawn by the view provider only; the solid is unchanged.
 - Default pitch by diameter: ≤8 mm 0.6, ≤16 mm 0.8, ≤32 mm 1.0, else 1.2 (ideas from DIN 82 tables).
 - Depth 0 = automatic (90° teeth: 0.5 x pitch x cos(angle)), capped at half the radius.
 - Verified in real FreeCAD 26.3 (tests/freecad_knurl_test.py): button, wrong selection card, panel,

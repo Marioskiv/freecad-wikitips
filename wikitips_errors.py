@@ -45,6 +45,9 @@ KEEP_ANCHOR = wt._enum(QtGui.QTextCursor, "KeepAnchor", "MoveMode")
 SILENT_TYPES = re.compile(r"^PartDesign::(Pad|Pocket|Revolution|Groove|Hole|Additive|Subtractive|"
                           r"LinearPattern|PolarPattern|Mirrored|MultiTransform|Thickness|Fillet|Chamfer|Draft)")
 DRESSUP = re.compile(r"::(Fillet|Chamfer|Thickness|Draft)$")
+TRANSFORM = re.compile(r"::(LinearPattern|PolarPattern|Mirrored|MultiTransform)$")
+SILENT_MAX = 3              # features measured per recompute (the newest ones)
+SILENT_MAX_FACES = 20000    # bigger shapes are not measured (Volume would take too long)
 NOT_ROOT = re.compile(r"^(PartDesign::Body|App::Part|App::Origin|App::Line|App::Plane|App::Point)$")
 WORKBENCH_HINT = {
     "Sketcher_": "Το κουμπί φαίνεται μόνο μέσα σε σκαρίφημα: άνοιξέ το με διπλό κλικ.",
@@ -549,9 +552,21 @@ class Explainer(QtCore.QObject):
                 self.card.dismiss()
 
     def silent_problem(self, doc, names):
-        for n in names:
+        """Silent mistakes in the features just recomputed.
+
+        Only the last few (in tree order) are measured, and very big shapes are
+        skipped: a full recompute of a large model must not cost seconds here.
+        """
+        order = {o.Name: i for i, o in enumerate(doc.Objects)}
+        recent = sorted((n for n in names if n in order), key=order.get)[-SILENT_MAX:]
+        for n in reversed(recent):
             obj = doc.getObject(n)
             if obj is None or not SILENT_TYPES.match(obj.TypeId) or _status(obj) is not None:
+                continue
+            try:
+                if len(obj.Shape.Faces) > SILENT_MAX_FACES:
+                    continue
+            except Exception:
                 continue
             base = getattr(obj, "BaseFeature", None)
             vol, solids = _solid_info(obj)
@@ -563,7 +578,8 @@ class Explainer(QtCore.QObject):
                 r["d"] = r["d"] % obj.Label
                 return (("empty", doc.Name, obj.Name), doc.Name, r, "Στο: <b>%s</b>" % obj.Label, "")
             if bvol is not None and abs(vol - bvol) <= 1e-6 * max(1.0, abs(bvol)):
-                r = dict(special("_nochange_dressup" if DRESSUP.search(obj.TypeId) else "_nochange"))
+                r = dict(special("_nochange_dressup" if DRESSUP.search(obj.TypeId) else
+                                 "_nochange_pattern" if TRANSFORM.search(obj.TypeId) else "_nochange"))
                 r["d"] = r["d"] % obj.Label
                 return (("nochange", doc.Name, obj.Name, round(vol, 6)), doc.Name, r,
                         "Στο: <b>%s</b>" % obj.Label, "")
