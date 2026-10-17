@@ -61,8 +61,11 @@ Global toolbar "WikiTips" with an on/off command `WikiTips_Toggle`
 - content/commands_el.json now covers ALL visible toolbar buttons of Sketcher, Part Design, Part and
   CAM (194 commands). Without our own GIF the popup keeps the wiki picture (footer credits it).
 - Still English: menu-only commands and other workbenches (Draft, TechDraw, Assembly...).
-- Next: our own animations for the most used ones (Pad, Pocket, Revolution, Hole, Fillet, Chamfer,
-  Groove, Line, Slot, Offset, Part Extrude...).
+- DONE (PR 11, 2026-10-17): EVERY one of these toolbar buttons has its own GIF recorded in real
+  FreeCAD 26.3 (only CAM Axis Map and Z Correct are drawn). Part / Part Design 3D scenes:
+  tools/gifs/part_more.py (72 scenes) → content/img/part; Sketcher: tools/gifs/sketcher_more.py.
+  content/img is ~18 MB in total.
+- Still without field help: Part workbench dialogs (Extrude, Revolve, Fillet...), Sketcher dialogs.
 
 ## CAM toolbar commands (PR 7)
 - 38 CAM commands in content/commands_el.json (all CAM toolbars of 26.3 + Surface/Waterline),

@@ -1,5 +1,14 @@
 # Session log
 
+## 2026-10-17: a GIF for every toolbar button (PR 11)
+- 72 new 3D scenes in tools/gifs/part_more.py (Part Design features, additive/subtractive
+  primitives, dressups, Body, datums, binders, sketch 3D commands, Part ops and primitives)
+  + 11 regenerated; Sketcher_CreateText added to sketcher_more.py. All 194 commands in
+  commands_el.json now point to our own GIF (checked by script). Full real-FreeCAD suite: ALL PASS.
+- Second gallery page (Sketcher / Part Design / Part) published as an artifact for Marios.
+- Next (agreed direction "make it professional"): ideas from addon-research.md, first the
+  plain-language error explainer and "show me where" (outline of the real button).
+
 ## 2026-10-17: Part Design dialog fields (PR 10) + addon survey
 - Marios: "yes, do ALL functions; search for helper addons and take ideas, make it professional".
 - 124 Part Design panel fields with Greek help (Pad, Pocket, Revolution, Groove, Hole, Fillet,

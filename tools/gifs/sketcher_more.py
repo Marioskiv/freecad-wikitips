@@ -655,5 +655,25 @@ def s_group():
     r.save()
 
 
+@scene("Sketcher_CreateText")
+def s_text():
+    r = Rec("Sketcher_CreateText", center=(20, 8), height=46)
+    r.edit()
+    r.cap(1, "Κλικ στην αρχή της βάσης")
+    r.click(2, 2)
+    r.cap(2, "Κλικ στο τέλος (πλάτος)")
+    r.click(38, 2)
+    r.cap(3, "Γράψε το κείμενο, OK")
+    r.hold(700)
+    font = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+
+    def make():   # what the tool does (DrawSketchHandlerText.h, FreeCAD 26.3)
+        h = r.line((2, 2), (38, 2), construction=True)
+        r.sk.addConstraint(Sketcher.Constraint("Text", [h, 0], "CNC", font, False))
+        r.sk.setTextAndFont(len(r.sk.Constraints) - 1, "CNC", font, False, False)
+    r.apply(make, 4, "Γράμματα-γεωμετρία μέσα στο σκαρίφημα")
+    r.save()
+
+
 R.os.makedirs(R.OUT, exist_ok=True)
 QtCore.QTimer.singleShot(3500, R.run)

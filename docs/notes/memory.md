@@ -81,6 +81,12 @@ Short, durable facts for the next Claude session. Details live in the other note
 - Sketcher B-splines: turn off the curvature comb (Mod/Sketcher/General BSplineCombVisible) or the
   curve disappears under green hatching.
 - Part Design settings: real recordings, one property change per frame (tools/gifs/pd_rec.py).
+- Part Design primitives sit inside group commands: Gui.Command.get() returns None → take the icon
+  with QIcon(":/icons/<name>.svg"). Subtractive primitives are not attached → move them with
+  Placement. MultiTransform shows nothing unless body.Tip = it and the sub-transforms are hidden.
+- Sketcher text geometry from Python: Sketcher.Constraint("Text", [geo, 0], text, font, False),
+  then sketch.setTextAndFont(idx, text, font, False, False) (form from DrawSketchHandlerText.h).
+- part_rec.py / sketcher_rec.py run a demo on import unless WT_NO_AUTORUN=1 is set.
 
 ## CAM recording lessons (2026-10-16, PR 7)
 - Marios: "if 26.3 blocks you, use the stable 1.1". Not needed so far: everything worked in 26.3.
