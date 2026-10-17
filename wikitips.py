@@ -53,8 +53,8 @@ SMOOTH = _enum(Qt, "SmoothTransformation", "TransformationMode")
 KEEP_AR = _enum(Qt, "KeepAspectRatio", "AspectRatioMode")
 ALIGN_CENTER = _enum(Qt, "AlignCenter", "AlignmentFlag")
 
-POPUP_WIDTH = 440        # small screens (laptops); POPUP_WIDTH_BIG on screens of 1500 x 950 and up
-POPUP_WIDTH_BIG = 560
+POPUP_WIDTH = 440        # the smallest popup; on bigger screens it grows with the screen width
+POPUP_WIDTH_MAX = 820    # (40 % of it) up to this, so our 1248 px GIFs show their detail
 
 
 def params():
@@ -493,7 +493,7 @@ class TipPopup(QtWidgets.QFrame):
         big = 1.0
         if self._hidpi and w > 416:               # ours: 2x or 3x of 416 x 250, may be shown bigger
             h, w = h * 416.0 / w, 416.0
-            big = 1.35                            # shown up to 562 px wide: still sharp from 1248 px
+            big = (POPUP_WIDTH_MAX - 24) / 416.0  # shown up to 796 px wide: still sharp from 1248 px
         k = min(big, (self._pw - 24) / w, self._max_image_h / h)
         size = QtCore.QSize(int(round(w * k * dpr)), int(round(h * k * dpr)))
         if size != pm.size():
@@ -518,17 +518,17 @@ class TipPopup(QtWidgets.QFrame):
         if screen is None:
             screen = QtGui.QGuiApplication.primaryScreen()
         geo = screen.availableGeometry()
-        # bigger popup and picture on big screens; on a small screen first drop the examples and
-        # the tip, and only if it still does not fit make the picture smaller
-        big = geo.width() >= 1500 and geo.height() >= 950
-        self._pw = POPUP_WIDTH_BIG if big else POPUP_WIDTH
+        # the popup and its picture grow with the screen (a 536 px picture hides the detail of our
+        # GIFs on a 100 % 1920 px screen); if it does not fit, first drop the examples and the tip,
+        # then make the picture lower until it fits
+        self._pw = max(POPUP_WIDTH, min(POPUP_WIDTH_MAX, int(geo.width() * 0.4)))
         self.setFixedWidth(self._pw)
-        self._max_image_h = 322 if big else 250
+        self._max_image_h = int((self._pw - 24) * 0.6)
         self.fill(key, entry, action)
         if self.height() > geo.height() - 30 and entry.get("_el"):
             self.fill(key, entry, action, compact=True)
         if self.height() > geo.height() - 30:
-            self._max_image_h = 170
+            self._max_image_h = max(170, self._max_image_h - (self.height() - geo.height() + 30))
             self.fill(key, entry, action, compact=bool(entry.get("_el")))
         x, y = gpos.x() + 16, gpos.y() + 22
         w, h = self.width(), self.height()

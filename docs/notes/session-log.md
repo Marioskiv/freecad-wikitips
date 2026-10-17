@@ -1,5 +1,15 @@
 # Session log
 
+## 2026-10-17 (later): bigger popup picture on big screens
+- Marios: picture quality "needs more checking, fix it". Checked: the GIF files themselves are sharp
+  (1248 x 750); the real popup in FreeCAD 26.3 drew them only 536 px wide on a 1920 px screen at
+  100 % (520 px at 125 %), so FreeCAD's own small text in them (dimension values) was hard to read.
+- Now the popup width is 40 % of the screen's available width, between 440 and 820 px, and the
+  picture is up to (width - 24) x 0.6 high: 742 px wide on 1920 @ 100 %, 735 real pixels on
+  1920 @ 125 %, 1113 real pixels on 150 %; 1366 x 768 laptop 520 px. If the popup does not fit,
+  first the examples/tip go, then the picture gets just as much lower as needed (min 170).
+- Libraries sent today (IZAR, Stepcraft, Amana): see memory.md "CAM tool library".
+
 ## 2026-10-17: sharp GIFs + Greek help for ~110 more buttons (PR 22)
 - Marios: GIFs still low resolution ("raise it a lot, don't skimp"); some buttons still showed the
   English wiki text and the blurry wiki picture ("check well and do them all").

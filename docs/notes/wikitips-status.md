@@ -21,7 +21,7 @@ Global toolbar "WikiTips" with an on/off command `WikiTips_Toggle`
   checked, else same icon, else the first. `lookup()` also tries CAM_ ↔ Path_ prefixes.
 - Popup text is shortened (`short_html`): first 2 paragraphs, ≤ 420 visible chars, ≤ 4 steps.
 - A NEW `TipPopup` is created per hover (re-using one kept stale sizes). Labels get fixed width and
-  `heightForWidth` heights; image max height 260 px (170 on screens < 900 px tall); GIFs via QMovie,
+  `heightForWidth` heights; popup width 40 % of the screen (440-820 px), image up to (width - 24) x 0.6 high, lowered only if the popup does not fit (min 170); GIFs via QMovie,
   scaled. Hidden on Leave/press/wheel/hide of the owner and by a 250 ms cursor-position check.
 - `eventFilter` wraps everything in try/except → never disturbs FreeCAD.
 
@@ -180,7 +180,7 @@ Text is English (wiki has no Greek translation).
   through the Addon Manager without credentials).
 
 ## GIFs (PR 22, 2026-10-17)
-- 1248 x 750 (3x), shown 416 px wide (562 on big screens) with the screen's real pixels.
+- 1248 x 750 (3x), shown up to 796 px wide (742 on a 1920 px screen) with the screen's real pixels.
 - Recorders: sketcher_rec/more/extra, part_rec/more/extra, pd_rec, cam_rec/extra (+ cam_gifs,
   cam_dressup_gifs, cam_cmd_gifs drawn). See memory.md "Recording lessons".
 - Greek help now covers almost every Sketcher, Part, Part Design and CAM button of 26.3.
