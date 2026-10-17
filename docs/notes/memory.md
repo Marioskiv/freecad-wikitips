@@ -30,7 +30,9 @@ Short, durable facts for the next Claude session. Details live in the other note
   `https://github.com/Marioskiv/freecad-wikitips`, branch `main` → WikiTips shows in the list,
   Install / Update like any addon (the manual copy in Mod must be removed first). A private repo
   cannot be used (no password support). Bump `package.xml` <version> on every release so the
-  Addon Manager offers the update. Making the repo public is HIS decision.
+  Addon Manager offers the update. Marios made the repo PUBLIC on 2026-10-17. Verified the same day
+  in FreeCAD 26.3 (clean user folder): AddonInstaller with url + branch main downloads it into
+  Mod/WikiTips, and after a restart the WikiTips toolbar, Knurl and Wrap load.
 - **NEXT PHASE: CAM (Marios, 2026-10-17: "not now, in another phase"; do NOT start before he says).**
   DECISION (2026-10-17): this will be a SEPARATE addon, not part of WikiTips ("I don't want
   everything in one addon"). New repo/addon, its own notes; WikiTips stays help + error
