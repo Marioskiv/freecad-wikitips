@@ -414,6 +414,9 @@ class TipPopup(QtWidgets.QFrame):
 
         img = entry.get("i")
         path = os.path.join(CONTENT_IMG_DIR if (field or el) else IMG_DIR, img) if img else ""
+        if el and img and not os.path.isfile(path):
+            # Greek text without our own animation: keep the wiki picture
+            path = os.path.join(IMG_DIR, img)
         if img and os.path.exists(path):
             if img.lower().endswith(".gif"):
                 self._movie = QtGui.QMovie(path)
@@ -443,7 +446,10 @@ class TipPopup(QtWidgets.QFrame):
             html = entry.get("d", "") if field else short_html(entry.get("d", ""))
         if entry.get("w"):
             html += "<p style='color:#c0392b'><b>⚠ </b>%s</p>" % entry["w"]
+        wiki_pic = el and path.startswith(IMG_DIR)
         self.footer.setText("WikiTips · δικά μας σχέδια και κείμενα" if field else
+                            "WikiTips · εικόνα: FreeCAD wiki (CC-BY 3.0) · Shift+F1 και κλικ: ολόκληρη η σελίδα"
+                            if wiki_pic else
                             "WikiTips · ελέγχθηκε με το FreeCAD wiki · Shift+F1 και κλικ: ολόκληρη η σελίδα"
                             if el else
                             "Ολόκληρη η σελίδα: Shift+F1 και κλικ στο κουμπί · "
