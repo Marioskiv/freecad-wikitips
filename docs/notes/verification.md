@@ -126,3 +126,19 @@ recordable here): CAM_DressupAxisMap, CAM_DressupZCorrect; Surface/Waterline are
 OpenCamLib 2023.01.11 (conda-forge) installed in the test FreeCAD
 (`tools/gifs/cam_cmd_gifs.py`). The Simulator GIFs show material removal made with Part booleans
 along the real path (same idea as the simulator, not a screenshot of its window).
+
+# CAM dressup panel fields (content/fields_el.json, 2026-10-17)
+
+Field names read from the 26.3 panel files (`:/panels/DogboneEdit.ui`, HoldingTagsEdit, DressUpLeadInOutEdit,
+DragKnifeEdit, DressupPathBoundary, AxisMapEdit, ZCorrectEdit, read out of the running FreeCAD) and
+checked in a real FreeCAD by tests/run_freecad_tests.sh (each dressup panel, every field: popup OK).
+
+| Field | Statement | Source |
+|---|---|---|
+| Dogbone style / incision / custom / bones | Dogbone = shortest path to cover the corner, T-bone = extend one direction; incision adaptive / fixed (R·(2/√2−1) dogbone, R T-bone) / custom; 26.3: custom caps adaptive; greyed bone = already dressed | DogboneEdit.ui tooltips; wiki CAM_DressupDogbone |
+| Tag width / height / angle / radius / min / max | as in the wiki options; height may come out smaller if width and angle don't allow it; tags on convex parts are easier to file | HoldingTagsEdit.ui tooltips; wiki CAM_DressupTag |
+| Lead in/out style, radius/length, angle (1..90), extend (only Arc/Line/Perpendicular/Tangent), offset (move start/end point), rapid plunge (G0), retract threshold | LeadInOut.py property tooltips (26.3) |
+| Drag knife filter angle / offset / pivot height | pivot: the point should stay slightly in the material, higher for thicker material | wiki CAM_DressupDragKnife; DragKnifeEdit.ui |
+| Boundary shape, extents (negative values to cut part of a path), Create Box sets only the size, "Constrained to inside" | wiki CAM_DressupPathBoundary; DressupPathBoundary.ui |
+| Axis map radius / mapping / reverse; Z correct probe file (LinuxCNC G38; CAM Probe makes a G38.2 grid) | AxisMap.py, ZCorrect.py, Op/Probe.py |
+| Dressup animations (dogbone_style, tag_shape, lead_style, dragknife, boundary_inside) | geometry from the statements above; our own drawings |

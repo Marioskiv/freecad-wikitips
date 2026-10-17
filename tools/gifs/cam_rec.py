@@ -35,6 +35,7 @@ MODEL = (0.62, 0.68, 0.77)     # part: light slate
 TOOLC = (0.20, 0.25, 0.33)     # cutter: graphite
 PATHC = (0.31, 0.27, 0.90)     # toolpath: indigo
 NEWC = (0.88, 0.11, 0.28)      # what the command changed: rose
+BEFOREC = (0.65, 0.71, 0.99)   # the path before a dressup: light indigo
 FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 
 
@@ -54,8 +55,11 @@ def set_theme():
     pv.SetBool("Gradient", False)
     pv.SetBool("ShowNaviCube", False)
     pv.SetBool("CornerCoordSystem", False)
+    cam = App.ParamGet("User parameter:BaseApp/Preferences/Mod/CAM")
     # 3D Surface / Waterline buttons exist only with this CAM preference (and OpenCamLib)
-    App.ParamGet("User parameter:BaseApp/Preferences/Mod/CAM").SetBool("EnableAdvancedOCLFeatures", True)
+    cam.SetBool("EnableAdvancedOCLFeatures", True)
+    cam.SetBool("HideFirstRapid", True)                     # no line from the machine origin
+    cam.SetUnsigned("DefaultRapidPathColor", 0x94A3B8FF)    # rapids: light slate, not red
 
 
 def color(obj, rgb, transparency=0, lw=2):
@@ -314,6 +318,10 @@ class Rec:
             self.cap(n, caption)
         self.events.append({"t": "pick", "row": row})
 
+    def legend(self, items):
+        """Small colour key in the top right corner, e.g. before/after."""
+        self.events.append({"t": "legend", "items": items})
+
     def panel_off(self):
         self.events.append({"t": "panel", "title": None})
 
@@ -361,7 +369,7 @@ class Rec:
             self.cutter = self.doc.addObject("Part::Feature", "Cutter")
             self.cutter.Shape = Part.makeCylinder(dia / 2, length)
             color(self.cutter, TOOLC, 0, 1)
-        self.events.append({"t": "move", "to": [int(self.W * 0.93), int(self.H * 0.12)], "ms": 300})
+        self.events.append({"t": "move", "to": [int(self.W * 0.95), int(self.H * 0.72)], "ms": 300})
         n = len(pts)
         for k in range(1, frames + 1):
             p, idx = pts[min(n - 1, int(round(k * (n - 1) / frames)))]
@@ -592,7 +600,7 @@ def simulate(r):
     cur = sb.copy()
     frames = 24
     last = 0
-    r.events.append({"t": "move", "to": [int(r.W * 0.93), int(r.H * 0.12)], "ms": 300})
+    r.events.append({"t": "move", "to": [int(r.W * 0.95), int(r.H * 0.72)], "ms": 300})
     for k in range(1, frames + 1):
         upto = int(round(k * (len(pts) - 1) / frames))
         tools = [Part.makeCylinder(rad, 30, p) for p in pts[last:upto + 1]]
@@ -829,14 +837,18 @@ def dressup_scene(name, base_fn, make, text, zoom=1.25, click_at=(50, 0, 0), fra
     r.cap(2, "Πάτα το κουμπί")
     r.press()
     Gui.Selection.clearSelection()
-    r.see_through()
+    r.see_through(70)          # the dressed-up path often runs inside a pocket
     d = make(r, o)
+    Gui.Selection.clearSelection()     # a selected path is drawn green: show the real colours
     r.doc.recompute()
     r.style_path(d, NEWC)
-    try:
-        o.ViewObject.Visibility = False
+    try:                       # keep the original path visible, faded: before vs after
+        o.ViewObject.Visibility = True
+        r.style_path(o, BEFOREC)
+        o.ViewObject.LineWidth = 2
     except Exception:
         pass
+    r.legend([["#A5B4FC", "πριν"], ["#E11D48", "μετά"]])
     r.cap(3, text)
     r.img(blend=True)
     if run:

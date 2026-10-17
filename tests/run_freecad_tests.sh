@@ -28,7 +28,9 @@ run() {  # name, extra env assignments...
 }
 
 run toolbars WT_CAM_OPS=
-for op in CAM_Profile: CAM_Pocket_Shape:Face6 CAM_MillFacing:Face6 CAM_Adaptive:Face6 CAM_Drilling:Face7; do
+for op in CAM_Profile: CAM_Pocket_Shape:Face6 CAM_MillFacing:Face6 CAM_Adaptive:Face6 CAM_Drilling:Face7 \
+          CAM_DressupDogbone: CAM_DressupTag: CAM_DressupLeadInOut: CAM_DressupPathBoundary: \
+          CAM_DressupDragKnife: CAM_DressupAxisMap:; do
     run "${op%%:*}" WT_SKIP_WB=1 WT_CAM_OPS="$op"
 done
 [ $status -eq 0 ] && echo "ALL PASS" || echo "SOME FAILED (see $OUT)"
