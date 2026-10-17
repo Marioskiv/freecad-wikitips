@@ -121,6 +121,7 @@ def run():
     sh = k.Shape
     check(k.Kind == "Πραγματικό" and "Invalid" not in k.State, "real knurl computed (%s)" % k.getStatusString())
     check(sh.isValid() and len(sh.Solids) == 1, "one valid solid")
+    check(wk.LAST_METHOD == "direct", "fast direct build used (got %r)" % wk.LAST_METHOD)
     removed = pad.Shape.Volume - sh.Volume
     check(200 < removed < 600, "material removed %.1f mm³" % removed)
     check(b.Tip == k, "Knurl is the Tip of the Body")
@@ -185,6 +186,16 @@ def run():
     doc.recompute()
     check(k2.TypeId == "Part::FeaturePython" and k2.Shape.isValid() and cyl.Shape.Volume - k2.Shape.Volume > 50,
           "straight knurl on a Part cylinder")
+    # a cross hole in the band: the direct build is not possible, the boolean takes over
+    holed = doc.addObject("Part::Feature", "Holed")
+    holed.Shape = Part.makeCylinder(8, 30, V(0, 60, 0)).cut(Part.makeCylinder(2, 30, V(-15, 60, 15), V(1, 0, 0)))
+    doc.recompute()
+    hf = next(f for f in holed.Shape.Faces if wk.cylinder_of(f) and abs(wk.cylinder_of(f)[2] - 8) < 1e-6)
+    k3 = wk.make_knurl(holed, hf)
+    k3.StartMargin, k3.EndMargin = 5, 5
+    doc.recompute()
+    check(wk.LAST_METHOD == "boolean" and k3.Shape.isValid() and len(k3.Shape.Solids) == 1,
+          "band with a cross hole: boolean fallback, valid (%s)" % wk.LAST_METHOD)
 
     # save and open again
     path = os.path.join(OUT, "knurl.FCStd")
