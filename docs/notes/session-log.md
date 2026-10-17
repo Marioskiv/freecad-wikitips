@@ -1,5 +1,31 @@
 # Session log
 
+## 2026-10-17: sharp GIFs + Greek help for ~110 more buttons (PR 22)
+- Marios: GIFs still low resolution ("raise it a lot, don't skimp"); some buttons still showed the
+  English wiki text and the blurry wiki picture ("check well and do them all").
+- Cause of the blur: GIFs were 416 x 250 and Windows at 125-150 % stretched them (on his laptop the
+  popup also shrank them to 170 px high, then the screen stretched that up again).
+- Now: every GIF is 1248 x 750 (3x). Recordings are made with QT_SCALE_FACTOR=1.5, so FreeCAD draws
+  fonts, markers and lines like on a 150 % screen (1248 x 750 view); the drawn CAM pictures are drawn
+  at 6x and saved at 3x. The compositor (sketcher_gifs.py) works in layout pixels (832 wide) and
+  scales to the picture (ScaledDraw). The popup draws each frame itself, smooth-scaled to the
+  screen's real pixels (devicePixelRatio), shows it 416 px wide (562 on screens >= 1500 x 950) and
+  only shrinks it when the popup cannot fit even after dropping the examples.
+- All 238 old GIFs re-recorded/re-drawn at 3x (same scenes). New scenes: sketcher_extra.py (36),
+  part_extra.py (36 Part Design + Part), cam_extra.py (10 CAM). Text-only (no GIF) where a picture
+  could not be checked: CAM Quick Validate, Tapping, Flute, ToolBit files, experimental Area/Shape;
+  Part Export/Import/selection filters...; PartDesign Migrate.
+- 26.3 facts found: Sketcher Grid / Snap / Rendering Order are no longer toolbar buttons, they are in
+  a settings menu of the sketch task panel ("snap to grid" is in the Grid settings).
+  Sketcher Paste puts the copy at the SAME place (clipboard = Python script).
+- Coverage (26.3 commands): Sketcher 122/140 (rest: drop-down groups), Part Design 38/43,
+  Part 68/73, CAM 59/64 (rest: drop-down groups).
+- content/img grew 18 MB -> ~50 MB (3x pictures).
+- Marios asked about a ready CAM tool library: 26.3 ships "Default" with 15 sample bits; offered
+  to build his own library file from a list of his real cutters (no code). Waiting for the list.
+- Repo made PUBLIC by Marios; Addon Manager install verified (custom repository). In this Addon
+  Manager version the custom repositories are in Edit → Preferences → Addon Manager (not the ⚙).
+
 ## 2026-10-17: Marios's first install on Windows - feedback round 1 (PR 20)
 - Installed by hand in `C:\Users\mario\AppData\Roaming\FreeCAD\v26-3\Mod`: it works. His points:
   1. GIFs low resolution / not sharp -> NOT done yet (next: re-record at 2x, show with devicePixelRatio).

@@ -95,7 +95,8 @@ class Rec:
         self.icon = None
         try:
             act = Gui.Command.get(name).getAction()[0]
-            act.icon().pixmap(64, 64).save(os.path.join(self.dir, "icon.png"))
+            if not act.icon().pixmap(64, 64).save(os.path.join(self.dir, "icon.png")):
+                raise ValueError("no icon")
             self.icon = "icon.png"
         except Exception:
             # commands inside a dropdown group have no own action: use their icon resource
@@ -103,9 +104,10 @@ class Rec:
                 from PySide import QtGui
                 cmd = Gui.Command.get(name)
                 pix = cmd.getInfo()["pixmap"] if cmd is not None else name   # e.g. sub-items of a group
-                for path in (":/icons/%s.svg" % pix, ":/icons/%s.png" % pix, pix):
-                    ic = QtGui.QIcon(path)
-                    if not ic.isNull() and ic.pixmap(64, 64).save(os.path.join(self.dir, "icon.png")):
+                icons = [QtGui.QIcon(p) for p in (":/icons/%s.svg" % pix, ":/icons/%s.png" % pix, pix)]
+                icons.append(Gui.getIcon(pix))        # BitmapFactory: finds the workbench icons too
+                for ic in icons:
+                    if ic is not None and not ic.isNull() and ic.pixmap(64, 64).save(os.path.join(self.dir, "icon.png")):
                         self.icon = "icon.png"
                         break
             except Exception:

@@ -128,10 +128,17 @@ class Rec:
         self.icon = None
         try:
             act = Gui.Command.get(name).getAction()[0]
-            act.icon().pixmap(64, 64).save(os.path.join(self.dir, "icon.png"))
-            self.icon = "icon.png"
+            if act.icon().pixmap(64, 64).save(os.path.join(self.dir, "icon.png")):
+                self.icon = "icon.png"
         except Exception:
             pass
+        if self.icon is None:     # commands inside a drop-down group: the icon by its pixmap name
+            try:
+                ic = Gui.getIcon(Gui.Command.get(name).getInfo()["pixmap"])
+                if ic is not None and not ic.isNull() and ic.pixmap(64, 64).save(os.path.join(self.dir, "icon.png")):
+                    self.icon = "icon.png"
+            except Exception:
+                pass
         self.part = self.doc.addObject("Part::Feature", "Part")
         self.part.Shape = shape if shape is not None else plate()
         self.doc.recompute()

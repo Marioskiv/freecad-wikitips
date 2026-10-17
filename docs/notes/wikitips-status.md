@@ -178,3 +178,9 @@ Text is English (wiki has no Greek translation).
 - Optional "Open full page" (the offline HTML page) on Ctrl+hover.
 - Publish to the Addon Manager catalog later (needs a public repo; private repos cannot be installed
   through the Addon Manager without credentials).
+
+## GIFs (PR 22, 2026-10-17)
+- 1248 x 750 (3x), shown 416 px wide (562 on big screens) with the screen's real pixels.
+- Recorders: sketcher_rec/more/extra, part_rec/more/extra, pd_rec, cam_rec/extra (+ cam_gifs,
+  cam_dressup_gifs, cam_cmd_gifs drawn). See memory.md "Recording lessons".
+- Greek help now covers almost every Sketcher, Part, Part Design and CAM button of 26.3.

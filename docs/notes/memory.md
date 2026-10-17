@@ -21,9 +21,7 @@ Short, durable facts for the next Claude session. Details live in the other note
 ## Pending (do later, he asked to wait)
 - **Current priority (Marios, 2026-10-17):** GIFs, Greek error explanations and Knurl must work
   correctly. Next step only after he hears "I am sure" and tries it on his PC.
-- **Feedback round 1 (2026-10-17, after his first install on Windows), still open:** GIFs must be
-  sharper (re-record at 2x and show them with devicePixelRatio; do not shrink them to 170 px on
-  small screens). Done in PR 20: no flicker, Knurl Apply button, cards bottom centre, knurl depth
+- **Feedback round 1 (2026-10-17):** GIFs sharper → done in PR 22 (3x, see session-log). Done in PR 20: no flicker, Knurl Apply button, cards bottom centre, knurl depth
   limits + flat tops + BREP speed-up.
 - **Install through the Addon Manager (his question):** possible only if the repo is PUBLIC. Then:
   Addon Manager → ⚙ (Preferences) → Custom repositories → add
@@ -33,6 +31,9 @@ Short, durable facts for the next Claude session. Details live in the other note
   Addon Manager offers the update. Marios made the repo PUBLIC on 2026-10-17. Verified the same day
   in FreeCAD 26.3 (clean user folder): AddonInstaller with url + branch main downloads it into
   Mod/WikiTips, and after a restart the WikiTips toolbar, Knurl and Wrap load.
+- **CAM tool library (asked 2026-10-17):** waiting for Marios's list of real cutters (type,
+  diameter, flutes, cutting length) to build a .fctl library + .fctb bits for him (config, no code).
+  Belongs to the separate CAM addon/phase, but the library file can be given earlier.
 - **NEXT PHASE: CAM (Marios, 2026-10-17: "not now, in another phase"; do NOT start before he says).**
   DECISION (2026-10-17): this will be a SEPARATE addon, not part of WikiTips ("I don't want
   everything in one addon"). New repo/addon, its own notes; WikiTips stays help + error
@@ -109,6 +110,12 @@ Short, durable facts for the next Claude session. Details live in the other note
   (all generators use draw.save_gif). Change only that number if he asks again.
 
 ## Recording lessons (all GIFs)
+- ALWAYS record with QT_SCALE_FACTOR=1.5 and an xvfb screen of 2400x1600 (3x GIFs, 2026-10-17).
+  Render with tools/gifs/sketcher_gifs.py (it detects the scale from the key frames).
+- Check every new GIF on a contact sheet before using it; never show settings, checks or G-code
+  that were not produced by FreeCAD itself (cards with invented content were removed).
+- Commands inside drop-down groups have no QAction of their own: take the icon with
+  Gui.getIcon(<pixmap name>) (done in all recorders).
 - Click marks: sketcher_gifs.py draws an amber dot at every click until the next result (blend).
   Set "marks": false in events.json to disable; "cursor": false hides the mouse (pd_rec settings).
 - Sketcher B-splines: turn off the curvature comb (Mod/Sketcher/General BSplineCombVisible) or the
