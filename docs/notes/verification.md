@@ -189,3 +189,13 @@ inside Bodies; Std DependencyGraph needs Graphviz; Std TextureMapping is tempora
 starts without addons and user settings; Std Group is only a folder (no placement), Std Part moves its content
 together. Removed while checking (not sure enough): "No shading shows the edges", "Mass Properties uses the
 material", what exactly the Cutting / Color edit modes do (written neutrally).
+
+# TechDraw commands — Greek help (content/commands_el.json, 2026-10-20)
+
+106 entries: every TechDraw command of FreeCAD 26.3 except the 13 drop-down group buttons (they show the help of
+the command they display). Sources: FreeCAD 26.3 menu texts / tooltips / shortcuts (`getInfo()`), the wiki text in
+`data/commands.json`; for AlignVertexesHorizontally/Vertically and ExportPagePDF (no wiki page) only FreeCAD's own
+tooltip. Shortcuts written: D (Dimension), Shift+H, Shift+V — equal to FreeCAD's. Knurling in a drawing = the
+geometric (PAT) hatch "Diamond" (moved there from the image hatch). Removed while checking (not sure enough): which
+of the three points is the vertex of a 3-point angle / the centre of a cosmetic arc, "3/4 circle" for threads seen
+end-on, "frames are hidden when printing".
