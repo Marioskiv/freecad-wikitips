@@ -760,12 +760,13 @@ def _ensure_toolbar():
     p.SetBool("ToolbarCreated", True)
 
 
-def _ensure_tool_buttons():
-    """WikiTips tools (Knurl ...) on the WikiTips toolbar, also for users who already have it."""
+def _remove_old_tool_buttons():
+    """Knurl and Wrap left WikiTips on 2026-10-20 (now "Knurling & Wrap", in the polar converter
+    repository): take their old buttons off the WikiTips toolbar of existing installs."""
     grp = App.ParamGet("User parameter:BaseApp/Workbench/Global/Toolbar/WikiTips")
     for cmd in ("WikiTips_Knurl", "WikiTips_Wrap"):
-        if not grp.GetString(cmd, ""):
-            grp.SetString(cmd, "wikitips")
+        if grp.GetString(cmd, ""):
+            grp.RemString(cmd)
 
 
 class ToggleCommand:
@@ -805,13 +806,9 @@ def install():
     _SCAN_TIMER.start()
     QtCore.QTimer.singleShot(500, _scan)
     try:
-        import wikitips_knurl    # tools: knurling on a cylinder, drawing on a cylinder
-        import wikitips_wrap
-        wikitips_knurl.install()
-        wikitips_wrap.install()
-        _ensure_tool_buttons()
+        _remove_old_tool_buttons()
     except Exception as e:
-        App.Console.PrintWarning("WikiTips: tools off: %s\n" % e)
+        App.Console.PrintWarning("WikiTips: toolbar clean-up: %s\n" % e)
     try:
         import wikitips_errors   # Greek explanation of red features, "show me where"
         wikitips_errors.install()

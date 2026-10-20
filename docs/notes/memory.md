@@ -18,11 +18,18 @@ Short, durable facts for the next Claude session. Details live in the other note
 - "The more problems it solves the better": keep adding rules from REAL probed messages
   (tests/freecad_error_test.py lists them). He does NOT want a Greek search.
 
-## Pending (do later, he asked to wait)
-- **Current priority (Marios, 2026-10-17):** GIFs, Greek error explanations and Knurl must work
-  correctly. Next step only after he hears "I am sure" and tries it on his PC.
-- **Feedback round 1 (2026-10-17):** GIFs sharper → done in PR 22 (3x, see session-log). Done in PR 20: no flicker, Knurl Apply button, cards bottom centre, knurl depth
-  limits + flat tops + BREP speed-up.
+## What lives where (Marios, 2026-10-20) — read this
+- **This repo = ONLY WikiTips**: hover help for FreeCAD's commands and the Greek error explanations.
+  No tools inside. Open work: `pending.md`.
+- **Knurl and "Σκαρίφημα σε κύλινδρο" (Wrap) LEFT WikiTips on 2026-10-20 (0.5.0)**: they are now
+  "Knurling & Wrap" in `Marioskiv/polar-cnc-converter` (folder `cad/`, Part Design toolbar, MIT, notes in
+  its `docs/notes/knurlwrap.md`). Do not bring them back here; WikiTips has no help or error rules for them.
+- Everything for his XZC machine (web converter, Polar CNC addon, Knurling & Wrap) is in
+  `polar-cnc-converter` (to be renamed); machine files in `cnc-manuals`; calibration in
+  `linuxcnc-calibrations`; the cutter libraries will get their own repo. Never mix them.
+- **No change without his clear "ναι"** (rule of 2026-10-20); only the notes may be updated freely.
+
+## Durable facts (moved from "Pending" on 2026-10-20; open items are in pending.md)
 - **Install through the Addon Manager (his question):** possible only if the repo is PUBLIC. Then:
   Addon Manager → ⚙ (Preferences) → Custom repositories → add
   `https://github.com/Marioskiv/freecad-wikitips`, branch `main` → WikiTips shows in the list,
@@ -30,8 +37,9 @@ Short, durable facts for the next Claude session. Details live in the other note
   cannot be used (no password support). Bump `package.xml` <version> on every release so the
   Addon Manager offers the update. Marios made the repo PUBLIC on 2026-10-17. Verified the same day
   in FreeCAD 26.3 (clean user folder): AddonInstaller with url + branch main downloads it into
-  Mod/WikiTips, and after a restart the WikiTips toolbar, Knurl and Wrap load.
-- **CAM tool library (2026-10-17):** Marios will buy YG-1 ALU-POWER carbide end mills (aluminium,
+  Mod/WikiTips, and after a restart the WikiTips toolbar loads (then with Knurl and Wrap; since 0.5.0
+  they come with the polar-cnc-converter addon).
+- **CAM tool library (2026-10-17; Marios asked 2026-10-20 for a SEPARATE repo for it, see pending.md):** Marios will buy YG-1 ALU-POWER carbide end mills (aluminium,
   heavy DIY machine, 1 and 2 flutes). Built from his catalog PDF (YG-1 "YE-AP25 EUROPE") and sent as
   a zip (not in this repo): 26 bits, E5E47 1F Ø2-12, E5E48 2F short Ø3-12, E5522 2F long Ø3-12,
   E5910 2F ball Ø6-12; Tools/Library/YG1_AluPower.fctl + Tools/Bit/*.fctb, loaded and checked in
@@ -49,25 +57,15 @@ Short, durable facts for the next Claude session. Details live in the other note
   A Fusion .tools file is a zip with tools.json (geometry DC/LCF/OAL/SFDM/NOF in the tool's unit,
   presets n / v_f / v_f_plunge); converting it to .fctb/.fctl is a few lines of Python.
   Clarkson: no catalog or library found; ask him for codes or a PDF.
-- **NEXT PHASE: CAM (Marios, 2026-10-17: "not now, in another phase"; do NOT start before he says).**
-  DECISION (2026-10-17): this will be a SEPARATE addon, not part of WikiTips ("I don't want
-  everything in one addon"). New repo/addon, its own notes; WikiTips stays help + error
-  explainer + Knurl + Wrap. Start it only after Marios confirms WikiTips works on his PC.
-  Do nothing more for CAM until then. Plan he described:
-  1. Try to bring his polar-coordinate converter (his separate repo `Marioskiv/polar-cnc-converter`)
-     into the FreeCAD CAM workflow (e.g. as a post-processing step or a WikiTips tool).
-  2. Make the CAM setup easy for polar work and for a 4th (rotary) axis.
-  3. Ideas already waiting for that phase: G-code for knurling on a 4th axis (same parameters as
-     the Knurl tool); helical grooves / wrapped engraving on a rotary axis.
-  Ask him first: does he already have the 4th axis, is it parallel to X, where is Z zero (axis
-  centre or part surface), which controller/post (linuxcnc today).
-  Keep the two repos separate: link or call the converter, don't copy its code here without asking.
+- **CAM phase: DONE elsewhere.** The CAM addon he planned on 2026-10-17 (separate addon, his polar
+  converter in FreeCAD CAM) was built in `polar-cnc-converter` (Polar CNC, 2.x, Oct 2026). Nothing of it
+  belongs here.
 - CAM animations: **more colour contrast** (he likes the v4 look, but the stock/tool/paths need
   stronger contrast). Ideas: darker stock edge + darker tool, stronger path colour, darker labels.
-- Repo: `Marioskiv/freecad-wikitips` (private). Created by Marios by hand on github.com because
-  Claude's GitHub app cannot create repositories (403). Attach it with `add_repo` (push access).
+- Repo: `Marioskiv/freecad-wikitips` (public since 2026-10-17). Created by Marios by hand on github.com
+  because Claude's GitHub app could not create repositories (403). Attach it with `add_repo` (push access).
 - Scope: ONLY the WikiTips FreeCAD addon. His other projects (e.g. polar-cnc-converter) are separate.
-- End of every session: update `docs/notes/` (session-log, status, findings) and this file.
+- End of every session: update `docs/notes/` (session-log, status, findings, pending) and this file.
 
 ## His setup
 - Windows laptop, FreeCAD **26.3.0RC1** in `C:\Program Files\FreeCAD 26.3`, Python 3.13, Qt6.
@@ -168,7 +166,7 @@ Short, durable facts for the next Claude session. Details live in the other note
   package.xml, data, content, Resources), then
   `FREECAD=<fc>/bin/freecad OUT=<dir> sh tests/run_freecad_tests.sh` → must print ALL PASS.
   The suite includes the error explainer test (tests/freecad_error_test.py, run name "errors").
-  Copy wikitips_errors.py, wikitips_knurl.py and wikitips_wrap.py too when installing (suite runs "knurl", "wrap").
+  Copy wikitips_errors.py too when installing (or symlink the whole repo as Mod/WikiTips).
 - Offline mock test: `QT_QPA_PLATFORM=offscreen <fc>/bin/python tests/run_popup_test.py tests/shim . <out>`
   (system PySide6 lacks libEGL; FreeCAD's own Python works).
 - GIF prototypes: real FreeCAD scene → `ActiveView.saveImage()` frames → ffmpeg palette GIF (~70 KB),

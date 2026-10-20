@@ -1,4 +1,4 @@
-# WikiTips — status (v0.2.1 on branch fix/real-freecad-groups, 2026-10-16)
+# WikiTips — status (first written for v0.2.1 on 2026-10-16; now v0.5.0, 2026-10-20; later changes also in session-log.md)
 
 ## What it does
 Hover a toolbar button → frameless popup (Qt ToolTip window) with: visible button label as title,
@@ -142,30 +142,11 @@ Text is English (wiki has no Greek translation).
 - Not verified: Marios's Windows machine; FreeCAD in Greek UI language (messages are matched in
   English; getStatusString seemed untranslated, to check).
 
-## Knurl tool (PR 14, 2026-10-17)
-- wikitips_knurl.py (geometry without GUI + command/panel/view provider when the GUI is up).
-  WikiTips_Knurl is added to the global WikiTips toolbar (also for existing installs).
-- Real teeth: direct_knurl (groove, then the teeth and the rest of the part written as one BREP
-  text, see _Brep; no sewing, no boolean) when the band is a clean ring, else the boolean.
-  Limits: MAX_FACES 60000 (direct), MAX_FACES_BOOLEAN 25000; bigger is refused with a Greek card.
-  Light kind: lines drawn by the view provider only; the solid is unchanged.
-- Teeth: 90° flanks with a flat top (5 faces a diamond tooth, 3 a straight ridge). Depth 0 = auto
-  = 75 % of the full height (0.5 x pitch x cos(angle)); any depth is held between 20 % and 100 %
-  of it (Marios's 0.8 on pitch 0.3 was impossible and took 10 minutes); also capped at half the radius.
-- Panel: Ok | Apply | Cancel. Apply computes and stays open, OK closes, Cancel restores all values.
-- Default pitch by diameter: ≤8 mm 0.6, ≤16 mm 0.8, ≤32 mm 1.0, else 1.2 (ideas from DIN 82 tables).
-- Verified in real FreeCAD 26.3 (tests/freecad_knurl_test.py): button, wrong selection card, panel,
-  preview, Apply/OK, depth limits, real teeth valid, Tip, Pocket after it, Part cylinder,
-  cross hole (boolean), pitch 0.3 / depth 0.8, save + reopen.
-- Not done: inner (bore) knurling, G-code for a 4th axis, a GIF for the button.
-
-## Drawing on a cylinder (PR 14, 2026-10-17)
-- wikitips_wrap.py, button WikiTips_Wrap. Uses the picked point (Selection PickedPoints) for the
-  tangent sketch (MapMode Deactivated, Placement set; in a Body: body.newObject). Construction frame
-  2πR wide x cylinder length. The Wrap feature (PartDesign::FeaturePython or Part::FeaturePython)
-  reads the sketch Placement on every recompute, so moving the sketch moves the drawing.
-- Only closed shapes count (Bullseye face maker: letters with holes work). Open lines are ignored.
-- Verified in real FreeCAD 26.3 (tests/freecad_wrap_test.py).
+## Knurl and "Σκαρίφημα σε κύλινδρο" — MOVED OUT (0.5.0, 2026-10-20)
+- Both tools (added in PR 14, 2026-10-17) left WikiTips at Marios's request: they are now "Knurling & Wrap"
+  in `Marioskiv/polar-cnc-converter` (`cad/`), with their tests and all their notes
+  (`docs/notes/knurlwrap.md` there: method, limits, what was verified). WikiTips 0.5.0 removed the modules,
+  icons, tests, help entries and error rules, and takes the two old buttons off its toolbar at start.
 
 ## Ideas / open (plan agreed 2026-10-16, see memory.md)
 - NEXT PHASE (on hold until Marios says): CAM with his polar converter + 4th axis (memory.md, Pending).
