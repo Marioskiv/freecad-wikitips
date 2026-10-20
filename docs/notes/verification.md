@@ -199,3 +199,11 @@ tooltip. Shortcuts written: D (Dimension), Shift+H, Shift+V — equal to FreeCAD
 geometric (PAT) hatch "Diamond" (moved there from the image hatch). Removed while checking (not sure enough): which
 of the three points is the vertex of a 3-point angle / the centre of a cosmetic arc, "3/4 circle" for threads seen
 end-on, "frames are hidden when printing".
+
+# Draft commands — Greek help (content/commands_el.json, 2026-10-20)
+
+81 entries: every Draft command of FreeCAD 26.3, including the commands inside the drop-down buttons (Arc, Arc
+3 points, Bézier, cubic Bézier, all arrays) that the first toolbar/menu audit had missed, and AutoGroup /
+UpdateShape2DView. Sources: FreeCAD 26.3 menu texts / tooltips (`getInfo()`) and the wiki text in
+`data/commands.json`. The shortcuts (two-letter ones like "L, I", and Shift+S) are added by script from what FreeCAD
+reports, not typed by hand. Check in real FreeCAD: all 54 visible Draft toolbar buttons resolve to Greek help.
