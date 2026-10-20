@@ -36,7 +36,9 @@ Made 2026-10-20 (he asked for a memory file and a pending file in every repo). N
 - **Question for him:** which cutters (flat/ball/V-bit) and materials (wood/alu/plastic) he uses, so the
   examples match his work.
 - **Tool libraries → their own repository** (his request 2026-10-20; 2026-10-20: "I will find the zips later,
-  leave it in pending"; he asked whether they should be an addon — answered: possible, see memory.md). Not WikiTips work any more; the facts
+  leave it in pending"; he asked whether they should be an addon — answered: possible (an addon with an "install libraries"
+  button that copies the files into CamAssets/Tools, asking before overwriting; updates through the Addon
+  Manager), or plain files imported with CAM → Toolbit Library Manager; his choice is open). Not WikiTips work any more; the facts
   are in memory.md ("CAM tool library"). Open: repo name, private or public; the zips (YG-1, IZAR, Stepcraft,
   Amana) are not in any repo and not in the cloud machine: he uploads them, or they are rebuilt from his
   catalogs; his spindle max RPM; Clarkson (no catalog found).
