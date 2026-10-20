@@ -1,5 +1,19 @@
 # Session log
 
+## 2026-10-20: Knurl and Wrap moved out, WikiTips = only help (0.5.0)
+- Marios reorganised his repositories: "everything polar in the polar converter repo, WikiTips separate,
+  it is another thing"; Knurl and "Σκαρίφημα σε κύλινδρο" go to the polar-cnc-converter repo as a separate
+  Part Design part ("Knurling & Wrap", MIT, with nothing of WikiTips inside). He asked for a memory file and a
+  pending file in every repo, and that from now on this chat is for WikiTips only.
+- Done here: removed wikitips_knurl.py, wikitips_wrap.py, their icons and tests, their help entries
+  (commands_el.json) and error rules/translations (errors_el.json), `tell()` (only they used it);
+  `_remove_old_tool_buttons()` takes WikiTips_Knurl / WikiTips_Wrap off the WikiTips toolbar of existing
+  installs. README, package.xml 0.5.0, CLAUDE.md (table of what lives where), memory.md (Pending section
+  split into durable facts + new pending.md).
+- Done there (polar-cnc-converter 2.23.0): the tools with their tests; a file made with WikiTips 0.4.1 opens
+  with no WikiTips installed (FreeCAD 26.3 blocks imports during restore unless the module is already loaded:
+  the old module names are loaded at start-up).
+
 ## 2026-10-17 (later): bigger popup picture on big screens
 - Marios: picture quality "needs more checking, fix it". Checked: the GIF files themselves are sharp
   (1248 x 750); the real popup in FreeCAD 26.3 drew them only 536 px wide on a 1920 px screen at

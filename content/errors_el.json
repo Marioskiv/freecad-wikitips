@@ -54,12 +54,7 @@
     "cannot add a constraint between two external geometries": "Δεν μπαίνει περιορισμός ανάμεσα σε δύο εξωτερικές γεωμετρίες.",
     "cannot add a tangency constraint at an unconnected point": "Δεν μπαίνει εφαπτομένη σε σημείο που δεν είναι ενωμένο.",
     "not allowed to edit the datum because the sketch contains conflicting constraints": "Δεν αλλάζει η τιμή, γιατί το σκαρίφημα έχει περιορισμούς που συγκρούονται.",
-    "early feature must not depend on later feature": "Μια παλιότερη λειτουργία δεν πρέπει να εξαρτάται από μεταγενέστερη.",
-    "wikitips knurl: no base solid": "Knurl: δεν υπάρχει στερεό από κάτω.",
-    "wikitips knurl: length and pitch must be greater than zero": "Knurl: το μήκος και το βήμα πρέπει να είναι πάνω από 0.",
-    "wikitips wrap: the sketch has no closed shapes": "Σχέδιο σε κύλινδρο: το σκαρίφημα δεν έχει κλειστά σχήματα.",
-    "wikitips wrap: no base solid or no sketch": "Σχέδιο σε κύλινδρο: λείπει το στερεό ή το σκαρίφημα.",
-    "wikitips knurl: too many teeth": "Knurl: πάρα πολλά δόντια για πραγματικό υπολογισμό."
+    "early feature must not depend on later feature": "Μια παλιότερη λειτουργία δεν πρέπει να εξαρτάται από μεταγενέστερη."
   },
   "glossary": {
     "wire": "περίγραμμα (σειρά ενωμένων γραμμών)",
@@ -115,36 +110,6 @@
     "stock": "ακατέργαστο υλικό"
   },
   "rules": [
-    {
-      "id": "wt_knurl_big",
-      "re": "wikitips knurl: too many teeth",
-      "t": "Το knurling είναι πολύ μεγάλο",
-      "d": "Τόσα πραγματικά δόντια θα βάραιναν πολύ τον υπολογιστή, γι' αυτό δεν υπολογίστηκαν.",
-      "fix": [
-        "Άνοιξε το Knurl (διπλό κλικ) και μεγάλωσε το βήμα ή μίκρυνε το μήκος.",
-        "Για να το βλέπεις μόνο, διάλεξε «Ελαφρύ»: γραμμές στην οθόνη, γρήγορο."
-      ]
-    },
-    {
-      "id": "wt_knurl",
-      "re": "wikitips knurl",
-      "t": "Το knurling δεν βγαίνει",
-      "d": "Μετά τις αποστάσεις από την αρχή και το τέλος δεν μένει μήκος, ή το βήμα είναι 0, ή ο κύλινδρος χάθηκε.",
-      "fix": [
-        "Άνοιξε το Knurl (διπλό κλικ) και μίκρυνε τις αποστάσεις «Από την αρχή» και «Από το τέλος».",
-        "Δες ότι ο κύλινδρος υπάρχει ακόμα πριν από το Knurl στο δέντρο."
-      ]
-    },
-    {
-      "id": "wt_wrap",
-      "re": "wikitips wrap",
-      "t": "Το σχέδιο στον κύλινδρο δεν βγαίνει",
-      "d": "Το σκαρίφημα δεν έχει κλειστά σχήματα. Οι διακεκομμένες γραμμές (το πλαίσιο) δεν μετράνε.",
-      "fix": [
-        "Άνοιξε το WrapSketch (διπλό κλικ) και σχεδίασε κλειστά σχήματα ή γράμματα μέσα στο πλαίσιο.",
-        "Ένωσε τα άκρα με {Sketcher_ConstrainCoincidentUnified}."
-      ]
-    },
     {
       "id": "open_wire",
       "re": "wire is not closed|could not create face from sketch|face from sketch failed|failed to obtain profile shape|no valid sketch or face|facemaker",
