@@ -25,8 +25,9 @@ Made 2026-10-20 (he asked for a memory file and a pending file in every repo). N
   | Reverse Engineering, Inspection, Materials, Test | 28 | 0 | 0 | 1 | 27 |
   FEM: its commands were not caught by the listing (to check). Proposed order (to confirm): Std →
   TechDraw → Draft → Assembly → Spreadsheet → Mesh/Surface/OpenSCAD/Points → BIM/Arch → the rest.
-  GIFs: 320 now, 51 MB, ~160 KB each; ~600 more would add ~100 MB to every download of the addon:
-  ask whether all, or GIFs only where a picture helps (Greek text for every command in any case).
+  GIFs: DECIDED 2026-10-20 (his answer "b"): Greek text for EVERY command; GIFs only where a moving
+  picture really helps (drawing tools, TechDraw…), not for simple ones (Save, Undo…). 320 GIFs now = 51 MB.
+  Still to confirm: the order above (he did not understand the question; asked again).
 - **Try 0.5.0 on his PC** (Knurl and Wrap removed; their buttons are taken off the WikiTips toolbar at start).
   For his old files with Knurl/Wrap he needs the polar-cnc-converter addon installed (Knurling & Wrap).
 - **Earlier priority (2026-10-17), still open:** GIFs and Greek error explanations must work correctly on his
@@ -34,7 +35,8 @@ Made 2026-10-20 (he asked for a memory file and a pending file in every repo). N
 - **CAM animations:** more colour contrast (darker stock edge and tool, stronger path colour, darker labels).
 - **Question for him:** which cutters (flat/ball/V-bit) and materials (wood/alu/plastic) he uses, so the
   examples match his work.
-- **Tool libraries → their own repository** (his request 2026-10-20). Not WikiTips work any more; the facts
+- **Tool libraries → their own repository** (his request 2026-10-20; 2026-10-20: "I will find the zips later,
+  leave it in pending"; he asked whether they should be an addon — answered: possible, see memory.md). Not WikiTips work any more; the facts
   are in memory.md ("CAM tool library"). Open: repo name, private or public; the zips (YG-1, IZAR, Stepcraft,
   Amana) are not in any repo and not in the cloud machine: he uploads them, or they are rebuilt from his
   catalogs; his spindle max RPM; Clarkson (no catalog found).
