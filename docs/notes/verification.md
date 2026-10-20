@@ -171,3 +171,21 @@ faces (draft before fillet); Thickness inward must be thinner than the body; "In
 not recommended by the wiki; Extent = (n−1)·Spacing; Polar 360° spreads evenly.
 Numbers in the animations: M5 clearance ≈ 5.5 mm (ISO 273 medium), M5 tap drill 4.2 mm (common
 practice, matches FreeCAD's value in the recording).
+
+# Std (common) commands — Greek help (content/commands_el.json, 2026-10-20)
+
+156 entries (all user-facing Std commands of FreeCAD 26.3; the 15 developer test commands of the Test menu
+— Std_MDITest*, Std_Test*, Std_ViewExample* — are left out on purpose). Sources for every sentence:
+1. the command's own texts in FreeCAD 26.3 (menu text, tooltip, shortcut via `Gui.Command.get(n).getInfo()`,
+   every workbench loaded);
+2. the FreeCAD wiki text in `data/commands.json` (wiki of 2026-10-16);
+3. for the commands with no wiki page of their own: `src/Gui/CommandView.cpp` (draw-style names and tooltips:
+   As Is, Points, Wireframe, Hidden Line, No Shading, Shaded, Flat Lines) and the wiki pages Std_DrawStyle,
+   Std_UserEditMode, Std_ViewDockUndockFullscreen.
+Every shortcut written in a text (F5, Ctrl+S, Ctrl+Z, Space, Esc, F11, 0–6, V F, V S) was compared with the
+shortcut FreeCAD 26.3 reports: all equal. Statements taken from the wiki: Std Cut works only for spreadsheet
+cells; Std ToggleTransparency switches between 0 % and 70 %; Std Show/ToggleObjects also show the hidden steps
+inside Bodies; Std DependencyGraph needs Graphviz; Std TextureMapping is temporary; Std RestartInSafeMode
+starts without addons and user settings; Std Group is only a folder (no placement), Std Part moves its content
+together. Removed while checking (not sure enough): "No shading shows the edges", "Mass Properties uses the
+material", what exactly the Cutting / Color edit modes do (written neutrally).
