@@ -207,3 +207,11 @@ end-on, "frames are hidden when printing".
 UpdateShape2DView. Sources: FreeCAD 26.3 menu texts / tooltips (`getInfo()`) and the wiki text in
 `data/commands.json`. The shortcuts (two-letter ones like "L, I", and Shift+S) are added by script from what FreeCAD
 reports, not typed by hand. Check in real FreeCAD: all 54 visible Draft toolbar buttons resolve to Greek help.
+
+## Property view (0.6.0, 2026-10-22)
+Source of every text: FreeCAD 26.3's own property documentation (`getDocumentationOfProperty`, the English
+tooltip of each row) and the options of each list (`getEnumerationsOfProperty`), read in real FreeCAD.
+Checked in real FreeCAD: defaults quoted in the texts (Sphere/Ellipsoid Angle1 -90°, Angle2 90°, Angle3 360°;
+Torus Angle1/2 -180°/180°; Circle 0°–360°; Angular Deflection 28.65°, its doc says 28.5 → text says "about
+28.6°"). Removed as unverified: "Threaded makes the diameter the tap drill", "Deviation sets the STL export
+accuracy" (its doc speaks of the 3D view only).

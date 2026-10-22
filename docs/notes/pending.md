@@ -4,6 +4,11 @@ Made 2026-10-20 (he asked for a memory file and a pending file in every repo). N
 `memory.md` when it is decided, delete it when it is done. Only WikiTips items here.
 
 ## Waiting for Marios
+- **Explanations for every setting** (his request 2026-10-22, order: Property view first, then Edit →
+  Preferences). DONE in 0.6.0: Property view for App, Part, Part Design, Sketcher (461 entries). NEXT, same
+  way: CAM (Python objects: Job, operations, Tool Controller; count them first), then Draft, TechDraw,
+  Assembly, Spreadsheet, Mesh/Surface/Points, BIM, FEM, rest (701 Data + 132 View names counted for the C++
+  objects). After that: Edit → Preferences (needs code: it is a modal dialog, not a task panel).
 - **Greek text (+ GIF where possible) for ALL FreeCAD commands** (his request 2026-10-20: "where the
   explanation is still in English, I want Greek for all; GIFs for all if possible, Greek text for sure").
   Audit in real FreeCAD 26.3 (every workbench activated, toolbars + menus, 870 command names):

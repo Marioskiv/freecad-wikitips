@@ -158,6 +158,7 @@ def action_name(action):
 
 
 _FIELDS = None
+_PROPS = None
 _COMMANDS_EL = None
 
 
@@ -243,6 +244,76 @@ def current_op():
 def field_entry(name):
     f = fields()
     return f.get(current_op() + ":" + name) or f.get(name)
+
+
+def properties():
+    """Greek help for the rows of the Property view, keyed by the property's name.
+
+    'Name' = Data tab, 'view:Name' = View tab; 'Module:Name' or 'Module::Type:Name' (e.g.
+    'PartDesign:Length', 'Part::Box:Length') overrides it for one kind of object.
+    """
+    global _PROPS
+    if _PROPS is None:
+        try:
+            with open(os.path.join(CONTENT_DIR, "properties_el.json"), encoding="utf-8") as f:
+                _PROPS = {k: v for k, v in json.load(f).items() if not k.startswith("_")}
+        except Exception as e:  # pragma: no cover
+            App.Console.PrintError("WikiTips: cannot read property help: %s\n" % e)
+            _PROPS = {}
+    return _PROPS
+
+
+def _selected_kinds():
+    """Most specific first: 'PartDesign::Pad', the Python class's module (e.g. 'Profile'), 'PartDesign'."""
+    try:
+        sel = Gui.Selection.getSelection()
+    except Exception:
+        return []
+    if not sel:
+        return []
+    obj = sel[0]
+    kinds = [obj.TypeId]
+    proxy = getattr(obj, "Proxy", None)
+    if proxy is not None:
+        kinds.append(type(proxy).__module__.rsplit(".", 1)[-1])
+    kinds.append(obj.TypeId.split("::")[0])
+    return kinds
+
+
+def property_entry(name, view=False):
+    p = properties()
+    pre = "view:" if view else ""
+    for kind in _selected_kinds():
+        e = p.get(pre + kind + ":" + name)
+        if e:
+            return e
+    return p.get(pre + name)
+
+
+def property_under_cursor():
+    """(key, property name, view tab?, screen rect of the row) under the mouse in the Property view.
+
+    The row's own tooltip says 'Type: …\nName: <property>' (FreeCAD 26.3), so the real property
+    name is known whatever the row shows. Nothing is kept: the widgets are only used here.
+    """
+    pos = QtGui.QCursor.pos()
+    w = QtWidgets.QApplication.widgetAt(pos)
+    tree = w.parentWidget() if w is not None else None
+    if tree is None or not tree.metaObject().className().startswith("Gui::PropertyEditor"):
+        return None, None, False, None
+    ix = tree.indexAt(w.mapFromGlobal(pos))
+    if not ix.isValid():
+        return None, None, False, None
+    ix0 = ix.sibling(ix.row(), 0)
+    tip = ix0.data(3) or ""
+    if "Name: " not in tip:
+        return None, None, False, None
+    name = tip.split("Name: ", 1)[1].split("\n", 1)[0].strip()
+    view = "View" in tree.objectName()
+    r = tree.visualRect(ix0).united(tree.visualRect(ix.sibling(ix.row(), 1)))
+    rect = QtCore.QRect(w.mapToGlobal(r.topLeft()), r.size())
+    key = "%s|%s|%d" % ("view" if view else "data", name, ix0.row())
+    return key, name, view, rect
 
 
 def command_name(action, button=None):
@@ -581,6 +652,13 @@ class ButtonFilter(QtCore.QObject):
 
     def _filter(self, obj, ev):
         t = ev.type()
+        if t == EV_TOOLTIP and obj.property("wikitips_props"):
+            # Property view: our Greek popup (FieldWatcher) replaces the English tooltip of rows
+            # that have help; other rows keep FreeCAD's tooltip
+            if not is_enabled():
+                return False
+            _key, prop, view, _rect = property_under_cursor()
+            return bool(prop and property_entry(prop, view))
         if t == EV_TOOLTIP:
             if not is_enabled():
                 return False
@@ -613,7 +691,7 @@ _SCAN_TIMER = None
 
 
 def _scan():
-    """Attach the filter to the buttons of the main window's toolbars.
+    """Attach the filter to the buttons of the main window's toolbars and to the Property view.
 
     Only toolbar buttons: they live as long as FreeCAD. Wrapping short-lived
     widgets (e.g. of task dialogs) in Python leaves stale PySide wrappers that
@@ -627,6 +705,13 @@ def _scan():
             if not btn.property("wikitips"):
                 btn.installEventFilter(_FILTER)
                 btn.setProperty("wikitips", True)
+    # the Property view's trees live as long as FreeCAD too (Combo view and Property view dock)
+    for tree in mw.findChildren(QtWidgets.QTreeView):
+        if tree.metaObject().className().startswith("Gui::PropertyEditor"):
+            vp = tree.viewport()
+            if not vp.property("wikitips_props"):
+                vp.installEventFilter(_FILTER)
+                vp.setProperty("wikitips_props", True)
 
 
 # --------------------------------------------------------------------------
@@ -712,7 +797,16 @@ class FieldWatcher(QtCore.QObject):
             pass
 
     def _tick(self):
-        if not is_enabled() or not Gui.Control.activeDialog():
+        if not is_enabled():
+            self._hide()
+            self.name = None
+            return
+        if QtWidgets.QApplication.mouseButtons() == _enum(Qt, "NoButton", "MouseButton"):
+            key, prop, view, rect = property_under_cursor()
+            if key is not None or (self.name or "").startswith("prop:"):
+                self._prop_tick(key, prop, view, rect)
+                return
+        if not Gui.Control.activeDialog():
             self._hide()
             self.name = None
             return
@@ -740,6 +834,32 @@ class FieldWatcher(QtCore.QObject):
         f.popup.deleteLater()
         f.popup = TipPopup()
         f.popup.show_for(None, name, entry, None, QtGui.QCursor.pos(), rect=rect)
+        self.shown = True
+
+    def _prop_tick(self, key, prop, view, rect):
+        """Same rhythm as the fields: rest REST_MS on a row, then the Greek help."""
+        key = "prop:" + key if key else None
+        if key != self.name:
+            self._hide()
+            self.name = key
+            self.since.restart()
+            return
+        if not key:
+            return
+        if self.shown:
+            QtWidgets.QToolTip.hideText()   # the row's English tooltip would cover our popup
+            return
+        if self.since.elapsed() < REST_MS:
+            return
+        entry = property_entry(prop, view)
+        if not entry:
+            return
+        f = self.owner
+        f.popup.dismiss()
+        f.popup.deleteLater()
+        f.popup = TipPopup()
+        f.popup.show_for(None, prop, entry, None, QtGui.QCursor.pos(), rect=rect)
+        QtWidgets.QToolTip.hideText()
         self.shown = True
 
     def _hide(self):
