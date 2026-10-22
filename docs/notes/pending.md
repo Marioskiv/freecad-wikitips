@@ -5,8 +5,8 @@ Made 2026-10-20 (he asked for a memory file and a pending file in every repo). N
 
 ## Waiting for Marios
 - **Explanations for every setting** (his request 2026-10-22, order: Property view first, then Edit →
-  Preferences). DONE in 0.6.0: Property view for App, Part, Part Design, Sketcher (461 entries). NEXT, same
-  way: CAM (Python objects: Job, operations, Tool Controller; count them first), then Draft, TechDraw,
+  Preferences). DONE: Property view for App, Part, Part Design, Sketcher (0.6.0) and CAM (0.7.0); 766 entries. NEXT,
+  same way: Draft, TechDraw,
   Assembly, Spreadsheet, Mesh/Surface/Points, BIM, FEM, rest (701 Data + 132 View names counted for the C++
   objects). After that: Edit → Preferences (needs code: it is a modal dialog, not a task panel).
 - **Greek text (+ GIF where possible) for ALL FreeCAD commands** (his request 2026-10-20: "where the

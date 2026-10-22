@@ -275,7 +275,14 @@ def _selected_kinds():
     kinds = [obj.TypeId]
     proxy = getattr(obj, "Proxy", None)
     if proxy is not None:
-        kinds.append(type(proxy).__module__.rsplit(".", 1)[-1])
+        mod = type(proxy).__module__
+        kinds.append(mod.rsplit(".", 1)[-1])
+        # CAM objects are Python objects: 'ToolBit:' for every cutter shape, 'CAM:' for everything of CAM
+        # (their names clash with Part's: Base, Direction, Length… mean other things there)
+        if mod.startswith("Path.Tool.toolbit"):
+            kinds.append("ToolBit")
+        if mod.startswith("Path."):
+            kinds.append("CAM")
     kinds.append(obj.TypeId.split("::")[0])
     return kinds
 

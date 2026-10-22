@@ -215,3 +215,6 @@ Checked in real FreeCAD: defaults quoted in the texts (Sphere/Ellipsoid Angle1 -
 Torus Angle1/2 -180°/180°; Circle 0°–360°; Angular Deflection 28.65°, its doc says 28.5 → text says "about
 28.6°"). Removed as unverified: "Threaded makes the diameter the tap drill", "Deviation sets the STL export
 accuracy" (its doc speaks of the 3D view only).
+CAM (0.7.0): same sources (property docs + list options read in real FreeCAD 26.3); where the property is the
+same as a task-panel field, the already verified text of fields_el.json was reused. Notes: FreeCAD's own docs
+of SetupSheet HorizRapid/VertRapid are swapped (horizontal says vertical); our texts follow the names.

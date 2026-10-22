@@ -50,12 +50,19 @@ Global toolbar "WikiTips" with an on/off command `WikiTips_Toggle`
 - FieldWatcher (same 150 ms poll, no dialog needed) shows the popup after REST_MS on a row. `_scan` puts the
   ButtonFilter on the two trees' viewports (they live as long as FreeCAD, like toolbar buttons): it swallows
   the English ToolTip only for rows that have Greek help (without that, Qt's tooltip came on top ~1 in 3).
-- Covered: every row shown for App, Part, Part Design and Sketcher objects (461 entries: 266 Data + 55 View
+- Covered: every row shown for App, Part, Part Design, Sketcher and CAM objects (0.6.0: 461 entries: 266 Data + 55 View
   names + overrides). Counted in real FreeCAD 26.3 by creating every C++ object type and reading the Property
   view (358 types): 701 Data + 132 View names in all workbenches; Python objects (CAM operations, Draft, BIM,
   FEM, Assembly joints) not counted yet.
+- 0.7.0 (2026-10-22): CAM added (305 entries, 766 in all). CAM objects are Python objects: counted by
+  creating in real FreeCAD the Job, Stock, Tool Controller, ToolBit, Setup Sheet, 21 operations and 11
+  dressups (276 Data + 24 View names). Their names clash with Part's (Base, Direction, Length, Tool,
+  Offset…), so `_selected_kinds` also gives 'CAM' (proxy module starts with 'Path.') and 'ToolBit' (module
+  'Path.Tool.toolbit…'); the Tool Controller's module ends in 'Controller'. Order of lookup: TypeId, proxy
+  module's last part (Profile, Pocket, LeadInOut…), ToolBit, CAM, TypeId module. Texts of fields_el.json
+  (task-panel help, already verified) reused where the property is the same field.
 - Test: tests/freecad_props_test.py (run name "properties" in run_freecad_tests.sh): Part box, sphere, Part
-  Design Pad and sketch; every row with help shows its popup, the right override wins, English tooltip
+  Design Pad and sketch, CAM Job, Stock, Profile, Tool Controller, ToolBit, LeadInOut dressup; every row with help shows its popup, the right override wins, English tooltip
   hidden, popup closes when leaving; every row of these 4 objects has Greek help.
 
 ## Greek help for commands (branch feature/sketcher-help, PR 4)
