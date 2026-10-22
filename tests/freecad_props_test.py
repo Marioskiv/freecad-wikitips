@@ -168,8 +168,29 @@ def run():
         hover_rows(wikitips, rect, False, {"Height": ["rectangle:Height"], "MakeFace": ["Draft:MakeFace"]})
         hover_rows(wikitips, arr, False, {"Base": ["array:Base"]})
         hover_rows(wikitips, dim, True, {})
-        # every row of these objects has Greek help (App, Part, Part Design, Sketcher, CAM, Draft are covered)
-        for obj in (box, sph, pad, sk, job, job.Stock, prof, tc, bit, lead, wire, rect, arr, dim):
+        # TechDraw: page, template, view of the box, dimension
+        Gui.activateWorkbench("TechDrawWorkbench")
+        pump(1000)
+        page = doc.addObject("TechDraw::DrawPage", "Page")
+        tmpl = doc.addObject("TechDraw::DrawSVGTemplate", "Template")
+        tmpl.Template = App.getResourceDir() + "Mod/TechDraw/Templates/ISO/A4_Landscape_blank.svg"
+        page.Template = tmpl
+        tdv = doc.addObject("TechDraw::DrawViewPart", "View")
+        page.addView(tdv)
+        tdv.Source = [box]
+        doc.recompute()
+        tdd = doc.addObject("TechDraw::DrawViewDimension", "Dimension")
+        tdd.Type = "DistanceX"
+        tdd.References2D = [(tdv, "Edge0")]
+        page.addView(tdd)
+        doc.recompute()
+        pump(800)
+        hover_rows(wikitips, tdv, False, {"Scale": ["TechDraw:Scale"], "X": ["TechDraw:X"]})
+        hover_rows(wikitips, page, False, {"Scale": ["TechDraw::DrawPage:Scale"]})
+        hover_rows(wikitips, tdd, True, {})
+        # every row of these objects has Greek help (App, Part, Part Design, Sketcher, CAM, Draft, TechDraw)
+        for obj in (box, sph, pad, sk, job, job.Stock, prof, tc, bit, lead, wire, rect, arr, dim,
+                    page, tmpl, tdv, tdd):
             for view in (False, True):
                 Gui.Selection.clearSelection()
                 Gui.Selection.addSelection(obj)

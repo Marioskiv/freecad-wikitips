@@ -2,7 +2,7 @@
 <package format="1" xmlns="https://wiki.freecad.org/Package_Metadata">
   <name>WikiTips</name>
   <description>Shows a picture and a short explanation from the FreeCAD wiki when hovering a toolbar button, and explains error messages in Greek. (Knurl and Wrap moved to the polar-cnc-converter addon in 0.5.0.)</description>
-  <version>0.8.0</version>
+  <version>0.9.0</version>
   <date>2026-10-20</date>
   <maintainer email="">Marios</maintainer>
   <license file="LICENSE">LGPL-2.1-or-later</license>

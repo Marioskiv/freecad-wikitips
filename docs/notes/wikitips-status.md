@@ -66,8 +66,12 @@ Global toolbar "WikiTips" with an on/off command `WikiTips_Toggle`
   kinds with Draft.make_* in real FreeCAD (117 Data + 58 View names). Kind 'Draft' (module starts with
   'draftobjects.') + the module's last part (e.g. 'wire:Length', 'array:Base'). RestoreView / RestoreState of
   the working-plane proxy have no doc: meaning read in WorkingPlane.py (camera / visibility of objects).
+- 0.9.0 (2026-10-22): TechDraw added (226 entries, 1144 in all). C++ objects (already counted: 45 types,
+  166 Data + 76 View names). Shared names (X, Y, Scale, Source, Rotation, Width/Height…) get 'TechDraw:'
+  entries (the TypeId module is the last kind); the page's Scale has its own 'TechDraw::DrawPage:Scale'.
+  List options checked in real FreeCAD (CutSurfaceDisplay, ProjectionStrategy, BreakLineType, MeasureType…).
 - Test: tests/freecad_props_test.py (run name "properties" in run_freecad_tests.sh): Part box, sphere, Part
-  Design Pad and sketch, Draft wire, rectangle, ortho array, dimension, CAM Job, Stock, Profile, Tool Controller, ToolBit, LeadInOut dressup; every row with help shows its popup, the right override wins, English tooltip
+  Design Pad and sketch, TechDraw page, template, view, dimension, Draft wire, rectangle, ortho array, dimension, CAM Job, Stock, Profile, Tool Controller, ToolBit, LeadInOut dressup; every row with help shows its popup, the right override wins, English tooltip
   hidden, popup closes when leaving; every row of these 4 objects has Greek help.
 
 ## Greek help for commands (branch feature/sketcher-help, PR 4)
