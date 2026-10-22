@@ -26,6 +26,15 @@ def main():
             if len(e.get("d", "")) > 160:
                 bad.append("%s %s: 'd' longer than 160 characters (keep it short)" % (fname, key))
     import re
+    props = json.load(open(os.path.join(ROOT, "content", "properties_el.json"), encoding="utf-8"))
+    for key, e in props.items():
+        if key.startswith("_"):
+            continue
+        for k in ("t", "d"):
+            if not e.get(k):
+                bad.append("properties_el.json %s: no '%s'" % (key, k))
+        if len(re.sub("<[^>]+>", "", e.get("d", ""))) > 160:
+            bad.append("properties_el.json %s: 'd' longer than 160 characters (keep it short)" % key)
     for r in json.load(open(os.path.join(ROOT, "content", "errors_el.json"), encoding="utf-8"))["rules"]:
         for k in ("id", "t", "d", "fix"):
             if not r.get(k):

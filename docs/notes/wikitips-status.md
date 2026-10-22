@@ -38,6 +38,26 @@ Global toolbar "WikiTips" with an on/off command `WikiTips_Toggle`
 - Covered: CAM Profile, Pocket Shape, MillFacing, Adaptive, Drilling (+ Helix/Engrave fields).
   3D Surface/Waterline commands do not exist in this build (need experimental/OCL) — not done.
 
+## Help in the Property view (0.6.0, 2026-10-22)
+- Marios 2026-10-22: explain every setting; order he chose: first the Property view (Data/View tabs), then
+  Edit → Preferences.
+- `content/properties_el.json`: key = the property's real name ('Length'), 'view:Name' for the View tab,
+  'Module::Type:Name' (e.g. 'PartDesign::Pad:Length') or 'Module:Name' overrides for one kind of selected
+  object. t / d (≤ 160 visible characters, checked by check_content.py) / w.
+- How the row is known: the Property view's model gives every row the tooltip 'Type: …\nName: <property>'
+  (FreeCAD 26.3), so `property_under_cursor()` reads the real name whatever the row shows. Trees =
+  QTreeView with class 'Gui::PropertyEditor::PropertyEditor', objectName propertyEditorData / propertyEditorView.
+- FieldWatcher (same 150 ms poll, no dialog needed) shows the popup after REST_MS on a row. `_scan` puts the
+  ButtonFilter on the two trees' viewports (they live as long as FreeCAD, like toolbar buttons): it swallows
+  the English ToolTip only for rows that have Greek help (without that, Qt's tooltip came on top ~1 in 3).
+- Covered: every row shown for App, Part, Part Design and Sketcher objects (461 entries: 266 Data + 55 View
+  names + overrides). Counted in real FreeCAD 26.3 by creating every C++ object type and reading the Property
+  view (358 types): 701 Data + 132 View names in all workbenches; Python objects (CAM operations, Draft, BIM,
+  FEM, Assembly joints) not counted yet.
+- Test: tests/freecad_props_test.py (run name "properties" in run_freecad_tests.sh): Part box, sphere, Part
+  Design Pad and sketch; every row with help shows its popup, the right override wins, English tooltip
+  hidden, popup closes when leaving; every row of these 4 objects has Greek help.
+
 ## Greek help for commands (branch feature/sketcher-help, PR 4)
 - `content/commands_el.json`: hand-written Greek help for 17 Sketcher commands, overriding the
   English wiki text (menu path kept). Sections: d (what), sel/selw (how to select), uses (where
