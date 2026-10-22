@@ -67,6 +67,12 @@ Short, durable facts for the next Claude session. Details live in the other note
 - Scope: ONLY the WikiTips FreeCAD addon. His other projects (e.g. polar-cnc-converter) are separate.
 - End of every session: update `docs/notes/` (session-log, status, findings, pending) and this file.
 
+## Popup size (2026-10-22)
+- Marios: "make the GIF windows a bit smaller, but keep the high resolution". 0.9.1: popup width = 30 % of the
+  screen, 380–640 px (was 40 %, 440–820). Checked in real FreeCAD at 1920×1080: 768 → 576 px; at 125 %
+  (QT_SCALE_FACTOR=1.25) the popup is 460 logical / 575 device px and the GIF stays sharp (our GIFs are
+  1248 px wide and are only scaled down, to the screen's real pixels).
+
 ## His setup
 - Windows laptop, FreeCAD **26.3.0RC1** in `C:\Program Files\FreeCAD 26.3`, Python 3.13, Qt6.
   User Mod folder (to confirm with `print(App.getUserAppDataDir() + "Mod")`):

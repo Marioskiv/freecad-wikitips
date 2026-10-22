@@ -53,8 +53,9 @@ SMOOTH = _enum(Qt, "SmoothTransformation", "TransformationMode")
 KEEP_AR = _enum(Qt, "KeepAspectRatio", "AspectRatioMode")
 ALIGN_CENTER = _enum(Qt, "AlignCenter", "AlignmentFlag")
 
-POPUP_WIDTH = 440        # the smallest popup; on bigger screens it grows with the screen width
-POPUP_WIDTH_MAX = 820    # (40 % of it) up to this, so our 1248 px GIFs show their detail
+POPUP_WIDTH = 380        # the smallest popup; on bigger screens it grows with the screen width
+POPUP_WIDTH_MAX = 640    # (30 % of it) up to this; our 1248 px GIFs are only scaled DOWN, so they stay sharp
+POPUP_SCREEN_SHARE = 0.3 # Marios 2026-10-22: "a bit smaller, but keep the high resolution" (was 40 %, 440-820)
 
 
 def params():
@@ -573,7 +574,7 @@ class TipPopup(QtWidgets.QFrame):
         big = 1.0
         if self._hidpi and w > 416:               # ours: 2x or 3x of 416 x 250, may be shown bigger
             h, w = h * 416.0 / w, 416.0
-            big = (POPUP_WIDTH_MAX - 24) / 416.0  # shown up to 796 px wide: still sharp from 1248 px
+            big = (POPUP_WIDTH_MAX - 24) / 416.0  # shown up to 616 px wide: still sharp from 1248 px
         k = min(big, (self._pw - 24) / w, self._max_image_h / h)
         size = QtCore.QSize(int(round(w * k * dpr)), int(round(h * k * dpr)))
         if size != pm.size():
@@ -601,7 +602,7 @@ class TipPopup(QtWidgets.QFrame):
         # the popup and its picture grow with the screen (a 536 px picture hides the detail of our
         # GIFs on a 100 % 1920 px screen); if it does not fit, first drop the examples and the tip,
         # then make the picture lower until it fits
-        self._pw = max(POPUP_WIDTH, min(POPUP_WIDTH_MAX, int(geo.width() * 0.4)))
+        self._pw = max(POPUP_WIDTH, min(POPUP_WIDTH_MAX, int(geo.width() * POPUP_SCREEN_SHARE)))
         self.setFixedWidth(self._pw)
         self._max_image_h = int((self._pw - 24) * 0.6)
         self.fill(key, entry, action)
