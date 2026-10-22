@@ -61,8 +61,13 @@ Global toolbar "WikiTips" with an on/off command `WikiTips_Toggle`
   'Path.Tool.toolbit…'); the Tool Controller's module ends in 'Controller'. Order of lookup: TypeId, proxy
   module's last part (Profile, Pocket, LeadInOut…), ToolBit, CAM, TypeId module. Texts of fields_el.json
   (task-panel help, already verified) reused where the property is the same field.
+- 0.8.0 (2026-10-22): Draft added (152 entries, 918 in all). Draft objects are Python objects (module
+  'draftobjects.<kind>': wire, rectangle, circle, array, patharray, dimension, label…): counted by making 26
+  kinds with Draft.make_* in real FreeCAD (117 Data + 58 View names). Kind 'Draft' (module starts with
+  'draftobjects.') + the module's last part (e.g. 'wire:Length', 'array:Base'). RestoreView / RestoreState of
+  the working-plane proxy have no doc: meaning read in WorkingPlane.py (camera / visibility of objects).
 - Test: tests/freecad_props_test.py (run name "properties" in run_freecad_tests.sh): Part box, sphere, Part
-  Design Pad and sketch, CAM Job, Stock, Profile, Tool Controller, ToolBit, LeadInOut dressup; every row with help shows its popup, the right override wins, English tooltip
+  Design Pad and sketch, Draft wire, rectangle, ortho array, dimension, CAM Job, Stock, Profile, Tool Controller, ToolBit, LeadInOut dressup; every row with help shows its popup, the right override wins, English tooltip
   hidden, popup closes when leaving; every row of these 4 objects has Greek help.
 
 ## Greek help for commands (branch feature/sketcher-help, PR 4)

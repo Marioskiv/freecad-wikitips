@@ -154,8 +154,22 @@ def run():
         hover_rows(wikitips, tc, False, {"Tool": ["Controller:Tool"]})
         hover_rows(wikitips, bit, False, {"Length": ["ToolBit:Length"], "Diameter": ["ToolBit:Diameter"]})
         hover_rows(wikitips, lead, False, {"Base": ["CAM:Base"]})
-        # every row of these objects has Greek help (App, Part, Part Design, Sketcher, CAM are covered)
-        for obj in (box, sph, pad, sk, job, job.Stock, prof, tc, bit, lead):
+        # Draft: Python objects too (Length, Base, Closed… mean other things than in Part)
+        Gui.activateWorkbench("DraftWorkbench")
+        pump(1000)
+        import Draft
+        wire = Draft.make_wire([App.Vector(0, 0, 0), App.Vector(10, 0, 0), App.Vector(10, 10, 0)])
+        rect = Draft.make_rectangle(10, 5)
+        arr = Draft.make_ortho_array(sph, App.Vector(20, 0, 0), App.Vector(0, 20, 0), App.Vector(0, 0, 20), 2, 2, 1)
+        dim = Draft.make_linear_dimension(App.Vector(0, 0, 0), App.Vector(10, 0, 0), App.Vector(5, 5, 0))
+        doc.recompute()
+        pump(500)
+        hover_rows(wikitips, wire, False, {"Length": ["wire:Length"], "Closed": ["Draft:Closed"]})
+        hover_rows(wikitips, rect, False, {"Height": ["rectangle:Height"], "MakeFace": ["Draft:MakeFace"]})
+        hover_rows(wikitips, arr, False, {"Base": ["array:Base"]})
+        hover_rows(wikitips, dim, True, {})
+        # every row of these objects has Greek help (App, Part, Part Design, Sketcher, CAM, Draft are covered)
+        for obj in (box, sph, pad, sk, job, job.Stock, prof, tc, bit, lead, wire, rect, arr, dim):
             for view in (False, True):
                 Gui.Selection.clearSelection()
                 Gui.Selection.addSelection(obj)

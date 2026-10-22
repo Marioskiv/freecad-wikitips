@@ -283,6 +283,8 @@ def _selected_kinds():
             kinds.append("ToolBit")
         if mod.startswith("Path."):
             kinds.append("CAM")
+        if mod.startswith("draftobjects."):
+            kinds.append("Draft")
     kinds.append(obj.TypeId.split("::")[0])
     return kinds
 
